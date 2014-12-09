@@ -1,0 +1,13 @@
+DEFINE_CONFIG { name = physics4 }
+
+ADD_CONFIG{
+  name      = pmt_fem_mod
+  config_id = 6
+  mask      = 0x3ff
+}
+
+ADD_CONFIG{
+  name      = tpc_fem_mod
+  config_id = 0
+  mask      = 0x3ff
+}

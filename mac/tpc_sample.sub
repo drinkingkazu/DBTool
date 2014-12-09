@@ -1,0 +1,54 @@
+DEFINE_CONFIG
+{
+  name = tpc_config
+  id   = 11
+}
+
+ADD_CONFIG
+{
+  crate    = -999
+  slot     = -1
+  channel  = -1
+  mask     = 0x1fffd
+
+  PARAMETERS
+  {
+    type= "TPC" 
+    port= 38300
+    recipe=Calibration
+    trigger_source = INT
+    fragment_id=1 
+    nu_stream_source=dma
+    nu_stream_sink=assembler
+    sn_stream_source=NONE
+    sn_stream_sink=NONE
+    dma_buffer_size= 12700
+    circular_buffer_size=2e9
+    shmKey=38300
+  }
+}
+
+
+ADD_CONFIG
+{
+  crate    = -1
+  slot     = -999
+  channel  = -1
+  mask     = 0x0
+
+  PARAMETERS
+  {}
+}
+
+ADD_CONFIG
+{
+  crate    = -1
+  slot     = -1
+  channel  = -999
+  mask     = 0x0
+
+  PARAMETERS
+  {}
+}
+
+

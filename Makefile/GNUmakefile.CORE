@@ -1,0 +1,64 @@
+###################################################
+
+# default target list
+
+all: pre_build main_build 
+
+pre_build:
+
+LOCAL_ROOTMAP=lib/$(SHLIB:.so=.rootmap)
+
+main_build: .depend $(DICT).cxx lib/$(SHLIB) $(LOCAL_ROOTMAP)  
+
+# root class dictionary
+$(DICT).cxx: $(HEADERS) LinkDef.h
+	@echo '<< generating CINT >>'
+	@rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
+	
+# default rule for making .o files from .cxx files
+%.o: %.cxx
+	@echo '<< compiling' $< '>>'
+	@$(CXX) $(CXXFLAGS) $(INCFLAGS) -c $<
+
+# rule for making shareable library
+lib/$(SHLIB): $(OBJECTS) $(DICT).o
+	@echo '<< generating $(SHLIB) >>'
+	@mkdir -p lib
+	@$(SOMAKER) $(SOFLAGS) -o lib/$(SHLIB) $(filter-out $(DICT).o, $(OBJECTS)) $(DICT).o
+
+# if ROOTMAP defined, define rule for making it
+$(LOCAL_ROOTMAP): lib/$(SHLIB)
+	@echo "<< generating rootmap >>"
+	@cd lib && ./gen_rootmap.sh
+
+###################################################
+
+# "make clean" target
+clean: pre_clean
+	@echo '<< cleaning all >>'
+	@rm -f $(DICT).* *.o lib*.so *~ .depend ./lib/*.o lib/lib*.so lib/lib*.rootmap $(DBTOOL_LIBDIR)/$(SHLIB) $(DBTOOL_LIBDIR)/$(SHLIB:.so=.rootmap)
+
+pre_clean: 
+
+###################################################
+libclean:
+	@echo '<< clearning lib directory >>'
+	@rm -f $(DBTOOL_LIBDIR)/$(SHLIB) 
+	@rm -f lib/$(SHLIB) 
+
+###################################################
+clearCINT:
+	@echo '<< removing CINT >>'
+	@rm -f $(DICT).*
+
+
+###################################################
+# auto-generate dependencies using g++ -M
+.depend: $(SOURCES) $(HEADERS)
+	@#rm .depend
+	@echo '<< checking dependencies >>'
+	@$(CXX) -M $(CXXFLAGS) $(INCFLAGS) $(SOURCES) > .depend
+
+-include .depend
+
+#ALWAYS:
