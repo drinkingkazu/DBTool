@@ -1,7 +1,7 @@
 DEFINE_CONFIG
 {
   name = pmt_config
-  id   = 18
+  id   = 0
   mask = 0x0
 }
 
