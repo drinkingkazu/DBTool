@@ -64,7 +64,7 @@ CREATE TABLE  ConfigLookUp  (
   PRIMARY KEY ( SubConfigType )
 ); -- 'Calibration Hardware parameters';
 
-
+DROP TYPE IF EXISTS UnitConfig CASCADE;
 CREATE TYPE UnitConfig AS ( Crate INT, Slot INT, Channel INT, Params HSTORE );
 
 DROP TYPE IF EXISTS subconfigreturntype CASCADE; 
