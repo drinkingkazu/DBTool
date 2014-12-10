@@ -40,6 +40,12 @@ namespace ubpsql {
 
     const std::string& Name() const { return _name; }
 
+    void clear(std::string new_name="") { 
+      if(!new_name.empty()) _name = new_name;
+      _leaf.clear();
+      _node.clear();
+    }
+
     inline bool operator< (const FPSet& rhs) const
     { return _name < rhs.Name(); }
     
@@ -66,6 +72,8 @@ namespace ubpsql {
     
     /// Default destructor
     virtual ~FhiclMaker(){}
+
+    void set(const RunConfig& cfg);
 
   protected:
 

@@ -70,6 +70,10 @@ namespace ubpsql{
   FhiclMaker::FhiclMaker() : _pset("fhicl")
   {}
 
+  void FhiclMaker::set(const RunConfig& cfg)
+  {
+    _pset.clear(cfg.Name());
+  }
 }
 
 #endif
