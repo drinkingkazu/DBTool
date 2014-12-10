@@ -89,7 +89,7 @@ class MainCIP(UBPyBase):
             self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
             raise ParseIException
 
-        res = ubpsql.ConfigData(cfg_name,cfg_id,cfg_mask)
+        res = ubpsql.SubConfig(cfg_name,cfg_id,cfg_mask)
 
         return (content.replace(content[cfg_loc:cfg_end+1],''),res)
             

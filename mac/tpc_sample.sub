@@ -29,26 +29,5 @@ ADD_CONFIG
 }
 
 
-ADD_CONFIG
-{
-  crate    = -1
-  slot     = -999
-  channel  = -1
-  mask     = 0x0
-
-  PARAMETERS
-  {}
-}
-
-ADD_CONFIG
-{
-  crate    = -1
-  slot     = -1
-  channel  = -999
-  mask     = 0x0
-
-  PARAMETERS
-  {}
-}
 
 

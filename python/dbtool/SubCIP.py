@@ -22,7 +22,7 @@ class SubCIP(UBPyBase):
         (content,cfg_id) = self._parse_id_(content)
 
         for x in self._parse_params_(content):
-            cfg_id.insert(x)
+            cfg_id.append(x[0],x[1])
 
         return cfg_id
 
@@ -138,10 +138,10 @@ class SubCIP(UBPyBase):
         for c in crate:
             for s in slot:
                 for i in ch:
-                    res.append(ubpsql.ConfigParams(c,s,i,mask))
+                    res.append([ubpsql.CParamsKey(c,s,i),ubpsql.CParams(mask)])
 
                     for x in params.keys():
-                        res[-1].append(x,params[x])
+                        res[-1][-1].append(x,params[x])
 
         return (content.replace(content[cfg_loc:cfg_end+1],''),res)
             
@@ -216,7 +216,7 @@ class SubCIP(UBPyBase):
             raise ParseIException
 
         return ( content.replace(content[cfg_loc:cfg_end+1],''), 
-                 ubpsql.ConfigData(cfg_name, cfg_id, cfg_mask) )
+                 ubpsql.SubConfig(cfg_name, cfg_id, cfg_mask) )
 
 if __name__ == '__main__':
 
