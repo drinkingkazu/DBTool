@@ -53,6 +53,10 @@ namespace ubpsql {
 
     void ls() const;
 
+    void append(const CParamsKey& key,
+		const CParams& value)
+    { (*this)[key]=value; }
+
     inline bool operator== (const SubConfig& rhs) const
     { return ( fName == rhs.Name() && fConfigID == rhs.ConfigID() ); }
 

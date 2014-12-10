@@ -54,7 +54,7 @@ namespace ubpsql {
       << "  ... with following configurations." << std::endl;
     
     for(auto const& key_params : *this) {
-      auto const& key    = key_params.first;
+      //auto const& key    = key_params.first;
       auto const& params = key_params.second;
       params.ls();
     }
