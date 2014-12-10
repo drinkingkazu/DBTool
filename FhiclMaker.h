@@ -32,13 +32,12 @@ namespace ubpsql {
     void append(const std::string& key, 
 		const std::string& param);
 
-    void append(const std::string& key,
-		const FPSet& pset);
+    void append(const FPSet& pset);
 
     void append(const std::string& key,
 		const std::map<std::string,std::string>& pset);
 
-    const std::string& Name() const { return _name; }
+    const std::string& name() const { return _name; }
 
     void clear(std::string new_name="") { 
       if(!new_name.empty()) _name = new_name;
@@ -46,8 +45,13 @@ namespace ubpsql {
       _node.clear();
     }
 
+    void dump(std::string& content,size_t level=0) const;
+
     inline bool operator< (const FPSet& rhs) const
-    { return _name < rhs.Name(); }
+    { return _name < rhs.name(); }
+
+    std::string dump() const
+    { std::string res; dump(res); return res;}
     
   protected:
 
@@ -63,7 +67,7 @@ namespace ubpsql {
      User defined class FhiclMaker ... these comments are used to generate
      doxygen documentation!
   */
-  class FhiclMaker{
+  class FhiclMaker : public DBBase{
     
   public:
     
@@ -75,6 +79,23 @@ namespace ubpsql {
 
     void set(const RunConfig& cfg);
 
+    const FPSet& pset() const { return _pset; }
+
+  protected:
+
+    FPSet& CratePSet( const std::string& crate_name );
+
+    FPSet& SlotPSet ( const std::string& crate_name,
+		      const std::string& slot_name );
+
+    FPSet& ChannelPSet ( const std::string& crate_name,
+			 const std::string& slot_name,
+			 const std::string& channel_name);
+
+    FPSet& PSet( const std::string& crate_name,
+		 std::string slot_name="",
+		 std::string channel_name="" );
+    
   protected:
 
     FPSet _pset;

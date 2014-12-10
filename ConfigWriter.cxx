@@ -80,6 +80,7 @@ namespace ubpsql {
     cmd += "'";
     ctr = slot_default.size() - 1;
     for(auto const& param : slot_default) {
+      value = param.second;
       value = value.ReplaceAll("\"","\\\"");
       if( ctr ) cmd += Form(" \"%s\"=>\"%s\",", param.first.c_str(), value.Data());
       else cmd += Form(" \"%s\"=>\"%s\"", param.first.c_str(), value.Data());
@@ -90,6 +91,7 @@ namespace ubpsql {
     cmd += "'";
     ctr = channel_default.size() - 1;
     for(auto const& param : channel_default) {
+      value = param.second;
       value = value.ReplaceAll("\"","\\\"");
       if( ctr ) cmd += Form(" \"%s\"=>\"%s\",", param.first.c_str(), value.Data());
       else cmd += Form(" \"%s\"=>\"%s\"", param.first.c_str(), value.Data());

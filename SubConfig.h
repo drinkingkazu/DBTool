@@ -18,6 +18,7 @@
 #include <set>
 
 namespace ubpsql {
+
   /**
      \class SubConfig
   */
