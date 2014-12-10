@@ -20,9 +20,12 @@
 namespace ubpsql{
 
   // Basic classes
-  class DBException;     // Exception base
-  class InvalidUser;     // Exception implementation for invalid user
-  class ConnectionError; // Exception implementation for connection error
+  class DBException;    
+  class InvalidUser;    
+  class ConnectionError;
+  class TableDataError; 
+  class ConfigError;
+  class FhiclError;
   class DBBase;
   class DBAppBase;
 
@@ -39,6 +42,7 @@ namespace ubpsql{
   class SubConfig;
   class RunConfig;
   class FhiclMaker;
+  class FPSet;
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif
