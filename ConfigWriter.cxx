@@ -51,14 +51,14 @@ namespace ubpsql {
     return true;
   }
 
-  bool ConfigWriter::InsertSubConfiguration(const ConfigData& cfg)
+  bool ConfigWriter::InsertSubConfiguration(const SubConfig& cfg)
   {
     auto const& config_id   = cfg.ConfigID();
     auto const& config_name = cfg.Name();
 
-    auto const& crate_default   = cfg.CrateDefault();
-    auto const& slot_default    = cfg.SlotDefault();
-    auto const& channel_default = cfg.ChannelDefault();
+    auto const& crate_default   = cfg.GetParams(-999,-1,-1);
+    auto const& slot_default    = cfg.GetParams(-1,-999,-1);
+    auto const& channel_default = cfg.GetParams(-1,-1,-999);
 
     if(!Connect()) throw ConnectionError();
     std::string cmd(Form("SELECT InsertSubConfiguration('%s'::TEXT,%d::INT,",config_name.c_str(),config_id));
@@ -124,30 +124,32 @@ namespace ubpsql {
     return true;
   }
 
-  bool ConfigWriter::FillSubConfiguration(const ConfigData &data)
+  bool ConfigWriter::FillSubConfiguration(const SubConfig &data)
   {
     if(!Connect()) throw ConnectionError();
     auto const& cfg_name = data.Name();
     auto const  cfg_id   = data.ConfigID();
-    for(auto const& params : data) {
-      if(params.IsDefaultCrate()   ||
-	 params.IsDefaultChannel() ||
-	 params.IsDefaultSlot()) continue;
+    for(auto const& key_params : data) {
+      auto const& key    = key_params.first;
+      auto const& params = key_params.second;
+      if(key.IsDefaultCrate()   ||
+	 key.IsDefaultChannel() ||
+	 key.IsDefaultSlot()) continue;
 
       Print(msg::kDEBUG,__FUNCTION__,
 	    Form("Filling SubConfig \"%s\" (ID=%d) ... Crate=%d Slot=%d Ch=%d",
 		 cfg_name.c_str(),
 		 cfg_id,
-		 params.Crate(),
-		 params.Slot(),
-		 params.Channel()));
+		 key.Crate(),
+		 key.Slot(),
+		 key.Channel()));
 
       std::string cmd(Form("SELECT FillSubConfiguration('%s'::TEXT, %d::INT, %d::INT, %d::INT, %d::INT,",
 			   cfg_name.c_str(),
 			   cfg_id,
-			   params.Crate(),
-			   params.Slot(),
-			   params.Channel())
+			   key.Crate(),
+			   key.Slot(),
+			   key.Channel())
 		      );
 
       cmd += "'";
@@ -165,10 +167,8 @@ namespace ubpsql {
 	}
 	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), value.c_str());
       }
-      if(params.Name().empty())
+      if(params.find("name")==params.end())
 	cmd += " \"name\"=>\"\"";
-      else
-	cmd += Form(" \"name\"=>\"%s\"",params.Name().c_str());
 
       cmd += " '::HSTORE); ";
       
@@ -180,19 +180,21 @@ namespace ubpsql {
     return true;
   }
 
-  bool ConfigWriter::CheckNewSubConfiguration(const ConfigData &data)
+  bool ConfigWriter::CheckNewSubConfiguration(const SubConfig &data)
   {
     if(!Connect()) return false;
     bool good = true;
     auto const& cfg_name = data.Name();
     auto const  cfg_id   = data.ConfigID();
-    for(auto const& params : data) {
+    for(auto const& key_params : data) {
+      auto const& key    = key_params.first;
+      auto const& params = key_params.second;
       std::string cmd(Form("SELECT CheckNewSubConfiguration('%s'::TEXT, %d::INT, %d::INT, %d::INT, %d::INT",
 			   cfg_name.c_str(),
 			   cfg_id,
-			   params.Crate(),
-			   params.Slot(),
-			   params.Channel()
+			   key.Crate(),
+			   key.Slot(),
+			   key.Channel()
 			   )
 		      );
       cmd += "'";
@@ -200,7 +202,8 @@ namespace ubpsql {
       for(auto const& key_value : params)
 	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), key_value.second.c_str());
 
-      cmd += Form(" \"name\"=>\"%s\"",params.Name().c_str());
+      if(params.find("name")==params.end())
+	cmd += Form(" \"name\"=>\"\"");
 
       cmd += " '::HSTORE); ";
       

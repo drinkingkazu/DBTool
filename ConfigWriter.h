@@ -50,13 +50,13 @@ namespace ubpsql {
     bool InsertNewSubRun(unsigned int config_id, unsigned int run);
 
     /// Method to insert a new configuration ID with default parameters sets
-    bool InsertSubConfiguration(const ConfigData& cfg);
+    bool InsertSubConfiguration(const SubConfig& cfg);
 
     /// Method to check if a candidate configuration is valid
-    bool CheckNewSubConfiguration(const ConfigData &data);
+    bool CheckNewSubConfiguration(const SubConfig &data);
 
     /// Method to fill sub-config parameters to a configuration set
-    bool FillSubConfiguration(const ConfigData &data);
+    bool FillSubConfiguration(const SubConfig &data);
 
     /// Method to create a run configuration. Return value >= 0 represents a new main-config ID
     int InsertMainConfiguration(const RunConfig& cfg);

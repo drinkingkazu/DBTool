@@ -15,7 +15,6 @@
 #define DBTOOL_CONFIGREADER_H
 
 #include "DBAppBase.h"
-#include "ConfigData.h"
 #include "RunConfig.h"
 
 namespace ubpsql {

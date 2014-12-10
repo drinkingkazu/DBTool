@@ -240,7 +240,7 @@ namespace ubpsql {
     RunConfig result(cfg_name);
     for(auto const& name_id : SubConfigNameAndIDs(result.Name())) {
 
-      ConfigData d(name_id.first,name_id.second);
+      SubConfig d(name_id.first,name_id.second);
 
       if(!Connect()) throw ConnectionError();
       std::string cmd("");
@@ -262,18 +262,20 @@ namespace ubpsql {
 	throw TableDataError();
       }
 
-      ConfigParams p(d.Name());
+      CParamsKey key;
+      CParams p;
       for(size_t i=0; i<PQntuples(res); ++i) {
 
 	int crate = std::atoi(PQgetvalue(res,i,0));
 	int slot  = std::atoi(PQgetvalue(res,i,1));
 	int ch    = std::atoi(PQgetvalue(res,i,2));
 
-	ConfigParams tmp(d.Name(),crate,slot,ch);
-	if(!i) p = ConfigParams(d.Name(),crate,slot,ch);
-	else if(p!=tmp) {
-	  d.insert(p);
-	  p = tmp;
+	CParamsKey tmp_key(crate,slot,ch);
+	if(!i) key = CParamsKey(crate,slot,ch);
+	else if(key!=tmp_key) {
+	  d.insert(std::make_pair(key,p));
+	  key = tmp_key;
+	  p.clear();
 	}
 	std::string param = PQgetvalue(res,i,3);
 	if( param.size()<3 
@@ -293,7 +295,7 @@ namespace ubpsql {
 
       }
       
-      if(!d.contains(p)) d.insert(p);
+      if(!d.contains(key)) d.insert(std::make_pair(key,p));
 
       result.AddSubConfig(d);
     }

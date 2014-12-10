@@ -4,14 +4,14 @@ import sys, os
 if len(sys.argv)<2:
    sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
    sys.exit(1)
-if not 'LARLITE_USERDEVDIR' in os.environ.keys():
-   sys.stderr.write('$LARLITE_USERDEVDIR not defined!\n\n')
+if not 'DBTOOL_DIR' in os.environ.keys():
+   sys.stderr.write('$DBTOOL_DIR not defined!\n\n')
    sys.exit(1)
 
 name=sys.argv[1]
 working_package='UBOnlineDBI'
-target_dir='%s/DBTool/UBOnlineDBI' % os.environ['LARLITE_USERDEVDIR']
-source_dir='%s/DBTool/UBOnlineDBI/bin/tmp' % os.environ['LARLITE_USERDEVDIR']
+target_dir=os.environ['DBTOOL_DIR']
+source_dir='%s/bin/tmp' % target_dir
 
 in_source='%s/empty.cxx' % source_dir
 in_header='%s/empty.h' % source_dir

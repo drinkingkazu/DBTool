@@ -22,7 +22,7 @@ namespace ubpsql {
   }
 
   /// Getter for a Sub-Config
-  const ConfigData& RunConfig::Get(const std::string& name) const
+  const SubConfig& RunConfig::Get(const std::string& name) const
   { 
     auto iter = _data.find(name);
     if( iter == _data.end() ) {
@@ -47,7 +47,7 @@ namespace ubpsql {
 
   
   /// ConfigData inserter
-  void RunConfig::AddSubConfig(const ConfigData& cfg) 
+  void RunConfig::AddSubConfig(const SubConfig& cfg) 
   { 
     auto iter = _data.find(cfg.Name());
     if(iter != _data.end()) {

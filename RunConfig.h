@@ -14,7 +14,7 @@
 #ifndef DBTOOL_RUNCONFIG_H
 #define DBTOOL_RUNCONFIG_H
 
-#include "ConfigData.h"
+#include "SubConfig.h"
 #include <vector>
 namespace ubpsql {
 
@@ -41,7 +41,7 @@ namespace ubpsql {
     const std::string& Name() const { return fName;}
 
     /// Getter for a Sub-Config
-    const ConfigData& Get(const std::string& name) const;
+    const SubConfig& Get(const std::string& name) const;
 
     /// Sub-Config name list
     std::vector<std::string> List() const;
@@ -50,14 +50,14 @@ namespace ubpsql {
     void ls() const;
 
     /// ConfigData inserter
-    void AddSubConfig(const ConfigData& cfg);
+    void AddSubConfig(const SubConfig& cfg);
 
   private:
     /// Name
     std::string fName;
 
     /// Hidden config data
-    std::map<std::string,ubpsql::ConfigData> _data;
+    std::map<std::string,ubpsql::SubConfig> _data;
 
   };
 }

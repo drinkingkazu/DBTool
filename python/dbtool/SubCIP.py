@@ -63,8 +63,8 @@ class SubCIP(UBPyBase):
                     if y: cfg_def.append(y)
             else: cfg_def.append(x)
 
-        if not (len(cfg_def)) in [6,8,10]:
-            self.critical('%s block contains invalid number of params (crate, slot, ch, and/or mask/name)' % \
+        if not (len(cfg_def)) in [6,8]:
+            self.critical('%s block contains invalid number of params (crate, slot, ch, and/or mask)' % \
                           self._cfg_add_key)
             self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
             raise ParseIException
@@ -73,7 +73,6 @@ class SubCIP(UBPyBase):
         crate = []
         slot  = []
         ch    = []
-        name  = ''
         mask  = 0
         for i in xrange(len(cfg_def)-1):
             try:
@@ -88,8 +87,6 @@ class SubCIP(UBPyBase):
                         ch.append(int(x))
                 if cfg_def[i] == 'mask':
                     mask  = int(cfg_def[i+1],0)
-                if cfg_def[i] == 'name':
-                    name  = str(cfg_def[i+1])
             except TypeError, ValueError:
                 self.critical('%s block contains invalid value (\"%s\") for a key %s' % \
                               (self._cfg_add_key,cfg_def[i+1],cfg_def[i]))
@@ -137,16 +134,11 @@ class SubCIP(UBPyBase):
                 raise ParseIException
             params[key]=value
 
-        if 'name' in params.keys():
-            self.critical('%s block contains a parameter key \"name\" (not allowed)' % self._cfg_add_key)
-            self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
-            raise ParseIException
-
         res = []
         for c in crate:
             for s in slot:
                 for i in ch:
-                    res.append(ubpsql.ConfigParams(name,c,s,i,mask))
+                    res.append(ubpsql.ConfigParams(c,s,i,mask))
 
                     for x in params.keys():
                         res[-1].append(x,params[x])

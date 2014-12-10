@@ -5,7 +5,7 @@ DEFINE_CONFIG
   mask = 0x0
 }
 
-ADD_CONFIG
+ADD_CONFIG # this is adding default crate config
 {
   crate    = -999
   slot     = -1

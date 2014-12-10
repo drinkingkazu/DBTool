@@ -25,14 +25,16 @@
 #pragma link C++ class ubpsql::ConfigReader+;
 #pragma link C++ class ubpsql::ConfigWriter+;
 #pragma link C++ class std::map<string,string>+;
-#pragma link C++ class ubpsql::ConfigParams+;
-#pragma link C++ class std::pair<std::set<ubpsql::ConfigParams>::iterator,bool>+;
-#pragma link C++ class std::set<ubpsql::ConfigParams>+;
-#pragma link C++ class ubpsql::ConfigData+;
-#pragma link C++ class std::vector<ubpsql::ConfigData>+;
+#pragma link C++ class ubpsql::CParams+;
+#pragma link C++ class ubpsql::CParamsKey+;
+#pragma link C++ class std::map<ubpsql::CParamsKey,ubpsql::CParams>+;
+#pragma link C++ class ubpsql::SubConfig+;
+#pragma link C++ class std::vector<ubpsql::SubConfig>+;
 #pragma link C++ class ubpsql::RunConfig+;
+#pragma link C++ class ubpsql::FhiclMaker+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

@@ -1,9 +1,9 @@
 /**
- * \file ConfigData.h
+ * \file SubConfig.h
  *
  * \ingroup UBOnlineDBI
  * 
- * \brief Class def header for a class ConfigData
+ * \brief Class def header for a class SubConfig
  *
  * @author kazuhiro
  */
@@ -11,65 +11,55 @@
 /** \addtogroup UBOnlineDBI
 
     @{*/
-#ifndef DBTOOL_CONFIGDATA_H
-#define DBTOOL_CONFIGDATA_H
+#ifndef DBTOOL_SUBCONFIG_H
+#define DBTOOL_SUBCONFIG_H
 
-#include "ConfigParams.h"
+#include "CParams.h"
 #include <set>
 
 namespace ubpsql {
   /**
-     \class ConfigData
-     User defined class ConfigData ... these comments are used to generate
-     doxygen documentation!
+     \class SubConfig
   */
-  class ConfigData : public std::set<ubpsql::ConfigParams>,
-		     public DBBase {
+  class SubConfig : public std::map<ubpsql::CParamsKey,ubpsql::CParams>,
+		    public DBBase {
     
   public:
     
     /// Default constructor
-    ConfigData(std::string name = "",
+    SubConfig(std::string name = "",
 	       int    config_id = -1,
 	       size_t mask      = 0x0);
 
     /// Default destructor
-    virtual ~ConfigData(){}
+    virtual ~SubConfig(){}
     
     const std::string& Name() const { return fName; }
     
     int    ConfigID() const { return fConfigID; }
     size_t Mask()     const { return fMask;     }
 
-    const ConfigParams& CrateDefault() const;
-    const ConfigParams& SlotDefault() const;
-    const ConfigParams& ChannelDefault() const;
-
-    std::string FhiclDump() const;
-
-    bool contains(const ConfigParams& p) const
+    bool contains(const CParamsKey& p) const
     { return (this->find(p) != this->end()); }
 
-    bool contains(const std::string name,
-		  const int crate,
+    bool contains(const int crate,
 		  const int slot,
 		  const int channel) const
-    { ConfigParams p(name,crate,slot,channel); return contains(p);}
+    { CParamsKey p(crate,slot,channel); return contains(p);}
 
-    const ConfigParams& GetParams( const std::string name,
-				     const int crate,
-				     const int slot,
-				     const int channel);
+    const CParams& GetParams( const int crate,
+			      const int slot,
+			      const int channel) const;
 
     void ls() const;
 
-    inline bool operator== (const ConfigData& rhs) const
+    inline bool operator== (const SubConfig& rhs) const
     { return ( fName == rhs.Name() && fConfigID == rhs.ConfigID() ); }
 
-    inline bool operator!= (const ConfigData& rhs) const
+    inline bool operator!= (const SubConfig& rhs) const
     { return !( (*this) == rhs ); }
 
-    inline bool operator< (const ConfigData& rhs) const
+    inline bool operator< (const SubConfig& rhs) const
     {
       if( fName     < rhs.Name    () ) return true;
       if( fName     > rhs.Name    () ) return false;
@@ -78,7 +68,7 @@ namespace ubpsql {
       return false;
     }
 
-    inline bool operator> (const ConfigData& rhs) const
+    inline bool operator> (const SubConfig& rhs) const
     { return !((*this)<rhs); }
 
   private:
@@ -92,10 +82,10 @@ namespace ubpsql {
 #ifndef __GCCXML__
 namespace std {
   template <>
-  class less<ubpsql::ConfigData*>
+  class less<ubpsql::SubConfig*>
   {
   public:
-    bool operator()( const ubpsql::ConfigData* lhs, const ubpsql::ConfigData* rhs )
+    bool operator()( const ubpsql::SubConfig* lhs, const ubpsql::SubConfig* rhs )
     { return (*lhs) < (*rhs); }
   };
 }
