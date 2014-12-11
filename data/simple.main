@@ -1,8 +1,0 @@
-DEFINE_CONFIG { name = simple6 }
-
-ADD_CONFIG{
-  name      = pmt_simple
-  config_id = 5
-  mask      = 0x400
-}
-

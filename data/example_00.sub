@@ -1,7 +1,7 @@
 DEFINE_CONFIG
 {
-  name = pmt_simple
-  id   = 5
+  name = pmt_example
+  id   = 0
   mask = 0x400
 }
 

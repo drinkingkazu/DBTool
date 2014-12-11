@@ -1,0 +1,8 @@
+DEFINE_CONFIG { name = example }
+
+ADD_CONFIG{
+  name      = pmt_example
+  config_id = 0
+  mask      = 0x400
+}
+
