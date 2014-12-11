@@ -186,14 +186,12 @@ namespace ubpsql{
 		Form("Found ill-defined CParamsKey!"));
 	  throw ConfigError();
 	}
-
       }
       
       for(auto const& crate_slot_pair : slot_name_m) {
 	auto const& crate = crate_slot_pair.first;
 	auto const& slot_name = crate_slot_pair.second;
 	for(auto const& id_name : slot_name) {
-
 	  SlotPSet(crate_name_m[crate],
 		   id_name.second);
 	}
@@ -205,10 +203,11 @@ namespace ubpsql{
 	for(auto const& slot_ch_pair : slot_channel) {
 	  auto const& slot = slot_ch_pair.first;
 	  auto const& ch_name = slot_ch_pair.second;
-	  for(auto const& id_name : ch_name)
+	  for(auto const& id_name : ch_name){
 	    ChannelPSet(crate_name_m[crate],
 			slot_name_m[crate][slot],
 			id_name.second);
+	  }
 	}
       }
 
@@ -226,7 +225,7 @@ namespace ubpsql{
 	if(!key.IsCrate())
 	  slot_name = slot_name_m[key.Crate()][key.Slot()];
 	if(key.IsChannel())
-	  channel_name = slot_name_m[key.Crate()][key.Slot()];
+	  channel_name = channel_name_m[key.Crate()][key.Slot()][key.Channel()];
 
 	auto& pset = this->PSet(crate_name,slot_name,channel_name);
 	
