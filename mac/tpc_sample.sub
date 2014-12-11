@@ -9,7 +9,7 @@ ADD_CONFIG
   crate    = -999
   slot     = -1
   channel  = -1
-  mask     = 0x1fffd
+  mask     = 0x7fff8
 
   PARAMETERS
   {
