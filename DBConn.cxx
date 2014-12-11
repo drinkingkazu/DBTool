@@ -9,7 +9,12 @@ namespace ubpsql{
   static void
   modNoticeProcessor(void *arg, const char *message)
   {
-    ubpsql::PQMessenger::GetME().Print(ubpsql::msg::kINFO, __FUNCTION__, message);
+    std::string msg(message);
+    msg = "\n" + msg;
+    if(msg.find("WARNING")<msg.size())
+      ubpsql::PQMessenger::GetME().Print(ubpsql::msg::kWARNING, __FUNCTION__, message);
+    else
+      ubpsql::PQMessenger::GetME().Print(ubpsql::msg::kINFO, __FUNCTION__, message);      
   }
 
   void* DBConn::_voidarg(nullptr);
