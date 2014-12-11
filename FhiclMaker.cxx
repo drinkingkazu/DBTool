@@ -234,8 +234,10 @@ namespace ubpsql{
 
 	auto& pset = this->PSet(crate_name,slot_name,channel_name);
 	
-	for(auto const& key_value : params)
+	for(auto const& key_value : params){
+	  if(key_value.first == "name") continue;
 	  pset.append(key_value.first,key_value.second);
+	}
       }
     }
   }
