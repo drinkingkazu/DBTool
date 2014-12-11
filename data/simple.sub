@@ -10,7 +10,7 @@ ADD_CONFIG
   crate    = 10
   slot     = -1
   channel  = -1
-  mask     = 0x8
+  mask     = 0x18
 
   PARAMETERS
   {
@@ -43,6 +43,23 @@ ADD_CONFIG
     prescale0=0 
     prescale1=0 
     prescale8=0
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = 4
+  channel  = -1
+  mask     = 0x0
+
+  PARAMETERS
+  {
+    timesize=33
+    maxpoll=1e8
+    dmastrategy=disrespect
+    delay_after_trigger=0
+    max_internal_triggers=0
   }
 }
 
