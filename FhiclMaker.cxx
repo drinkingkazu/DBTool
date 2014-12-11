@@ -87,7 +87,6 @@ namespace ubpsql{
 
   FPSet& FhiclMaker::CratePSet( const std::string& name )
   {
-    std::cout<<"crate request: "<<name<<std::endl;
     if(_pset._node.find(name) == _pset._node.end()) {
       FPSet tmp(name);
       _pset.append(tmp);
@@ -98,7 +97,6 @@ namespace ubpsql{
   FPSet& FhiclMaker::SlotPSet ( const std::string& crate_name,
 				const std::string& slot_name )
   {
-    std::cout<<"slot request: "<<crate_name<<" : "<<slot_name<<std::endl;
     auto& crate_pset = CratePSet(crate_name);
     if(crate_pset._node.find(slot_name) == crate_pset._node.end()) {
       FPSet tmp(slot_name);
@@ -111,7 +109,6 @@ namespace ubpsql{
 				   const std::string& slot_name,
 				   const std::string& channel_name)
   {
-    std::cout<<"channel request: "<<crate_name<<" : "<<slot_name<<" : "<<channel_name<<std::endl;
     auto& slot_pset = SlotPSet(crate_name,slot_name);
     if(slot_pset._node.find(channel_name) == slot_pset._node.end()) {
       FPSet tmp(channel_name);
@@ -124,7 +121,6 @@ namespace ubpsql{
 			   std::string slot_name,
 			   std::string channel_name )
   {
-    std::cout<<"making: "<<crate_name<<" : "<<slot_name<<" : "<<channel_name<<std::endl;
     if( crate_name.empty() ) {
       Print(msg::kERROR,__FUNCTION__,
 	    "Cannot find FPSet for empty crate key!");
@@ -148,7 +144,7 @@ namespace ubpsql{
     for(auto const& sub_cfg_name : cfg.List()) {
 
       auto const& sub_cfg = cfg.Get(sub_cfg_name);
-      std::cout<<"reading... "<<sub_cfg.Name()<<std::endl;
+
       // Get crate/slot/channel name
       std::map<int,std::string> crate_name_m;
       std::map<int,std::map<int,std::string> > slot_name_m;
@@ -190,14 +186,14 @@ namespace ubpsql{
 		Form("Found ill-defined CParamsKey!"));
 	  throw ConfigError();
 	}
-	std::cout<<"named: "<<name<<std::endl;
+
       }
       
       for(auto const& crate_slot_pair : slot_name_m) {
 	auto const& crate = crate_slot_pair.first;
 	auto const& slot_name = crate_slot_pair.second;
 	for(auto const& id_name : slot_name) {
-	  std::cout<<crate<<" : \""<<crate_name_m[crate]<<"\""<<std::endl;
+
 	  SlotPSet(crate_name_m[crate],
 		   id_name.second);
 	}

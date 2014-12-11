@@ -272,7 +272,7 @@ namespace ubpsql {
 	std::string key   = param.substr(0,param.find(","));
 	std::string value = param.substr(param.find(",")+1,(param.size()-param.find(",")-2));
 	if(value.find("\"\"\"")==0) value = value.substr(2,value.size()-2);
-	if(value.rfind("\"\"\"")==(value.size()-3)) value = value.substr(0,value.size()-2);
+	if(value.rfind("\"")<value.size() && value.rfind("\"\"\"")==(value.size()-3)) value = value.substr(0,value.size()-2);
 	p.append(key,value);
 
       }
