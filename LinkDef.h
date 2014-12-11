@@ -12,6 +12,8 @@
 #pragma link C++ namespace ubpsql;
 #pragma link C++ namespace ubpsql::msg;
 
+#pragma link C++ class std::pair<string,unsigned int>+;
+#pragma link C++ class std::vector<std::pair<string,unsigned int> >+;
 #pragma link C++ class ubpsql::DBException+;
 #pragma link C++ class ubpsql::InvalidUser+;
 #pragma link C++ class ubpsql::ConnectionError+;
