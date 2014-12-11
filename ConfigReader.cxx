@@ -83,7 +83,7 @@ namespace ubpsql {
   {
     std::vector<std::string> config_ids;
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute("SELECT DISTINCT ConfigName FROM MainConfigTable ORDER BY ConfigID;");
+    PGresult* res = _conn->Execute("SELECT DISTINCT ConfigName,ConfigID FROM MainConfigTable ORDER BY ConfigID DESC;");
     if(!res)  return config_ids;
 
     for(size_t i=0; i<PQntuples(res); ++i)
@@ -105,24 +105,6 @@ namespace ubpsql {
 
     PQclear(res);
     return config_ids;
-  }
-
-  std::vector<std::string> ConfigReader::SubConfigNames(const std::string &cfg_name)
-  {
-    auto const name_ids = SubConfigNameAndIDs(cfg_name);
-    std::vector<std::string> result;
-    result.reserve(name_ids.size());
-    for(auto const& iter : name_ids) result.push_back(iter.first);
-    return result;
-  }
-
-  std::vector<unsigned int> ConfigReader::SubConfigIDs(const std::string &cfg_name)
-  {
-    auto const name_ids = SubConfigNameAndIDs(cfg_name);
-    std::vector<unsigned int> result;
-    result.reserve(name_ids.size());
-    for(auto const& iter : name_ids) result.push_back(iter.second);
-    return result;
   }
 
   std::vector<std::pair<std::string,unsigned int> >  ConfigReader::SubConfigNameAndIDs(const std::string& cfg_name)
@@ -316,6 +298,22 @@ namespace ubpsql {
       for(size_t i=0; i<PQntuples(res); ++i)
 	result.push_back(PQgetvalue(res,i,0));
     if(res) PQclear(res);
+    return result;
+  }
+
+  std::vector<unsigned int> ConfigReader::SubConfigIDs(const std::string& name)
+  {
+    std::vector<unsigned int> result;
+    if(!Connect()) throw ConnectionError();
+    if(!ExistSubConfig(name)) {
+      Print(msg::kERROR,__FUNCTION__,Form("SubConfig: \"%s\" not found!",name.c_str()));
+      throw TableDataError();
+    }
+    PGresult* res = _conn->Execute(Form("SELECT DISTINCT ConfigID FROM %s ORDER BY ConfigID ASC;",name.c_str()));
+    if(res && PQntuples(res)){
+      for(size_t i=0; i<PQntuples(res); ++i)
+	result.push_back(std::atoi(PQgetvalue(res,i,0)));
+    }
     return result;
   }
 

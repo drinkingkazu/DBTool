@@ -31,6 +31,19 @@ namespace ubpsql {
     return status;
   }
 
+  bool ConfigWriter::CleanSubConfig(const std::string cfg_name)
+  {
+    if(!Connect()) throw ConnectionError();
+    std::string cmd(Form("SELECT CleanSubConfig('%s');",cfg_name.c_str()));
+
+    PGresult* res = _conn->Execute(cmd);
+    if(!res) return false;
+    
+    bool status = std::atoi(PQgetvalue(res,0,0));
+    PQclear(res);
+    return status;
+  }
+
   bool ConfigWriter::InsertNewRun(unsigned int config_id)
   {
     if(!Connect()) throw ConnectionError();
@@ -288,10 +301,12 @@ namespace ubpsql {
       Print(msg::kERROR,__FUNCTION__,Form("MainConfig \"%s\" does not exist!",name.c_str()));
       return false;
     }
-    std::string cmd = Form("DELETE FROM MainRunConfig WHERE ConfigName='%s';",name.c_str());
+    std::string cmd = Form("SELECT CleanMainConfig('%s');",name.c_str());
     PGresult* res = _conn->Execute(cmd);
+    if(!res || !PQntuples(res)) return false;
+    bool result = std::atoi(PQgetvalue(res,0,0));
     PQclear(res);
-    return true;
+    return result;
   }
   
 }

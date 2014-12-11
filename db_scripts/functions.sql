@@ -1276,19 +1276,21 @@ DECLARE
 query TEXT;
 sub_conf_type INT;
 sub_conf_id INT;
+sub_conf_ctr INT;
 BEGIN
-  
+
+  sub_conf_type := -1;  
   SELECT INTO sub_conf_type SubConfigType(cfg_name);
   IF sub_conf_type IS NULL THEN 
   RETURN 0;
   END IF;
 
-  sub_conf_type := -1;
+  sub_conf_id :=-1;
 
   SELECT SubConfigID FROM MainConfigTable WHERE SubConfigType = sub_conf_type AND SubConfigID = cfg_id INTO sub_conf_id;
 
   IF sub_conf_id IS NOT NULL AND sub_conf_id >= 0 THEN
-    RAISE WARNING '++++++++++++ Sub-Config %s w/ ID % currently in use within MainConfigTable! ++++++++++++',sfg_name,cfg_id;
+    RAISE WARNING '++++++++++++ Sub-Config %s w/ ID % currently in use within MainConfigTable! ++++++++++++',cfg_name,cfg_id;
     RETURN 0;
   ELSE
     query := 'DELETE FROM ' || cfg_name || ' WHERE ConfigID = ' || cfg_id || ';';
@@ -1296,6 +1298,65 @@ BEGIN
     RETURN 1;    
   END IF;    
   RETURN 0;
+END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
+
+-------------------------------------------------------------
+
+DROP FUNCTION IF EXISTS CleanSubConfig( cfg_name TEXT);
+
+CREATE OR REPLACE FUNCTION CleanSubConfig( cfg_name TEXT ) RETURNS INT AS $$
+DECLARE
+query TEXT;
+sub_conf_type INT;
+sub_conf_id INT;
+sub_conf_ctr INT;
+BEGIN
+
+  sub_conf_type := -1;  
+  SELECT INTO sub_conf_type SubConfigType(cfg_name);
+  IF sub_conf_type IS NULL THEN 
+  RETURN 0;
+  END IF;
+
+  sub_conf_id :=-1;
+  SELECT SubConfigID FROM MainConfigTable WHERE SubConfigType = sub_conf_type INTO sub_conf_id;
+
+  IF sub_conf_id IS NOT NULL AND sub_conf_id >= 0 THEN
+    RAISE WARNING '++++++++++++ Sub-Config % currently in use within MainConfigTable! ++++++++++++',cfg_name;
+    RETURN 0;
+  ELSE
+    query := 'DROP TABLE ' || cfg_name || ';';
+    EXECUTE query;
+    DELETE FROM ConfigLookUp WHERE SubConfigName = cfg_name;
+    RETURN 1;    
+  END IF;    
+  RETURN 0;
+END;
+$$ LANGUAGE plpgsql VOLATILE STRICT;
+
+-------------------------------------------------------------
+DROP FUNCTION IF EXISTS CleanMainConfig( cfg_name TEXT );
+CREATE OR REPLACE FUNCTION CleanMainConfig( cfg_name TEXT) RETURNS INT AS $$
+DECLARE
+ret_val INT;
+conf_id INT;
+run_ctr INT;
+BEGIN
+  ret_val := 0;
+  SELECT ConfigID FROM MainConfigTable WHERE ConfigName = cfg_name INTO conf_id;
+  IF conf_id IS NULL THEN
+    RAISE WARNING '++++++++++ Main-COnfig % does not seem to exist... ++++++++++',cfg_name;
+  ELSE
+    SELECT COUNT(RunNumber) FROM MainRun WHERE ConfigID = conf_id INTO run_ctr;
+    IF run_ctr IS NOT NULL AND run_ctr>0 THEN
+      RAISE WARNING '++++++++++ Cannot remove Main-Config % (used in MainRun) +++++++++++',cfg_name;
+    ELSE
+      DELETE FROM MainConfigTable WHERE ConfigID = conf_id;
+      ret_val :=1;
+    END IF;
+  END IF;
+  RETURN ret_val;
 END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 

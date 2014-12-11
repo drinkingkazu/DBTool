@@ -56,10 +56,6 @@ namespace ubpsql {
     std::vector<std::string> RunConfigNames();
     /// List Run-Config ID
     std::vector<unsigned int> RunConfigIDs();
-    /// List All Sub-Config names for a given MainConfig name
-    std::vector<std::string> SubConfigNames(const std::string &cfg_name);
-    /// List All Sub-Config IDs for a given MainConfig name
-    std::vector<unsigned int> SubConfigIDs(const std::string &cfg_name);
     /// List All Sub-Config name/ID pair for a given MainConfig name
     std::vector<std::pair<std::string,unsigned int> >  SubConfigNameAndIDs(const std::string& cfg_name);
     /// Existence checker.
@@ -85,6 +81,8 @@ namespace ubpsql {
     //
     /// List all Sub-Configs
     std::vector<std::string> SubConfigNames();
+    /// List Sub-Config IDs
+    std::vector<unsigned int> SubConfigIDs(const std::string& name);
     /// Existence checker.
     bool ExistSubConfig(std::string sub_config_name);
     /// Existence checker for a specific sub-config id

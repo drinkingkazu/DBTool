@@ -40,8 +40,11 @@ namespace ubpsql {
      */
     bool CreateConfigType(const std::string config_name);
 
-    /// Remove a specific config ID
+    /// Remove a specific sub-config ID
     bool CleanSubConfig(const std::string cfg_name, unsigned int cfg_id);
+
+    /// Remove sub-config
+    bool CleanSubConfig(const std::string cfg_name);
 
     /// Create a new run number in the database
     bool InsertNewRun(unsigned int config_id);
