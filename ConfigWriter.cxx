@@ -20,6 +20,7 @@ namespace ubpsql {
 
   bool ConfigWriter::CleanSubConfig(const std::string cfg_name, unsigned int cfg_id)
   {
+    Print(msg::kWARNING,__FUNCTION__,Form("Constructing the Death Star to destroy a SubConfig ID."));
     if(!Connect()) throw ConnectionError();
     std::string cmd(Form("SELECT CleanSubConfig('%s',%d);",cfg_name.c_str(),cfg_id));
 
@@ -33,6 +34,7 @@ namespace ubpsql {
 
   bool ConfigWriter::CleanSubConfig(const std::string cfg_name)
   {
+    Print(msg::kWARNING,__FUNCTION__,Form("Eliminating a SubConfig for the empire."));
     if(!Connect()) throw ConnectionError();
     std::string cmd(Form("SELECT CleanSubConfig('%s');",cfg_name.c_str()));
 
@@ -197,7 +199,7 @@ namespace ubpsql {
 
   bool ConfigWriter::CheckNewSubConfiguration(const SubConfig &data)
   {
-    if(!Connect()) return false;
+    if(!Connect()) throw ConnectionError();
     bool good = true;
     auto const& cfg_name = data.Name();
     auto const  cfg_id   = data.ConfigID();
@@ -297,6 +299,8 @@ namespace ubpsql {
 
   bool ConfigWriter::CleanMainConfig(const std::string& name)
   {
+    if(!Connect()) throw ConnectionError();
+    Print(msg::kWARNING,__FUNCTION__,Form("Joining the Dark Side to destroy a MainConfig."));
     if(!(this->ExistRunConfig(name))) {
       Print(msg::kERROR,__FUNCTION__,Form("MainConfig \"%s\" does not exist!",name.c_str()));
       return false;
@@ -307,6 +311,16 @@ namespace ubpsql {
     bool result = std::atoi(PQgetvalue(res,0,0));
     PQclear(res);
     return result;
+  }
+
+  void ConfigWriter::SuperLaser()
+  {
+    if(!Connect()) throw ConnectionError();
+    Print(msg::kWARNING,__FUNCTION__,Form("Death Star is completed. Attempting to destroy Endor via SuperLaser."));
+    PGresult* res = _conn->Execute("SELECT CleanConfigDB();");
+    Print(msg::kWARNING,__FUNCTION__,Form("Bahahahaha!"));
+    if(res) PQclear(res);
+    return;
   }
   
 }
