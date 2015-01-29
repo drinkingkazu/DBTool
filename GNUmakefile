@@ -13,7 +13,8 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
-INCFLAGS  += -I$(PGSQL_INC)
+INCFLAGS  += -I$(POSTGRES_INC) 
+INCFLAGS  += -I$(ROOT_INC)
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
