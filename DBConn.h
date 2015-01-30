@@ -33,7 +33,7 @@ namespace ubpsql {
   private:
 
     /// Default constructor is private (pseudo-singleton)
-    DBConn(DBI_USER_t user_type=kDBI_USER_MAX);
+    DBConn(DBI_USER_t user_type=kUBDAQ_READER);
 
     /// Instance pointers holder
     static std::vector<DBConn*> _me_v;
@@ -59,7 +59,7 @@ namespace ubpsql {
        Note you do not have to configure if the default connection info suffices except for
        kCUSTOM_USER which has no default connection info.
     */
-    void Configure(const std::string config_string)
+    virtual void Configure(const std::string config_string)
     { _conn_config = config_string; }
 
     /// Verbosity setting

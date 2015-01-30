@@ -20,7 +20,7 @@ namespace ubpsql{
       /// kCUSTOM_USER
       "host=localhost dbname=testdb user=kazuhiro connect_timeout=5",
       /// kUBDAQ_READER
-      "host=192.168.144.189 dbname=rctestskazu user=uboonedaq_writer password=argon!uBooNE connect_timeout=5",
+      "host=192.168.144.189 dbname=rctestskazu user=uboonedaq_reader password=argon!uBooNE connect_timeout=5",
       /// kUBDAQ_WRITER
       "host=192.168.144.189 dbname=rctestskazu user=uboonedaq_writer password=argon!uBooNE connect_timeout=5"
     };

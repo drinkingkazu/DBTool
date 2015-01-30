@@ -29,8 +29,8 @@ namespace ubpsql {
     
     /// Default constructor
     ConfigReader() : DBAppBase() 
-    { _user_type = kCUSTOM_USER; }
-    //{ _user_type = kUBDAQ_READER; }
+      // { _user_type = kCUSTOM_USER; }
+      { _user_type = kUBDAQ_READER; }
     
     /// Default destructor
     virtual ~ConfigReader(){}
