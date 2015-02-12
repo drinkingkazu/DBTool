@@ -23,7 +23,7 @@ OSNAMEMODE      = $(OSNAME)
 include $(DBTOOL_DIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
-INCFLAGS +=  `root-config --cflags`
+CXXFLAGS +=  `root-config --cflags`
 
 # call the common GNUmakefile
 include $(DBTOOL_DIR)/Makefile/GNUmakefile.CORE
