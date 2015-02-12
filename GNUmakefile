@@ -13,7 +13,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS = -I.                       #Include itself
-INCFLAGS  += -I$(PGSQL_INC)
+INCFLAGS  += -I$(PGSQL_DIR)/include
 
 # platform-specific options
 OSNAME          = $(shell uname -s)
@@ -23,7 +23,7 @@ OSNAMEMODE      = $(OSNAME)
 include $(DBTOOL_DIR)/Makefile/Makefile.${OSNAME}
 
 # set compiler options for ROOT
-CXXFLAGS +=  `root-config --cflags`
+INCFLAGS +=  `root-config --cflags`
 
 # call the common GNUmakefile
 include $(DBTOOL_DIR)/Makefile/GNUmakefile.CORE
