@@ -78,15 +78,52 @@ class SubCIP(UBPyBase):
             try:
                 if cfg_def[i] == 'crate':
                     for x in cfg_def[i+1].split(','):
-                        crate.append(int(x))
+                        if x.find('>>') < 0:
+                            crate.append(int(x))
+                        else:
+                            ends=x.split('>>')
+                            if ( not len(ends)==2 or
+                                 not ends[0].isdigit() or
+                                 not ends[1].isdigit() or
+                                 int(ends[0]) > int(ends[1]) ):
+                                self.critical('%s block contains invalid crate expression (\"%s\")' % \
+                                              (self._cfg_add_key,cfg_def[i+1]))
+                                raise ParserIException
+                            start,end = (int(ends[0]),int(ends[1]))
+                            for crate_index in xrange(end-start+1):
+                                crate.append(start+crate_index)
                 if cfg_def[i] == 'slot':
                     for x in cfg_def[i+1].split(','):
-                        slot.append(int(x))
+                        if x.find('>>') < 0:
+                            slot.append(int(x))
+                        else:
+                            ends=x.split('>>')
+                            if ( not len(ends)==2 or
+                                 not ends[0].isdigit() or
+                                 not ends[1].isdigit() or
+                                 int(ends[0]) > int(ends[1]) ):
+                                self.critical('%s block contains invalid slot expression (\"%s\")' % \
+                                              (self._cfg_add_key,cfg_def[i+1]))
+                                raise ParserIException
+                            start,end = (int(ends[0]),int(ends[1]))
+                            for slot_index in xrange(end-start+1):
+                                slot.append(start+slot_index)
                 if cfg_def[i] == 'channel':
                     for x in cfg_def[i+1].split(','):
-                        ch.append(int(x))
-                if cfg_def[i] == 'mask':
-                    mask  = int(cfg_def[i+1],0)
+                        if x.find('>>') < 0:
+                            ch.append(int(x))
+                        else:
+                            ends=x.split('>>')
+                            if ( not len(ends)==2 or
+                                 not ends[0].isdigit() or
+                                 not ends[1].isdigit() or
+                                 int(ends[0]) > int(ends[1]) ):
+                                self.critical('%s block contains invalid ch expression (\"%s\")' % \
+                                              (self._cfg_add_key,cfg_def[i+1]))
+                                raise ParserIException
+                            start,end = (int(ends[0]),int(ends[1]))
+                            for ch_index in xrange(end-start+1):
+                                ch.append(start+ch_index)
             except TypeError, ValueError:
                 self.critical('%s block contains invalid value (\"%s\") for a key %s' % \
                               (self._cfg_add_key,cfg_def[i+1],cfg_def[i]))

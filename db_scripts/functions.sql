@@ -364,7 +364,7 @@ CREATE OR REPLACE FUNCTION CheckNewSubConfiguration( config_name TEXT,
       RETURN 1;
 
     ELSIF crate_id = -999 AND (slot_id >=0 OR channel_id >=0 ) THEN
-      RAISE WARNING '++++++++++ Slot and Channel ID must be -1 for default Crate config (ID=-999) ++++++++++';
+      RAISE WARNING '++++++++++ Slot and Channel ID must be -1 for default Crate config (ID=-999) ++++++++++ (%,%,%)',crate_id,slot_id,channel_id;
       RETURN 1;
 
     ELSIF crate_id = -1 AND (slot_id >= 0 OR channel_id >= 0) THEN
