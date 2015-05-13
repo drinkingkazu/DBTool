@@ -340,46 +340,46 @@ CREATE OR REPLACE FUNCTION CheckNewSubConfiguration( config_name TEXT,
 
  -- Check 0) Possible combination of crate_id, slot_id, and channel_id
     IF crate_id < 0 AND NOT (crate_id = -1 OR crate_id = -999) THEN
-      RAISE NOTICE '++++++++++ Invalid Crate ID: % +++++++++++', crate_id;
+      RAISE WARNING '++++++++++ Invalid Crate ID: % +++++++++++', crate_id;
       RETURN 1;
 
     ELSIF slot_id < 0 AND NOT (slot_id = -1 OR slot_id = -999) THEN
-      RAISE NOTICE '++++++++++ Invalid Slot ID: % +++++++++++', slot_id;
+      RAISE WARNING '++++++++++ Invalid Slot ID: % +++++++++++', slot_id;
       RETURN 1;
 
     ELSIF channel_id < 0 AND NOT (channel_id = -1 OR channel_id = -999) THEN
-      RAISE NOTICE '++++++++++ Invalid Channel ID: % +++++++++++', channel_id;
+      RAISE WARNING '++++++++++ Invalid Channel ID: % +++++++++++', channel_id;
       RETURN 1;
 
     ELSIF ((crate_id + channel_id + slot_id) < -1001) THEN
-      RAISE NOTICE '++++++++++ Duplicate -999 values among (crate,slot,channel)=(%,%,%) ++++++++++++', crate_id, slot_id, channel_id;
+      RAISE WARNING '++++++++++ Duplicate -999 values among (crate,slot,channel)=(%,%,%) ++++++++++++', crate_id, slot_id, channel_id;
       RETURN 1;
 
     ELSIF channel_id = -999 AND (crate_id = -1  AND slot_id >= 0) THEN
-      RAISE NOTICE '++++++++++ Crate ID must be 0 or positive integer for a specific slot default channel! ++++++++++';
+      RAISE WARNING '++++++++++ Crate ID must be 0 or positive integer for a specific slot default channel! ++++++++++';
       RETURN 1;
 
     ELSIF slot_id = -999 AND  channel_id != -1 THEN
-      RAISE NOTICE '++++++++++ Channel ID must be -1 if Slot ID is -999! +++++++++++';
+      RAISE WARNING '++++++++++ Channel ID must be -1 if Slot ID is -999! +++++++++++';
       RETURN 1;
 
     ELSIF crate_id = -999 AND (slot_id >=0 OR channel_id >=0 ) THEN
-      RAISE NOTICE '++++++++++ Slot and Channel ID must be -1 for default Crate config (ID=-999) ++++++++++';
+      RAISE WARNING '++++++++++ Slot and Channel ID must be -1 for default Crate config (ID=-999) ++++++++++';
       RETURN 1;
 
     ELSIF crate_id = -1 AND (slot_id >= 0 OR channel_id >= 0) THEN
-      RAISE NOTICE '++++++++++ (Crate,Slot,Channel) = (-1, %, %) not allowed! +++++++++++',slot_id,channel_id;
+      RAISE WARNING '++++++++++ (Crate,Slot,Channel) = (-1, %, %) not allowed! +++++++++++',slot_id,channel_id;
       RETURN 1;
 
     ELSIF crate_id >= 0 AND slot_id = -1 AND channel_id >= 0 THEN
-      RAISE NOTICE '++++++++++ (Crate,Slot,Channel) = (%, -1, %) not allowed! +++++++++++',crate_id,channel_id;
+      RAISE WARNING '++++++++++ (Crate,Slot,Channel) = (%, -1, %) not allowed! +++++++++++',crate_id,channel_id;
       RETURN 1;
 
     END IF;
 
  -- Check 1) find if this configuration type exists. If not, don't do anything
     IF NOT EXISTS ( SELECT TRUE FROM ConfigLookUp WHERE SubConfigName = config_name) THEN
-      RAISE NOTICE '++++++++++ Configuration % is not defined yet! +++++++++++', config_name;
+      RAISE WARNING '++++++++++ Configuration % is not defined yet! +++++++++++', config_name;
       RETURN 1;
     END IF;
 
@@ -387,7 +387,7 @@ CREATE OR REPLACE FUNCTION CheckNewSubConfiguration( config_name TEXT,
     query := format('SELECT 1 AS VAL FROM %s WHERE ConfigID=%s LIMIT 1;',config_name,config_id);
     EXECUTE query INTO myrec;
     IF myrec.VAL IS NULL THEN
-      RAISE NOTICE '++++++++++ Configuration % with ID % is not defined yet! +++++++++++', config_name, config_id;
+      RAISE WARNING '++++++++++ Configuration % with ID % is not defined yet! +++++++++++', config_name, config_id;
       RETURN 1;
     END IF;
 
@@ -395,7 +395,7 @@ CREATE OR REPLACE FUNCTION CheckNewSubConfiguration( config_name TEXT,
     query := format('SELECT TRUE AS VAL FROM %s WHERE ConfigID=%s AND Crate=%s AND Slot=%s AND Channel=%s',config_name,config_id, crate_id, slot_id, channel_id);
     EXECUTE query INTO myrec;
     IF NOT myrec.VAL IS NULL THEN
-      RAISE NOTICE '++++++++++ (ConfigID,Crate,Slot,Channel) = (%,%,%,%) already exists! ++++++++++', config_id, crate_id, slot_id, channel_id;
+      RAISE WARNING '++++++++++ (ConfigID,Crate,Slot,Channel) = (%,%,%,%) already exists! ++++++++++', config_id, crate_id, slot_id, channel_id;
       RETURN 1;
     END IF;
 
