@@ -1,0 +1,103 @@
+DEFINE_CONFIG
+{
+  name = basicTPCseb
+  id   = 0
+}
+
+ADD_CONFIG
+{
+  crate    = -999
+  slot     = -1
+  channel  = -1
+  mask     = 0x7fff8
+
+  PARAMETERS
+  {
+    name:        sebprivXX
+    type:        TPC
+    fragment_id: 1
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = -999
+  slot     = -1
+  channel  = -1
+  mask     = 0x7fff8
+
+  PARAMETERS
+  {
+    source:               dma
+    dma_buffer_size:      2e5
+    maxpoll:              1e7
+    timesize:             3199
+    dmastrategy:          eventboundary
+    delay_after_trigger:  0
+    max_internal_trigger: 1e9
+    circular_buffer_size: 1e9
+    configMem_shmKey:     31998
+
+    sink:                 assembler
+    port:                 33421
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = -999
+  slot     = -1
+  channel  = -1
+  mask     = 0x7fff8
+
+  PARAMETERS
+  {
+    source:  NONE
+    sink:    NONE
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = -999
+  slot     = -1
+  channel  = -1
+  mask     = 0x7fff8
+
+  PARAMETERS
+  {
+    vendor_id: 0x1172
+    device_id: 0x4
+    bus:       0x9
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = -999
+  slot     = -1
+  channel  = -1
+  mask     = 0x7fff8
+
+  PARAMETERS
+  {
+    vendor_id: 0x1172
+    device_id: 0x4
+    bus:       0x5
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = -999
+  slot     = -1
+  channel  = -1
+  mask     = 0x7fff8
+
+  PARAMETERS
+  {
+    vendor_id: 0x1172
+    device_id: 0x4
+    bus:       0x4
+  }
+}
