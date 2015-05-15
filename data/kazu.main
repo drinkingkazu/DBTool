@@ -1,0 +1,8 @@
+DEFINE_CONFIG { name = kazu_main }
+
+ADD_CONFIG{
+  name      = kazu
+  config_id = 0
+  mask      = 0xf
+}
+

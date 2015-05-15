@@ -2,7 +2,7 @@
 #define DBTOOL_CPARAMS_CXX
 
 #include "CParams.h"
-
+#include <sstream>
 namespace ubpsql {
   
   CParamsKey::CParamsKey(int    crate,
@@ -44,23 +44,35 @@ namespace ubpsql {
   bool CParamsKey::IsChannel()   const
   { return ((fCrate>=0 || fCrate==-1) && (fSlot>=0 || fSlot==-1) && (fChannel==-999 || fChannel>=0));}
 
+  void CParamsKey::ls() const
+  {
+    std::ostringstream msg;
+    if(this->IsCrate())
+      msg << "Crate " << fCrate;
+    else if(this->IsSlot())
+      msg << "Crate " << fCrate << " Slot " << fSlot;
+    else
+      msg << "Crate " << fCrate << " Slot " << fSlot << " Channel " << fChannel;
+    msg << " Configuration" << std::endl;
+    std::cout<<msg.str();
+  }
+  
   void CParams::ls() const
   {
-    std::cout
-      << std::endl
-      << "    Mask          : ";
+    std::ostringstream msg;
+    msg << std::endl
+	<< "    Mask          : ";
     for(size_t i=0; i < 8*sizeof(size_t); ++i) 
-      std::cout<< bool((fMask >> i) & 0x1);
-    std::cout<<std::endl;
-    std::cout
-      << std::endl
-      << "    ... with following parameter values:" << std::endl;
+      msg << bool((fMask >> i) & 0x1);
+    msg<<std::endl
+       << std::endl
+       << "    ... with following parameter values:" << std::endl;
 
       for(auto const& v : *this)
 
-	std::cout << "    " << v.first.c_str() << " => " << v.second.c_str() << std::endl;
+	msg << "    " << v.first.c_str() << " => " << v.second.c_str() << std::endl;
     
-      std::cout<<std::endl;
+      std::cout<<msg.str()<<std::endl;
   }
 
   std::string CParams::FhiclDump() const

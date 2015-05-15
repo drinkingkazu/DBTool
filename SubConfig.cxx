@@ -43,9 +43,9 @@ namespace ubpsql {
   {
     std::cout
       << std::endl
-      << "  Configuration \"" << fName.c_str() << "\"" << std::endl
-      << "  Config ID     : " << fConfigID << std::endl
-      << "  Mask          : ";
+      << "  Sub-Config \"" << fName.c_str() << "\"" << std::endl
+      << "  Config ID  : " << fConfigID << std::endl
+      << "  Mask       : ";
     for(size_t i=0; i < 8*sizeof(size_t); ++i) 
       std::cout << bool((fMask >> i) & 0x1);
 
@@ -54,8 +54,9 @@ namespace ubpsql {
       << "  ... with following configurations." << std::endl;
     
     for(auto const& key_params : *this) {
-      //auto const& key    = key_params.first;
+      auto const& key    = key_params.first;
       auto const& params = key_params.second;
+      key.ls();
       params.ls();
     }
     

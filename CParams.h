@@ -48,6 +48,8 @@ namespace ubpsql {
     bool IsSlot()      const;
     bool IsChannel()   const;
 
+    void ls() const;
+
     inline bool operator== (const CParamsKey& rhs) const
     {
       return ( fCrate   == rhs.Crate   () &&
