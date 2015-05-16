@@ -76,6 +76,8 @@ class SubCIP(UBPyBase):
         mask  = 0
         for i in xrange(len(cfg_def)-1):
             try:
+                if cfg_def[i] == 'mask':
+                    mask = int(cfg_def[i+1],16)
                 if cfg_def[i] == 'crate':
                     for x in cfg_def[i+1].split(','):
                         if x.find('>>') < 0:
@@ -145,7 +147,7 @@ class SubCIP(UBPyBase):
         
         # Now parse parameter values
         params = {}
-        target = content[param_start+1:param_end]
+        target = content[param_start+1:param_end].split("\n")
         target = target.replace('=',' = ').split(None)
 
         if not len(target)%3 == 0:

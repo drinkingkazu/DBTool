@@ -1,0 +1,7 @@
+DEFINE_CONFIG { name = sample }
+
+ADD_CONFIG{
+  name      = sample_sub
+  config_id = 0
+  mask      = 0x1f
+}
