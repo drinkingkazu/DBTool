@@ -147,29 +147,21 @@ class SubCIP(UBPyBase):
         
         # Now parse parameter values
         params = {}
-        target = content[param_start+1:param_end].split("\n")
-        target = target.replace('=',' = ').split(None)
-
-        if not len(target)%3 == 0:
-            self.critical('%s block contains invalid parameter key-value pair expression' % self._cfg_add_key)
-            self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
-            raise ParseIException
-
-        for x in xrange(len(target)/3):
-
-            index = 3*x
-            if not target[index+1] == '=':
+        for line in content[param_start+1:param_end].split("\n"):
+            tmp_line = line.strip(' ')
+            tmp_line = tmp_line.rstrip(' ')
+            if not tmp_line: continue
+            if tmp_line.find('=') < 0:
                 self.critical('%s block contains invalid parameter key-value pair expression' % self._cfg_add_key)
-                print index,target
-                self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
-                raise ParseIException
-
-            key   = target[index]
-            value = target[index+2]
-
+                self.info('Contents shown below\n %s' % line)
+                raise ParserIException
+            key = tmp_line[0:tmp_line.find('=')]
+            key = key.rstrip(' ')
+            value = tmp_line[tmp_line.find('=')+1:len(tmp_line)]
+            value = value.strip(' ')
             if key in params.keys():
-                self.critical('%s block contains duplicate parameter key (\"%s\")' % self._cfg_add_key)
-                self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
+                self.critical('%s block contains duplicate parameter key (\"%s\")' % (self._cfg_add_key,key))
+                self.info('Contents shown below\n %s' % line)
                 raise ParseIException
             params[key]=value
 
