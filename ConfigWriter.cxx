@@ -177,11 +177,17 @@ namespace ubpsql {
 
       for(auto const& key_value : params){
 	std::string value(key_value.second.c_str());
-	if(value.find("\"")==0) value = "\\" + value;
-	if(value.rfind("\"")==(value.size()-1)) {
-	  value = value.substr(0,value.size()-1);
-	  value = value + "\\" + "\"";
-	}
+	// if(value.find("\"")==0) value = "\\" + value;
+	// if(value.rfind("\"")==(value.size()-1)) {
+	//   value = value.substr(0,value.size()-1);
+	//   value = value + "\\" + "\"";
+	// }
+        std::cout << value << std::endl;
+        while ( value.find("\"") != value.size() ) {
+          size_t pos = value.find("\"");
+          // std::cout << "Find \" at " << pos << std::endl;
+          value.replace( pos, 1, "\\\"", 0, 2 );
+        }
 	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), value.c_str());
       }
       if(params.find("name")==params.end())

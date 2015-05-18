@@ -423,21 +423,6 @@ ADD_CONFIG
     pmt_gate_size  = 1500 # Beamgate readout window size in 64MHz clock
     pmt_beam_size  = 102  # Beamgate spill width in 64 MHz clock
     pmt_beam_delay = 256  # Beamgate spill start time from the readout window start in 64MHz clock
-    # Parameters for PMT-Trigger condition
-    #
-    pmt_width    = 5      # Sample width to issue PMT-Trigger
-    cos_mult     = 1      # Disc. 1 multiplicity condition for cosmic trigger
-    cos_thres    = 200    # Disc. 1 max adc sum  condition for cosmic trigger
-    beam_mult    = 1      # Disc. 3 multiplicity condition for beam trigger
-    beam_thres   = 1      # Disc. 3 max adc sum  condition for beam trigger
-
-    # Beamgate parameters
-    # This is somewhat confusing, but you can see detailed diagram and explanation
-    # in PMTFrontEndModule.h. Take a look at there.
-    #
-    pmt_gate_size  = 1500 # Beamgate readout window size in 64MHz clock
-    pmt_beam_size  = 102  # Beamgate spill width in 64 MHz clock
-    pmt_beam_delay = 256  # Beamgate spill start time from the readout window start in 64MHz clock
   }
 }
 
@@ -462,46 +447,8 @@ ADD_CONFIG
 
   PARAMETERS
   {
-    seb_names = [ "sebpriv01",
-                 "sebpriv02",
-                 "sebpriv03",
-                 "sebpriv04",
-                 "sebpriv05",
-                 "sebpriv06",
-                 "sebpriv07",
-                 "sebpriv08",
-                 "sebpriv09",
-                 "sebpriv10" ]
-    seb_types = [ "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "PMT" ]
-    seb_names: [ "sebpriv01",
-                 "sebpriv02",
-                 "sebpriv03",
-                 "sebpriv04",
-                 "sebpriv05",
-                 "sebpriv06",
-                 "sebpriv07",
-                 "sebpriv08",
-                 "sebpriv09",
-                 "sebpriv10" ]
-    seb_types = [ "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "TPC",
-                 "PMT" ]
+    seb_names = [ "sebpriv01", "sebpriv02", "sebpriv03", "sebpriv04", "sebpriv05", "sebpriv06", "sebpriv07", "sebpriv08", "sebpriv09", "sebpriv10" ]
+    seb_types = [ "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "PMT" ]
   }
 }
 
