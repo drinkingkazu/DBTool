@@ -15,6 +15,7 @@
 #define DBTOOL_CPARAMS_H
 
 #include "DBBase.h"
+#include "DBEnv.h"
 #include "DBException.h"
 #include <iostream>
 #include <string>
@@ -89,7 +90,7 @@ namespace ubpsql {
     
     /// Restricted constructor
     CParams(size_t mask      = 0x0)
-    { fMask = mask; this->append("name",""); }
+    { fMask = mask; this->append(kPSET_NAME_KEY,kEMPTY_STRING_PARAM); }
     
     /// Default destructor
     virtual ~CParams(){}
@@ -104,7 +105,7 @@ namespace ubpsql {
     void ls() const;
 
     void append(const std::string& key, const std::string& value)
-    {this->insert(std::make_pair(key,value));}
+    { (*this)[key]=value; }
     
     const std::map<std::string,std::string>& Params() const
     { return (*this); }
