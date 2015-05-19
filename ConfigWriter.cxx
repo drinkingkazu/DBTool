@@ -183,10 +183,12 @@ namespace ubpsql {
           pos += 2;
           pos = value.find("\"", pos);
 	}
+
 	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), value.c_str());
+	
       }
-      if(params.find("name")==params.end())
-	cmd += " \"name\"=>\"\"";
+      if(params.find(kPSET_NAME_KEY)==params.end())
+	cmd += Form(" \"%s\"=>%s",kPSET_NAME_KEY.c_str(),kEMPTY_STRING_PARAM.c_str());
 
       cmd += " '::HSTORE); ";
       
@@ -220,8 +222,8 @@ namespace ubpsql {
       for(auto const& key_value : params)
 	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), key_value.second.c_str());
 
-      if(params.find("name")==params.end())
-	cmd += Form(" \"name\"=>\"\"");
+      if(params.find(kPSET_NAME_KEY)==params.end())
+	cmd += Form(" \"%s\"=>%s",kPSET_NAME_KEY.c_str(),kEMPTY_STRING_PARAM.c_str());
 
       cmd += " '::HSTORE); ";
       

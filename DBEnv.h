@@ -25,6 +25,12 @@ namespace ubpsql{
       "host=192.168.144.189 dbname=rctestskazu user=uboonedaq_writer password=argon!uBooNE connect_timeout=5"
     };
 
+  /// Special key string to name a parameter set
+  const std::string kPSET_NAME_KEY("pset_name");
+
+  /// Empty string expression
+  const std::string kEMPTY_STRING_PARAM("");
+
 }
 
 #endif

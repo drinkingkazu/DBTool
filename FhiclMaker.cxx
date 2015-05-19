@@ -2,7 +2,7 @@
 #define DBTOOL_FHICLMAKER_CXX
 
 #include "FhiclMaker.h"
-
+#include "DBEnv.h"
 namespace ubpsql{
 
   FPSet::FPSet(std::string name)
@@ -158,7 +158,7 @@ namespace ubpsql{
 	if(key.IsDefaultCrate() || key.IsDefaultSlot() || key.IsDefaultChannel())
 	  continue;
 
-	auto const name_iter = params.find("name");
+	auto const name_iter = params.find(kPSET_NAME_KEY);
 
 	if(name_iter == params.end()) {
 	  Print(msg::kERROR,__FUNCTION__,
@@ -168,7 +168,6 @@ namespace ubpsql{
 	  throw FhiclError();
 	}
 	std::string name = (*name_iter).second;
-
 	if(key.IsCrate()) {
 	  if(name.empty()) name = Form("Crate%02d",key.Crate());
 	  crate_name_m[key.Crate()] = name;
@@ -230,7 +229,7 @@ namespace ubpsql{
 	auto& pset = this->PSet(crate_name,slot_name,channel_name);
 	
 	for(auto const& key_value : params){
-	  if(key_value.first == "name") continue;
+	  if(key_value.first == kPSET_NAME_KEY) continue;
 	  pset.append(key_value.first,key_value.second);
 	}
       }

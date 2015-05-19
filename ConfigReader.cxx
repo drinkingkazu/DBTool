@@ -263,18 +263,33 @@ namespace ubpsql {
 	if( param.size()<3 
 	    || param.find('(') != 0 || param.rfind(')') != (param.size()-1)
 	    || param.find(',') > param.size() ) {
-	  std::cout<<param.find('(')<<" : "<<param.rfind(')')<<" : "<<param.size()<< " : "<<param.find(",")<<std::endl;
 	  Print(msg::kERROR,__FUNCTION__,Form("Unexpected HSTORE expression: %s",param.c_str()));
 	  throw TableDataError();
 	}
 
 	param = param.substr(1,param.size()-1);
-	std::string key   = param.substr(0,param.find(","));
-	std::string value = param.substr(param.find(",")+1,(param.size()-param.find(",")-2));
-	if(value.find("\"\"\"")==0) value = value.substr(2,value.size()-2);
-	if(value.rfind("\"")<value.size() && value.rfind("\"\"\"")==(value.size()-3)) value = value.substr(0,value.size()-2);
-	p.append(key,value);
-
+	std::string param_key   = param.substr(0,param.find(","));
+	std::string param_value = param.substr(param.find(",")+1,(param.size()-param.find(",")-2));
+	if(param_value.find("\"\"\"")==0)
+	  param_value = param_value.substr(2,param_value.size()-2);
+	if(param_value.rfind("\"")<param_value.size() && param_value.rfind("\"\"\"")==(param_value.size()-3))
+	  param_value = param_value.substr(0,param_value.size()-2);
+	/*
+	if(param_value.find("\"") == 0) {
+	  if(param_value.find("\"\"\"")==0) param_value = param_value.substr(2,param_value.size()-2);
+	  else if(param_value.size()>1) param_value = param_value.substr(1,param_value.size()-1);
+        }
+	if(param_value.rfind("\"")<param_value.size()) {
+	  if(param_value.rfind("\"\"\"")==(param_value.size()-3)) param_value = param_value.substr(0,param_value.size()-2);
+	  else param_value = param_value.substr(0,param_value.size()-1);
+	}
+	*/
+	size_t pos = param_value.find("\"\"");
+	while(pos < param_value.size()) {
+	  param_value.replace(pos, 2, "\"");
+	  pos = param_value.find("\"\"");
+	}
+	p.append(param_key,param_value);
       }
       
       if(!d.contains(key)) d.insert(std::make_pair(key,p));
