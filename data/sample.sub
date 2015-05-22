@@ -2,25 +2,25 @@ DEFINE_CONFIG
 {
   name = sample_sub
   id   = 0
-  mask = 0xf
+  mask = 0x1fff
 }
 
 ADD_CONFIG
 {
-  crate   = 0
+  crate   = 1>>9
   slot    = -1
   channel = -1
   mask    = 0x3f
 
   PARAMETERS
   {
-    pset_name = basicTPCseb
+    # pset_name = basicTPCseb
   }
 }
 
 ADD_CONFIG
 {
-  crate    = 0
+  crate    = 1>>9
   slot     = 0
   channel  = -1
   mask     = 0x0
@@ -36,7 +36,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
+  crate    = 1>>9
   slot     = 1
   channel  = -1
   mask     = 0x0
@@ -61,7 +61,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
+  crate    = 1>>9
   slot     = 2
   channel  = -1
   mask     = 0x0
@@ -76,7 +76,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
+  crate    = 1>>9
   slot     = 3
   channel  = -1
   mask     = 0x0
@@ -92,7 +92,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
+  crate    = 1>>9
   slot     = 4
   channel  = -1
   mask     = 0x0
@@ -108,7 +108,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
+  crate    = 1>>9
   slot     = 5
   channel  = -1
   mask     = 0x0
@@ -124,7 +124,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 1
+  crate    = 10
   slot     = -1
   channel  = -1
   mask     = 0xf
@@ -137,7 +137,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 1
+  crate    = 10
   slot     = 0
   channel  = -1
   mask     = 0x0
@@ -156,7 +156,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 1
+  crate    = 10
   slot     = 1
   channel  = -1
   mask     = 0x0
@@ -169,7 +169,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 1
+  crate    = 10
   slot     = 2
   channel  = -1
   mask     = 0x0
@@ -183,7 +183,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 1
+  crate    = 10
   slot     = 3
   channel  = -1
   mask     = 0x0
@@ -197,7 +197,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = -1
   channel  = -1
   mask     = 0x7f
@@ -210,7 +210,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = 0
   channel  = -1
   mask     = 0x0
@@ -227,7 +227,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = 1
   channel  = -1
   mask     = 0x0
@@ -252,7 +252,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = 2
   channel  = -1
   mask     = 0x0
@@ -267,7 +267,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = 3
   channel  = -1
   mask     = 0x0
@@ -283,7 +283,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = 4
   channel  = -1
   mask     = 0x0
@@ -299,7 +299,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = 5
   channel  = -1
   mask     = 0x0
@@ -315,7 +315,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
+  crate    = 11
   slot     = 6
   channel  = -1
   mask     = 0x0
@@ -329,7 +329,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 3
+  crate    = 12
   slot     = -1
   channel  = -1
   mask     = 0xf
@@ -342,7 +342,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 3
+  crate    = 12
   slot     = 0
   channel  = -1
   mask     = 0x0
@@ -364,7 +364,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 3
+  crate    = 12
   slot     = 1
   channel  = -1
   mask     = 0x0
@@ -393,7 +393,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 3
+  crate    = 12
   slot     = 2
   channel  = -1
   mask     = 0x0
@@ -407,7 +407,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 3
+  crate    = 12
   slot     = 3
   channel  = -1
   mask     = 0x0
@@ -453,7 +453,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
+  crate    = 0
   slot     = -1
   channel  = -1
   mask     = 0x3
@@ -466,7 +466,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
+  crate    = 0
   slot     = 0
   channel  = -1
   mask     = 0x0
@@ -481,7 +481,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
+  crate    = 0
   slot     = 1
   channel  = -1
   mask     = 0x0
@@ -499,7 +499,7 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
+  crate    = 0
   slot     = 2
   channel  = -1
   mask     = 0x0

@@ -28,6 +28,9 @@ namespace ubpsql{
   /// Special key string to name a parameter set
   const std::string kPSET_NAME_KEY("pset_name");
 
+  /// Special key string to have a prefix of the name of a parameter set
+  const std::string kPSET_PREFIX_KEY("pset_prefix");
+
   /// Empty string expression
   const std::string kEMPTY_STRING_PARAM("");
 
