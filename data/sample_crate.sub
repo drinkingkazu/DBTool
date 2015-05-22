@@ -1,0 +1,92 @@
+DEFINE_CONFIG
+{
+  name = sample_crate
+  id   = 0
+  mask = 0x3fe
+}
+
+ADD_CONFIG
+{
+  crate    = 1>>9
+  slot     = -1
+  channel  = -1
+  mask     = 0xfffff
+  pset_prefix = crate
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 1>>9
+  slot      = 19
+  channel   = -1
+  mask      = 0x0
+  pset_name = registration
+
+  PARAMETERS
+  {
+    controller = 0
+    xmit       = 3
+    tpc        = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+
+    recipe         = NU
+    trigger_source = EXT
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 1>>9
+  slot     = 0>>2
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 1>>9
+  slot     = 5>>18
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 1>>9
+  slot     = 3
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+    timesize  = 3199
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 1>>9
+  slot     = 4
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+    channels  = 64
+  }
+}

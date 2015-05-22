@@ -1,7 +1,13 @@
 DEFINE_CONFIG { name = sample }
 
 ADD_CONFIG{
-  name      = sample_sub
+  name      = sample_seb
   config_id = 0
-  mask      = 0x1f
+  mask      = 0x3fe
+}
+
+ADD_CONFIG{
+  name      = sample_crate
+  config_id = 0
+  mask      = 0x3fe
 }
