@@ -14,6 +14,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = basicTPCseb
   }
 }
 
@@ -23,9 +24,10 @@ ADD_CONFIG
   slot      = 0
   channel   = -1
   mask      = 0x0
+  pset_name = registration
   PARAMETERS
   {
-    name        = sebprivXX	
+    name        = sebprivXX
     type        = TPC
     fragment_id = 1
   }
@@ -123,6 +125,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = basicTPCcrate
   }
 }
 
@@ -153,6 +156,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = slot0
   }
 }
 
@@ -165,7 +169,8 @@ ADD_CONFIG
 
   PARAMETERS
   {
-    timesize = 3199
+    pset_name = slot3
+    timesize  = 3199
   }
 }
 
@@ -178,7 +183,8 @@ ADD_CONFIG
 
   PARAMETERS
   {
-    channels = 64
+    pset_name = slot4
+    channels  = 64
   }
 }
 
@@ -191,6 +197,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = basicPMTseb
   }
 }
 
@@ -203,6 +210,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name    = registration
     name         = sebprivXX
     type         = PMT
     fragment_id  = 10
@@ -243,8 +251,8 @@ ADD_CONFIG
   pset_name = sn_stream
   PARAMETERS
   {
-    source  = NONE
-    sink    = NONE
+    source    = NONE
+    sink      = NONE
   }
 }
 
@@ -302,6 +310,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = gps
     enabled   = true
   }
 }
@@ -315,6 +324,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = basicPMTcrate
   }
 }
 
@@ -348,6 +358,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = slot3
     framesize = 25599
     trigmask0 = 0   # ??? (if you know, fill-in)
     trigmask1 = 0   # Enable PMT-FEM trigger ... 0x0=NONE, 0x1=Beam, 0x4=Cosmic, 0x8=ALL
@@ -376,7 +387,8 @@ ADD_CONFIG
 
   PARAMETERS
   {
-    timesize = 3199
+    pset_name = slot4
+    timesize  = 3199
   }
 }
 
@@ -389,7 +401,8 @@ ADD_CONFIG
 
   PARAMETERS
   {
-    channels = 40
+    pset_name = slot6
+    channels  = 40
 
     enable_top    = 0xffff # 3 switches to enable 3 sockets in the front panel of PMT-FEM module.
     enable_middle = 0xffff # Each socket has 16 channels, and 16-bit word is used to enable
@@ -434,6 +447,7 @@ ADD_CONFIG
 
   PARAMETERS
   {
+    pset_name = basicAssembler
   }
 }
 

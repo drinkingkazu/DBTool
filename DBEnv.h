@@ -18,7 +18,7 @@ namespace ubpsql{
   const std::string DBI_CONFIG[kDBI_USER_MAX] =
     {
       /// kCUSTOM_USER
-      "host=localhost dbname=testdb user=kazuhiro connect_timeout=5",
+      "host=localhost dbname=testdb user=yuntse connect_timeout=5",
       /// kUBDAQ_READER
       "host=192.168.144.189 dbname=rctestskazu user=uboonedaq_writer password=argon!uBooNE connect_timeout=5",
       /// kUBDAQ_WRITER
