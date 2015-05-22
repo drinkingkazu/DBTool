@@ -47,21 +47,52 @@ namespace ubpsql {
   void CParamsKey::ls() const
   {
     std::ostringstream msg;
+    msg<<"\033[93m";
     if(this->IsCrate())
       msg << "Crate " << fCrate;
     else if(this->IsSlot())
       msg << "Crate " << fCrate << " Slot " << fSlot;
     else
       msg << "Crate " << fCrate << " Slot " << fSlot << " Channel " << fChannel;
-    msg << " Configuration" << std::endl;
+    msg << " Configuration" << "\033[00m"<< std::endl;
     std::cout<<msg.str();
+  }
+
+  void CParams::Name(const std::string& name)
+  {
+    if(this->find(kPSET_NAME_PREFIX_KEY) != this->end()) {
+      Print(msg::kERROR,__FUNCTION__,"Cannot specify a name as prefix is specified!");
+      throw ConfigError();
+    }
+    fName = name;
+  }
+  
+  void CParams::append(const std::string& key, const std::string& value)
+  {
+    if(this->find(key) != this->end()) {
+      std::ostringstream msg;
+      msg << "Cannot add a duplicate key: "
+	  << key.c_str()
+	  << " with a value "
+	  << value.c_str();
+      Print(msg::kERROR,__FUNCTION__,msg.str());
+      throw ConfigError();
+    }
+    if(key == kPSET_NAME_PREFIX_KEY && !(this->Name().empty())) {
+      Print(msg::kERROR,__FUNCTION__,"Cannot specify a prefix as name is fully specified!");
+      throw ConfigError();
+    }
+    (*this)[key]=value;
   }
   
   void CParams::ls() const
   {
     std::ostringstream msg;
     msg << std::endl
-	<< "    Mask          : ";
+	<< "\033[95m"
+	<< "    Name : " << fName.c_str()  << std::endl
+	<< "    Mask : "
+	<< "\033[00m";
     for(size_t i=0; i < 8*sizeof(size_t); ++i) 
       msg << bool((fMask >> i) & 0x1);
     msg<<std::endl
@@ -86,7 +117,6 @@ namespace ubpsql {
     fcl += "}\n";
     
     return fcl;
-
   }
 
 

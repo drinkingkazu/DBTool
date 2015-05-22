@@ -71,9 +71,15 @@ namespace ubpsql {
     auto const& config_id   = cfg.ConfigID();
     auto const& config_name = cfg.Name();
 
-    auto const& crate_default   = cfg.GetParams(-999,-1,-1);
-    auto const& slot_default    = cfg.GetParams(-1,-999,-1);
-    auto const& channel_default = cfg.GetParams(-1,-1,-999);
+    CParams crate_default, slot_default, channel_default;
+
+    if(cfg.contains(-999,-1,-1)){
+      crate_default = cfg.GetParams(-999,-1,-1);
+    }
+    if(cfg.contains(-1,-999,-1))
+       slot_default = cfg.GetParams(-1,-999,-1);
+    if(cfg.contains(-1,-1,-999))
+       channel_default = cfg.GetParams(-1,-1,-999);
 
     if(!Connect()) throw ConnectionError();
     std::string cmd(Form("SELECT InsertSubConfiguration('%s'::TEXT,%d::INT,",config_name.c_str(),config_id));
@@ -187,8 +193,8 @@ namespace ubpsql {
 	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), value.c_str());
 	
       }
-      if(params.find(kPSET_NAME_KEY)==params.end())
-	cmd += Form(" \"%s\"=>%s",kPSET_NAME_KEY.c_str(),kEMPTY_STRING_PARAM.c_str());
+
+      cmd += Form(" \"%s\"=>\"%s\"",kPSET_NAME_KEY.c_str(),params.Name().c_str());
 
       cmd += " '::HSTORE); ";
       
@@ -222,8 +228,7 @@ namespace ubpsql {
       for(auto const& key_value : params)
 	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), key_value.second.c_str());
 
-      if(params.find(kPSET_NAME_KEY)==params.end())
-	cmd += Form(" \"%s\"=>%s",kPSET_NAME_KEY.c_str(),kEMPTY_STRING_PARAM.c_str());
+      cmd += Form(" \"%s\"=>\"%s\"",kPSET_NAME_KEY.c_str(),params.Name().c_str());
 
       cmd += " '::HSTORE); ";
       

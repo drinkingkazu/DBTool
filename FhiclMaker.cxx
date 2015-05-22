@@ -157,30 +157,15 @@ namespace ubpsql{
 
 	if(key.IsDefaultCrate() || key.IsDefaultSlot() || key.IsDefaultChannel())
 	  continue;
-
-	auto const name_iter = params.find(kPSET_NAME_KEY);
-
-	if(name_iter == params.end()) {
-	  Print(msg::kERROR,__FUNCTION__,
-		Form("CubConfig \"%s\" contains a parameter w/o name!",
-		     sub_cfg.Name().c_str())
-		);
-	  throw FhiclError();
-	}
-	std::string name = (*name_iter).second;
 	if(key.IsCrate()) {
-	  if(name.empty()) name = Form("Crate%02d",key.Crate());
-	  crate_name_m[key.Crate()] = name;
-	  CratePSet(name);
+	  crate_name_m[key.Crate()] = params.Name();
+	  CratePSet(params.Name());
 	}
-	else if(key.IsSlot()) {
-	  if(name.empty()) name = Form("Slot%02d",key.Slot());
-	  slot_name_m[key.Crate()][key.Slot()] = name;
-	}
-	else if(key.IsChannel()) {
-	  if(name.empty()) name = Form("Ch%02d",key.Channel());
-	  channel_name_m[key.Crate()][key.Slot()][key.Channel()] = name;
-	}else{
+	else if(key.IsSlot())
+	  slot_name_m[key.Crate()][key.Slot()] = params.Name();
+	else if(key.IsChannel())
+	  channel_name_m[key.Crate()][key.Slot()][key.Channel()] = params.Name();
+	else{
 	  Print(msg::kERROR,__FUNCTION__,
 		Form("Found ill-defined CParamsKey!"));
 	  throw ConfigError();

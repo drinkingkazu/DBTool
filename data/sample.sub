@@ -19,14 +19,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
-  slot     = 0
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 0
+  slot      = 0
+  channel   = -1
+  mask      = 0x0
   PARAMETERS
   {
-    name        = sebprivXX
+    name        = sebprivXX	
     type        = TPC
     fragment_id = 1
   }
@@ -34,14 +33,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
-  slot     = 1
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 0
+  slot      = 1
+  channel   = -1
+  mask      = 0x0
+  pset_name = nu_stream
   PARAMETERS
   {
-    pset_name = nu_stream
     source               = dma
     dma_buffer_size      = 2e5
     maxpoll              = 1e7
@@ -59,14 +57,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
-  slot     = 2
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 0
+  slot      = 2
+  channel   = -1
+  mask      = 0x0
+  pset_name = sn_stream
   PARAMETERS
   {
-    pset_name = sn_stream
     source  = NONE
     sink    = NONE
   }
@@ -74,14 +71,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
-  slot     = 3
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 0
+  slot      = 3
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_controller
   PARAMETERS
   {
-    pset_name = neviscard_controller
     vendor_id = 0x1172
     device_id = 0x4
     bus       = 0x9
@@ -90,14 +86,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
-  slot     = 4
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 0
+  slot      = 4
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_nu
   PARAMETERS
   {
-    pset_name = neviscard_nu
     vendor_id = 0x1172
     device_id = 0x4
     bus       = 0x5
@@ -106,14 +101,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 0
-  slot     = 5
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 0
+  slot      = 5
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_sn
   PARAMETERS
   {
-    pset_name = neviscard_sn
     vendor_id = 0x1172
     device_id = 0x4
     bus       = 0x4
@@ -134,14 +128,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 1
-  slot     = 0
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 1
+  slot      = 0
+  channel   = -1
+  mask      = 0x0
+  pset_name = registration
   PARAMETERS
   {
-    pset_name = registration
     controller = 0
     xmit       = 3
     tpc        = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
@@ -219,14 +212,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
-  slot     = 1
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 2
+  slot      = 1
+  channel   = -1
+  mask      = 0x0
+  pset_name = nu_stream
   PARAMETERS
   {
-    pset_name = nu_stream
     source               = dma_pmt
     dma_buffer_size      = 80
     maxpoll              = 1e8
@@ -244,14 +236,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
-  slot     = 2
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 2
+  slot      = 2
+  channel   = -1
+  mask      = 0x0
+  pset_name = sn_stream
   PARAMETERS
   {
-    pset_name = sn_stream
     source  = NONE
     sink    = NONE
   }
@@ -259,14 +250,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
-  slot     = 3
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 2
+  slot      = 3
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_controller
   PARAMETERS
   {
-    pset_name = neviscard_controller
     vendor_id = 0x1172
     device_id = 0x4
     bus       = 0x3
@@ -275,14 +265,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
-  slot     = 4
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 2
+  slot      = 4
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_nu
   PARAMETERS
   {
-    pset_name = neviscard_nu
     vendor_id = 0x1172
     device_id = 0x4
     bus       = 0x44
@@ -291,14 +280,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
-  slot     = 5
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 2
+  slot      = 5
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_sn
   PARAMETERS
   {
-    pset_name = neviscard_sn
     vendor_id = 0x1172
     device_id = 0x4
     bus       = 0x4
@@ -332,14 +320,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 3
-  slot     = 0
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 3
+  slot      = 0
+  channel   = -1
+  mask      = 0x0
+  pset_name = registration
   PARAMETERS
   {
-    pset_name = registration
     controller = 0
     xmit       = 4
     tpc        = []
@@ -452,14 +439,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
-  slot     = 0
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 4
+  slot      = 0
+  channel   = -1
+  mask      = 0x0
+  pset_name = registration
   PARAMETERS
   {
-    pset_name = registration
     seb_names = [ "sebpriv01", "sebpriv02", "sebpriv03", "sebpriv04", "sebpriv05", "sebpriv06", "sebpriv07", "sebpriv08", "sebpriv09", "sebpriv10" ]
     seb_types = [ "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "PMT" ]
   }
@@ -467,14 +453,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
-  slot     = 1
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 4
+  slot      = 1
+  channel   = -1
+  mask      = 0x0
+  pset_name = process_and_ship
   PARAMETERS
   {
-    pset_name = process_and_ship
     events_per_subrun  = 100
     output_directory   = "/data/tmp"
     output_file_header = "physics_data"
@@ -485,14 +470,13 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
-  slot     = 2
-  channel  = -1
-  mask     = 0x0
-
+  crate     = 4
+  slot      = 2
+  channel   = -1
+  mask      = 0x0
+  pset_name = fragment_reception
   PARAMETERS
   {
-    pset_name = fragment_reception
     assembler_max_wait = 1000
     port_timeout = 5e3
   }

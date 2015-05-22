@@ -33,11 +33,7 @@ class CUploader(UBPyBase):
 
     def upload_mainconfig(self,fname,batch=False):
         data = None
-        try:
-            data = self._main_parser.parse(fname)
-        except Exception as e:
-            print e
-            return False
+        data = self._main_parser.parse(fname)
 
         if not data:
             self.error('No data read-in ')
@@ -68,10 +64,7 @@ class CUploader(UBPyBase):
     def upload_subconfig(self,fname,batch=False):
 
         data = None
-        try:
-            data = self._sub_parser.parse(fname)
-        except Exception as e:
-            return False
+        data = self._sub_parser.parse(fname)
 
         if not data:
             self.error('No data read-in ')
