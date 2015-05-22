@@ -255,10 +255,35 @@ namespace ubpsql {
 	CParamsKey tmp_key(crate,slot,ch);
 	if(!i) key = CParamsKey(crate,slot,ch);
 	else if(key!=tmp_key) {
+	  if(p.Name().empty()) {
+	    std::string prefix;
+	    if(p.find(kPSET_NAME_PREFIX_KEY) != p.end())
+	      prefix = p[kPSET_NAME_PREFIX_KEY];
+	    
+	    if(key.IsCrate()){
+	      if(prefix.empty()) p.Name(Form("Crate%02d",key.Crate()));
+	      else p.Name(Form("%s%02d",prefix.c_str(),key.Crate()));
+	    }
+	    else if(key.IsSlot()){
+	      if(prefix.empty()) p.Name(Form("Slot%02d",key.Slot()));
+	      else p.Name(Form("%s%02d",prefix.c_str(),key.Slot()));
+	    }
+	    else if(key.IsChannel()){
+	      if(prefix.empty()) p.Name(Form("Ch%02d",key.Channel()));
+	      else p.Name(Form("%s%02d",prefix.c_str(),key.Slot()));
+	    }
+	  }
+	  
+	  if(p.Name().empty()){
+	    std::cout<<"Cannot have an empty name!"<<std::endl;
+	    key.ls();
+	    throw TableDataError();
+	  }
 	  d.insert(std::make_pair(key,p));
 	  key = tmp_key;
 	  p.clear();
 	}
+
 	std::string param = PQgetvalue(res,i,3);
 	if( param.size()<3 
 	    || param.find('(') != 0 || param.rfind(')') != (param.size()-1)
@@ -289,9 +314,13 @@ namespace ubpsql {
 	  param_value.replace(pos, 2, "\"");
 	  pos = param_value.find("\"\"");
 	}
-	p.append(param_key,param_value);
+	if(param_key == kPSET_NAME_KEY)
+	  p.Name(param_value);
+	else
+	  p.append(param_key,param_value);
+	
       }
-      
+
       if(!d.contains(key)) d.insert(std::make_pair(key,p));
 
       result.AddSubConfig(d);

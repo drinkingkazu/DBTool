@@ -16,9 +16,11 @@ namespace ubpsql {
     fName     = name;
     fConfigID = config_id;
     fMask     = mask;
-    this->insert(std::make_pair(CParamsKey(-999,-1,-1),CParams(0)));
-    this->insert(std::make_pair(CParamsKey(-1,-999,-1),CParams(0)));
-    this->insert(std::make_pair(CParamsKey(-1,-1,-999),CParams(0)));
+    /*
+      this->insert(std::make_pair(CParamsKey(-999,-1,-1),CParams(0)));
+      this->insert(std::make_pair(CParamsKey(-1,-999,-1),CParams(0)));
+      this->insert(std::make_pair(CParamsKey(-1,-1,-999),CParams(0)));
+    */
   }
   
   const CParams& SubConfig::GetParams( const int crate,
@@ -39,6 +41,21 @@ namespace ubpsql {
     return (*iter).second;
   }
 
+  void SubConfig::append(const CParamsKey& key,const CParams& value)
+  {
+    if(this->find(key) != this->end()) {
+      std::ostringstream msg;
+      msg << "Configuration for"
+	  << " crate = " << key.Crate()
+	  << " slot = " << key.Slot()
+	  << " ch = " << key.Channel()
+	  << " already registered! (duplication not allowed)";
+      Print(msg::kERROR,__FUNCTION__,msg.str());
+      throw ConfigError();
+    }
+    (*this)[key] = value;
+  }
+  
   void SubConfig::ls() const
   {
     std::cout

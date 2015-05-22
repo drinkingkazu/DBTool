@@ -1,6 +1,8 @@
 from UBPySQLException import *
 from UBPyBase import UBPyBase
 import os,sys,ctypes
+from ROOT import gSystem
+gSystem.Load("libUBOnlineDBI")
 from ROOT import ubpsql, std
 
 class SubCIP(UBPyBase):
@@ -35,6 +37,27 @@ class SubCIP(UBPyBase):
 
         return new_content
 
+    def _parse_numerical_keys_(self,content):
+        result=[]
+        for x in content.split(','):
+            if x.find('>>') < 0:
+                valid = x.isdigit()
+                valid = valid or x.replace('-','').isdigit()
+                if not valid:
+                    return False
+                result.append(int(x))
+            else:
+                ends=x.split('>>')
+                if ( not len(ends)==2 or
+                     not ends[0].isdigit() or
+                     not ends[1].isdigit() or
+                     int(ends[0]) > int(ends[1]) ):
+                    return False
+                start,end = (int(ends[0]),int(ends[1]))
+                for index in xrange(end-start+1):
+                    result.append(start+index)
+        return result
+
     def _parse_one_param_(self,content):
         # Check if config param key is there
         cfg_loc = content.find(self._cfg_add_key)
@@ -63,75 +86,85 @@ class SubCIP(UBPyBase):
                     if y: cfg_def.append(y)
             else: cfg_def.append(x)
 
-        if not (len(cfg_def)) in [6,8]:
-            self.critical('%s block contains invalid number of params (crate, slot, ch, and/or mask)' % \
-                          self._cfg_add_key)
+        valid_keys=('crate','slot','channel','mask',ubpsql.kPSET_NAME_KEY,ubpsql.kPSET_NAME_PREFIX_KEY)
+        if len(cfg_def)%2:
+            self.critical('%s block contains invalid number of params %s',
+                          self._cfg_add_key,
+                          valid_keys)
             self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
             raise ParseIException
+        for index in xrange(len(cfg_def)):
+            if index%2: continue
+            if not cfg_def[index] in valid_keys:
+                self.critical('%s block contains invalid key: %s',
+                              self._cfg_add_key,
+                              cfg_def[index])
+                self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
+                raise ParseIException
 
         # Get parameter ID
         crate = []
         slot  = []
         ch    = []
         mask  = 0
+        name  = ""
+        prefix = ""
         for i in xrange(len(cfg_def)-1):
             try:
                 if cfg_def[i] == 'mask':
+                    if mask:
+                        self.critical('%s block contains duplicate mask def!' % self._cfg_add_key)
+                        raise ParserIException
                     mask = int(cfg_def[i+1],16)
-                if cfg_def[i] == 'crate':
-                    for x in cfg_def[i+1].split(','):
-                        if x.find('>>') < 0:
-                            crate.append(int(x))
-                        else:
-                            ends=x.split('>>')
-                            if ( not len(ends)==2 or
-                                 not ends[0].isdigit() or
-                                 not ends[1].isdigit() or
-                                 int(ends[0]) > int(ends[1]) ):
-                                self.critical('%s block contains invalid crate expression (\"%s\")' % \
-                                              (self._cfg_add_key,cfg_def[i+1]))
-                                raise ParserIException
-                            start,end = (int(ends[0]),int(ends[1]))
-                            for crate_index in xrange(end-start+1):
-                                crate.append(start+crate_index)
-                if cfg_def[i] == 'slot':
-                    for x in cfg_def[i+1].split(','):
-                        if x.find('>>') < 0:
-                            slot.append(int(x))
-                        else:
-                            ends=x.split('>>')
-                            if ( not len(ends)==2 or
-                                 not ends[0].isdigit() or
-                                 not ends[1].isdigit() or
-                                 int(ends[0]) > int(ends[1]) ):
-                                self.critical('%s block contains invalid slot expression (\"%s\")' % \
-                                              (self._cfg_add_key,cfg_def[i+1]))
-                                raise ParserIException
-                            start,end = (int(ends[0]),int(ends[1]))
-                            for slot_index in xrange(end-start+1):
-                                slot.append(start+slot_index)
-                if cfg_def[i] == 'channel':
-                    for x in cfg_def[i+1].split(','):
-                        if x.find('>>') < 0:
-                            ch.append(int(x))
-                        else:
-                            ends=x.split('>>')
-                            if ( not len(ends)==2 or
-                                 not ends[0].isdigit() or
-                                 not ends[1].isdigit() or
-                                 int(ends[0]) > int(ends[1]) ):
-                                self.critical('%s block contains invalid ch expression (\"%s\")' % \
-                                              (self._cfg_add_key,cfg_def[i+1]))
-                                raise ParserIException
-                            start,end = (int(ends[0]),int(ends[1]))
-                            for ch_index in xrange(end-start+1):
-                                ch.append(start+ch_index)
+                elif cfg_def[i] == ubpsql.kPSET_NAME_KEY:
+                    if name:
+                        self.critical('%s block contains duplicate name def!' % self._cfg_add_key)
+                        raise ParserIException
+                    if prefix:
+                        self.critical('%s block contains both name & prefix def!' % self._cfg_add_key)
+                        raise ParserIException
+                    name = str(cfg_def[i+1])
+                elif cfg_def[i] == '%s_prefix' % ubpsql.kPSET_NAME_KEY:
+                    if name:
+                        self.critical('%s block contains both name & prefix def!' % self._cfg_add_key)
+                        raise ParserIException
+                    if prefix:
+                        self.critical('%s block contains duplicate prefix def!' % self._cfg_add_key)
+                        raise ParserIException
+                    prefix = str(cfg_def[i+1])
+                elif cfg_def[i] == 'crate':
+                    if crate:
+                        self.critical('%s block contains duplicate crate def!' % self._cfg_add_key)
+                        raise ParserIException
+                    crate = self._parse_numerical_keys_(cfg_def[i+1])
+                    if not crate:
+                        self.critical('%s block contains invalid crate expression (\"%s\")' % \
+                                      (self._cfg_add_key,cfg_def[i+1]))
+                        raise ParserIException
+                elif cfg_def[i] == 'slot':
+                    if slot:
+                        self.critical('%s block contains duplicate slot def!' % self._cfg_add_key)
+                        raise ParserIException
+                    slot = self._parse_numerical_keys_(cfg_def[i+1])
+                    if not slot:
+                        self.critical('%s block contains invalid slot expression (\"%s\")' % \
+                                      (self._cfg_add_key,cfg_def[i+1]))
+                        raise ParserIException
+                elif cfg_def[i] == 'channel':
+                    if ch:
+                        self.critical('%s block contains duplicate ch def!' % self._cfg_add_key)
+                        raise ParserIException
+                    ch = self._parse_numerical_keys_(cfg_def[i+1])
+                    if not ch:
+                        self.critical('%s block contains invalid ch expression (\"%s\")' % \
+                                      (self._cfg_add_key,cfg_def[i+1]))
+                        raise ParserIException
+
             except TypeError, ValueError:
                 self.critical('%s block contains invalid value (\"%s\") for a key %s' % \
                               (self._cfg_add_key,cfg_def[i+1],cfg_def[i]))
                 self.info('Contents shown below\n %s' % content[cfg_loc:cfg_end+1])
                 raise ParseIException
-
         check_map = {'crate' : crate, 'slot' : slot, 'channel' : ch}
 
         for x in check_map.keys():
@@ -169,11 +202,17 @@ class SubCIP(UBPyBase):
         for c in crate:
             for s in slot:
                 for i in ch:
+
                     res.append([ubpsql.CParamsKey(c,s,i),ubpsql.CParams(mask)])
 
                     for x in params.keys():
                         res[-1][-1].append(x,params[x])
 
+                    if name:
+                        res[-1][-1].Name(name)
+                    if prefix:
+                        res[-1][-1].append(ubpsql.kPSET_NAME_PREFIX_KEY,prefix)
+                        
         return (content.replace(content[cfg_loc:cfg_end+1],''),res)
             
     def _parse_params_(self,content):

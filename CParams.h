@@ -89,30 +89,35 @@ namespace ubpsql {
   public:
     
     /// Restricted constructor
-    CParams(size_t mask      = 0x0)
-    { fMask = mask; this->append(kPSET_NAME_KEY,kEMPTY_STRING_PARAM); }
+    CParams(size_t mask = 0x0,
+	    const std::string& name="")
+      : fMask(mask)
+      , fName(name)
+    {}
     
     /// Default destructor
     virtual ~CParams(){}
 
-    void clear() { fMask=0x0; std::map<std::string,std::string>::clear(); }
+    void clear() { fMask=0x0; fName=""; std::map<std::string,std::string>::clear(); }
     
-    size_t Mask()     const { return fMask;   }
-    void Mask    (size_t m) {        fMask=m; }
+    size_t Mask()               const { return fMask;   }
+    const std::string& Name()   const { return fName;   }
 
+    void Mask (size_t m) { fMask=m; }
+    void Name (const std::string& name);
+    
     std::string FhiclDump() const;
 
     void ls() const;
 
-    void append(const std::string& key, const std::string& value)
-    { (*this)[key]=value; }
+    void append(const std::string& key, const std::string& value);
     
     const std::map<std::string,std::string>& Params() const
     { return (*this); }
 
   private:
     size_t fMask;
-
+    std::string fName;
   };
 }
                                                                     
