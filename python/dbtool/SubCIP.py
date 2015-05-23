@@ -124,7 +124,7 @@ class SubCIP(UBPyBase):
                         self.critical('%s block contains both name & prefix def!' % self._cfg_add_key)
                         raise ParserIException
                     name = str(cfg_def[i+1])
-                elif cfg_def[i] == '%s_prefix' % ubpsql.kPSET_NAME_KEY:
+                elif cfg_def[i] == ubpsql.kPSET_NAME_PREFIX_KEY:
                     if name:
                         self.critical('%s block contains both name & prefix def!' % self._cfg_add_key)
                         raise ParserIException

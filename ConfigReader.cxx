@@ -246,6 +246,7 @@ namespace ubpsql {
 
       CParamsKey key;
       CParams p;
+      std::string pset_name_prefix;
       for(size_t i=0; i<PQntuples(res); ++i) {
 
 	int crate = std::atoi(PQgetvalue(res,i,0));
@@ -256,21 +257,18 @@ namespace ubpsql {
 	if(!i) key = CParamsKey(crate,slot,ch);
 	else if(key!=tmp_key) {
 	  if(p.Name().empty()) {
-	    std::string prefix;
-	    if(p.find(kPSET_NAME_PREFIX_KEY) != p.end())
-	      prefix = p[kPSET_NAME_PREFIX_KEY];
 	    
 	    if(key.IsCrate()){
-	      if(prefix.empty()) p.Name(Form("Crate%02d",key.Crate()));
-	      else p.Name(Form("%s%02d",prefix.c_str(),key.Crate()));
+	      if(pset_name_prefix.empty()) p.Name(Form("Crate%02d",key.Crate()));
+	      else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Crate()));
 	    }
 	    else if(key.IsSlot()){
-	      if(prefix.empty()) p.Name(Form("Slot%02d",key.Slot()));
-	      else p.Name(Form("%s%02d",prefix.c_str(),key.Slot()));
+	      if(pset_name_prefix.empty()) p.Name(Form("Slot%02d",key.Slot()));
+	      else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
 	    }
 	    else if(key.IsChannel()){
-	      if(prefix.empty()) p.Name(Form("Ch%02d",key.Channel()));
-	      else p.Name(Form("%s%02d",prefix.c_str(),key.Slot()));
+	      if(pset_name_prefix.empty()) p.Name(Form("Ch%02d",key.Channel()));
+	      else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
 	    }
 	  }
 	  
@@ -281,6 +279,7 @@ namespace ubpsql {
 	  }
 	  d.insert(std::make_pair(key,p));
 	  key = tmp_key;
+	  pset_name_prefix="";
 	  p.clear();
 	}
 
@@ -314,14 +313,40 @@ namespace ubpsql {
 	  param_value.replace(pos, 2, "\"");
 	  pos = param_value.find("\"\"");
 	}
+
 	if(param_key == kPSET_NAME_KEY)
 	  p.Name(param_value);
+	else if(param_key == kPSET_NAME_PREFIX_KEY)
+	  pset_name_prefix = param_value;
 	else
 	  p.append(param_key,param_value);
 	
       }
-
-      if(!d.contains(key)) d.insert(std::make_pair(key,p));
+      
+      if(!d.contains(key)) {
+	if(p.Name().empty()) {
+	  
+	  if(key.IsCrate()){
+	    if(pset_name_prefix.empty()) p.Name(Form("Crate%02d",key.Crate()));
+	    else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Crate()));
+	  }
+	  else if(key.IsSlot()){
+	    if(pset_name_prefix.empty()) p.Name(Form("Slot%02d",key.Slot()));
+	    else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
+	  }
+	  else if(key.IsChannel()){
+	    if(pset_name_prefix.empty()) p.Name(Form("Ch%02d",key.Channel()));
+	    else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
+	  }
+	}
+	
+	if(p.Name().empty()){
+	  std::cout<<"Cannot have an empty name!"<<std::endl;
+	  key.ls();
+	  throw TableDataError();
+	}
+	d.insert(std::make_pair(key,p));
+      }
 
       result.AddSubConfig(d);
     }

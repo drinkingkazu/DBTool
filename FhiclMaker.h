@@ -77,29 +77,27 @@ namespace ubpsql {
     /// Default destructor
     virtual ~FhiclMaker(){}
 
-    void set(const RunConfig& cfg);
+    FPSet FhiclParameterSet(const SubConfig& cfg);
 
-    const FPSet& pset() const { return _pset; }
+    FPSet FhiclParameterSet(const RunConfig& cfg);
 
-  protected:
+  private:
 
-    FPSet& CratePSet( const std::string& crate_name );
+    FPSet& CratePSet( FPSet& pset, const std::string& crate_name );
 
-    FPSet& SlotPSet ( const std::string& crate_name,
+    FPSet& SlotPSet ( FPSet& pset,
+		      const std::string& crate_name,
 		      const std::string& slot_name );
 
-    FPSet& ChannelPSet ( const std::string& crate_name,
+    FPSet& ChannelPSet ( FPSet& pset,
+			 const std::string& crate_name,
 			 const std::string& slot_name,
 			 const std::string& channel_name);
 
-    FPSet& PSet( const std::string& crate_name,
-		 std::string slot_name="",
-		 std::string channel_name="" );
-    
-  protected:
-
-    FPSet _pset;
-    
+    FPSet& PSet( FPSet& pset,
+		 const std::string& crate_name,
+		 const std::string& slot_name="",
+		 const std::string& channel_name="" );
   };
 }
 

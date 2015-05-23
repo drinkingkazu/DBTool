@@ -82,22 +82,24 @@ namespace ubpsql{
     content += (space + "}\n");
   }
 
-  FhiclMaker::FhiclMaker() : _pset("fhicl")
+  FhiclMaker::FhiclMaker() 
   {}
 
-  FPSet& FhiclMaker::CratePSet( const std::string& name )
+  FPSet& FhiclMaker::CratePSet( FPSet& pset,
+				const std::string& name )
   {
-    if(_pset._node.find(name) == _pset._node.end()) {
+    if(pset._node.find(name) == pset._node.end()) {
       FPSet tmp(name);
-      _pset.append(tmp);
+      pset.append(tmp);
     }
-    return _pset._node[name];
+    return pset._node[name];
   }
   
-  FPSet& FhiclMaker::SlotPSet ( const std::string& crate_name,
+  FPSet& FhiclMaker::SlotPSet ( FPSet& pset,
+				const std::string& crate_name,
 				const std::string& slot_name )
   {
-    auto& crate_pset = CratePSet(crate_name);
+    auto& crate_pset = CratePSet(pset,crate_name);
     if(crate_pset._node.find(slot_name) == crate_pset._node.end()) {
       FPSet tmp(slot_name);
       crate_pset.append(tmp);
@@ -105,11 +107,12 @@ namespace ubpsql{
     return crate_pset._node[slot_name];
   }
   
-  FPSet& FhiclMaker::ChannelPSet ( const std::string& crate_name,
+  FPSet& FhiclMaker::ChannelPSet ( FPSet& pset,
+				   const std::string& crate_name,
 				   const std::string& slot_name,
 				   const std::string& channel_name)
   {
-    auto& slot_pset = SlotPSet(crate_name,slot_name);
+    auto& slot_pset = SlotPSet(pset,crate_name,slot_name);
     if(slot_pset._node.find(channel_name) == slot_pset._node.end()) {
       FPSet tmp(channel_name);
       slot_pset.append(tmp);
@@ -117,9 +120,10 @@ namespace ubpsql{
     return slot_pset._node[channel_name];
   }
 
-  FPSet& FhiclMaker::PSet( const std::string& crate_name,
-			   std::string slot_name,
-			   std::string channel_name )
+  FPSet& FhiclMaker::PSet( FPSet& pset,
+			   const std::string& crate_name,
+			   const std::string& slot_name,
+			   const std::string& channel_name )
   {
     if( crate_name.empty() ) {
       Print(msg::kERROR,__FUNCTION__,
@@ -132,93 +136,105 @@ namespace ubpsql{
       throw FhiclError();
     }
 
-    if(slot_name.empty() && channel_name.empty()) return CratePSet(crate_name);
-    if(channel_name.empty()) return SlotPSet(crate_name,slot_name);
-    return ChannelPSet(crate_name,slot_name,channel_name);
+    if(slot_name.empty() && channel_name.empty()) return CratePSet(pset,crate_name);
+    if(channel_name.empty()) return SlotPSet(pset,crate_name,slot_name);
+    return ChannelPSet(pset,crate_name,slot_name,channel_name);
   }
 
-  void FhiclMaker::set(const RunConfig& cfg)
+  FPSet FhiclMaker::FhiclParameterSet(const SubConfig& sub_cfg)
   {
-    _pset.clear(cfg.Name());
+    FPSet pset(sub_cfg.Name());
 
-    for(auto const& sub_cfg_name : cfg.List()) {
-
-      auto const& sub_cfg = cfg.Get(sub_cfg_name);
-
-      // Get crate/slot/channel name
-      std::map<int,std::string> crate_name_m;
-      std::map<int,std::map<int,std::string> > slot_name_m;
-      std::map<int,std::map<int,std::map<int,std::string> > > channel_name_m;
-
-      for(auto const& key_param : sub_cfg) {
-
-	auto const& key    = key_param.first;
-	auto const& params = key_param.second;
-
-	if(key.IsDefaultCrate() || key.IsDefaultSlot() || key.IsDefaultChannel())
-	  continue;
-	if(key.IsCrate()) {
-	  crate_name_m[key.Crate()] = params.Name();
-	  CratePSet(params.Name());
-	}
-	else if(key.IsSlot())
-	  slot_name_m[key.Crate()][key.Slot()] = params.Name();
-	else if(key.IsChannel())
-	  channel_name_m[key.Crate()][key.Slot()][key.Channel()] = params.Name();
-	else{
-	  Print(msg::kERROR,__FUNCTION__,
-		Form("Found ill-defined CParamsKey!"));
-	  throw ConfigError();
-	}
-      }
+    // Get crate/slot/channel name
+    std::map<int,std::string> crate_name_m;
+    std::map<int,std::map<int,std::string> > slot_name_m;
+    std::map<int,std::map<int,std::map<int,std::string> > > channel_name_m;
+    
+    for(auto const& key_param : sub_cfg) {
       
-      for(auto const& crate_slot_pair : slot_name_m) {
-	auto const& crate = crate_slot_pair.first;
-	auto const& slot_name = crate_slot_pair.second;
-	for(auto const& id_name : slot_name) {
-	  SlotPSet(crate_name_m[crate],
-		   id_name.second);
-	}
+      auto const& key    = key_param.first;
+      auto const& params = key_param.second;
+      
+      if(key.IsDefaultCrate() || key.IsDefaultSlot() || key.IsDefaultChannel())
+	continue;
+      if(key.IsCrate()) {
+	crate_name_m[key.Crate()] = params.Name();
+	CratePSet(pset,params.Name());
       }
-
-      for(auto const& crate_slot_pair : channel_name_m) {
-	auto const& crate = crate_slot_pair.first;
-	auto const& slot_channel = crate_slot_pair.second;
-	for(auto const& slot_ch_pair : slot_channel) {
-	  auto const& slot = slot_ch_pair.first;
-	  auto const& ch_name = slot_ch_pair.second;
-	  for(auto const& id_name : ch_name){
-	    ChannelPSet(crate_name_m[crate],
-			slot_name_m[crate][slot],
-			id_name.second);
-	  }
-	}
+      else if(key.IsSlot())
+	slot_name_m[key.Crate()][key.Slot()] = params.Name();
+      else if(key.IsChannel())
+	channel_name_m[key.Crate()][key.Slot()][key.Channel()] = params.Name();
+      else{
+	Print(msg::kERROR,__FUNCTION__,
+	      Form("Found ill-defined CParamsKey!"));
+	throw ConfigError();
       }
-
-      // Insert a configuration
-      for(auto const& key_param : sub_cfg) {
-
-	auto const& key    = key_param.first;
-	auto const& params = key_param.second;
-
-	if(key.IsDefaultCrate() || key.IsDefaultSlot() || key.IsDefaultChannel())
-	  continue;
-
-	auto const& crate_name = crate_name_m[key.Crate()];
-	std::string slot_name, channel_name;
-	if(!key.IsCrate())
-	  slot_name = slot_name_m[key.Crate()][key.Slot()];
-	if(key.IsChannel())
-	  channel_name = channel_name_m[key.Crate()][key.Slot()][key.Channel()];
-
-	auto& pset = this->PSet(crate_name,slot_name,channel_name);
-	
-	for(auto const& key_value : params){
-	  if(key_value.first == kPSET_NAME_KEY) continue;
-	  pset.append(key_value.first,key_value.second);
+    }
+    
+    for(auto const& crate_slot_pair : slot_name_m) {
+      auto const& crate = crate_slot_pair.first;
+      auto const& slot_name = crate_slot_pair.second;
+      for(auto const& id_name : slot_name) {
+	SlotPSet(pset,crate_name_m[crate],
+		 id_name.second);
+      }
+    }
+    
+    for(auto const& crate_slot_pair : channel_name_m) {
+      auto const& crate = crate_slot_pair.first;
+      auto const& slot_channel = crate_slot_pair.second;
+      for(auto const& slot_ch_pair : slot_channel) {
+	auto const& slot = slot_ch_pair.first;
+	auto const& ch_name = slot_ch_pair.second;
+	for(auto const& id_name : ch_name){
+	  ChannelPSet(pset,
+		      crate_name_m[crate],
+		      slot_name_m[crate][slot],
+		      id_name.second);
 	}
       }
     }
+    
+    // Insert a configuration
+    for(auto const& key_param : sub_cfg) {
+      
+      auto const& key    = key_param.first;
+      auto const& params = key_param.second;
+      
+      if(key.IsDefaultCrate() || key.IsDefaultSlot() || key.IsDefaultChannel())
+	continue;
+      
+      auto const& crate_name = crate_name_m[key.Crate()];
+      std::string slot_name, channel_name;
+      if(!key.IsCrate())
+	slot_name = slot_name_m[key.Crate()][key.Slot()];
+      if(key.IsChannel())
+	channel_name = channel_name_m[key.Crate()][key.Slot()][key.Channel()];
+      
+      auto& target_pset = this->PSet(pset,crate_name,slot_name,channel_name);
+      
+      for(auto const& key_value : params){
+	if(key_value.first == kPSET_NAME_KEY) continue;
+	if(key_value.first == kPSET_NAME_PREFIX_KEY) continue;
+	target_pset.append(key_value.first,key_value.second);
+      }
+    }
+    return pset;
+  }
+
+  FPSet FhiclMaker::FhiclParameterSet(const RunConfig& cfg)
+  {
+    FPSet pset(cfg.Name());
+
+    for(auto const& sub_cfg_name : cfg.List()) {
+
+      auto sub_cfg_pset = this->FhiclParameterSet(cfg.Get(sub_cfg_name));
+
+      pset.append(sub_cfg_pset);
+      
+    }
+    return pset;
   }
 }
 
