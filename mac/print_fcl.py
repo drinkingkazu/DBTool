@@ -1,4 +1,4 @@
-from ROOT import ubpsql
+from dbtool import ubpsql
 from ROOT import TString
 import sys
 

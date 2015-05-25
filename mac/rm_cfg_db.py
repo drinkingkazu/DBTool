@@ -1,4 +1,4 @@
-from ROOT import ubpsql
+from dbtool import ubpsql
 
 writer = ubpsql.ConfigWriter()
 

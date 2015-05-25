@@ -1,6 +1,6 @@
 import sys,__main__
-from dbtool import CUploader
-from ROOT import ubpsql
+from dbtool import CUploader, ubpsql
+
 if not len(sys.argv) == 2 or (sys.argv[1].endswith('.sub') and sys.argv[1].endswith('.main')):
     print
     print 'Usage: %s CONFIG_FILE' % __main__.__file__

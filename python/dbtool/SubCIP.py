@@ -1,9 +1,7 @@
 from UBPySQLException import *
 from UBPyBase import UBPyBase
 import os,sys,ctypes
-from ROOT import gSystem
-gSystem.Load("libUBOnlineDBI")
-from ROOT import ubpsql, std
+from DBToolCPP import ubpsql, std
 
 class SubCIP(UBPyBase):
 

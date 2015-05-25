@@ -3,7 +3,7 @@ from UBPySQLException import UploadException
 from SubCIP import SubCIP
 from MainCIP import MainCIP
 from UBPyBase import UBPyBase
-from ROOT import ubpsql, std
+from DBToolCPP import ubpsql, std
 
 class CUploader(UBPyBase):
 

@@ -1,7 +1,7 @@
 from UBPySQLException import *
 from UBPyBase import UBPyBase
 import os,sys,ctypes
-from ROOT import ubpsql, std
+from DBToolCPP import ubpsql, std
 
 class MainCIP(UBPyBase):
 
