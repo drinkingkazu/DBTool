@@ -20,6 +20,7 @@ endif()
 
 # Get list of course
 file( GLOB MYHEADERS *.h  )
+file( GLOB MYSOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cxx  )
 file( GLOB LINKDEF LinkDef.h )
 list( GET LINKDEF 0 LINKDEF )
 list( REMOVE_ITEM MYHEADERS ${LINKDEF} )
@@ -31,14 +32,15 @@ execute_process(COMMAND root-config --cflags OUTPUT_VARIABLE ROOTINC OUTPUT_STRI
 
 # Set include dirs
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories($ENV{PGSQL_DIR}include)
-set(CMAKE_SHARED_LINKER_FLAGS ${ROOTLIB})
-set(CMAKE_CXX_FLAGS "${ROOTINC} -I$ENV{PGSQL_DIR}include")
+include_directories($ENV{PGSQL_DIR}/include)
+set(CMAKE_SHARED_LINKER_FLAGS "${ROOTLIB} -L$ENV{PGSQL_DIR}/lib -lpq")
+set(CMAKE_CXX_FLAGS "${ROOTINC} -I$ENV{PGSQL_DIR}/include")
 MESSAGE("CMAKE_SHARED_LINKER_FLAGS:" ${CMAKE_SHARED_LINKER_FLAGS})
 MESSAGE("CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS})
 
 # Compile libraries
 foreach( SRCFILE ${MYSOURCES} )
+MESSAGE("SRCFILE: " ${SRCFILE})
 string( REPLACE "." ";" SRCHOLDER ${SRCFILE} )
 list( GET SRCHOLDER 0 LIBFILE )
 list( APPEND MYLIBS ${LIBFILE} )
@@ -46,9 +48,22 @@ add_library( ${LIBFILE} STATIC ${SRCFILE} )
 link_libraries( ${LIBFILE} )
 endforeach()
 
-add_library(${DICT_NAME} STATIC ${DICT_NAME}.cxx)
+# Custom compilation for a dictionary
+add_library(${DICT_NAME} STATIC ${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.cxx)
 link_libraries(${DICT_NAME})
-add_library(UBOnlineDBI SHARED ${MYLIBS} ${DICT_NAME})
 
+# Generate a package library
+add_library(UBOnlineDBI SHARED ${MYLIBS} ${DICT_NAME})
+set_target_properties( UBOnlineDBI
+		       PROPERTIES
+	               LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib
+)
+
+# Generate a rootmap file
+add_custom_command( TARGET UBOnlineDBI
+		    POST_BUILD
+		    COMMAND rlibmap ARGS -f  -o ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap -l ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.dylib -c ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h
+		    )
+set_directory_properties( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap" )
 # Final: executables
 #add_executable(crap mymain.cc)
