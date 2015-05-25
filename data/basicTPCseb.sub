@@ -2,30 +2,45 @@ DEFINE_CONFIG
 {
   name = basicTPCseb
   id   = 0
-  mask = 0xffffffffffffffff
+  mask = 0x3fe
 }
 
 ADD_CONFIG
 {
-  crate    = 0
-  slot     = 0
-  channel  = 0
-  mask     = 0xffffffffffffffff
+  crate   = 1>>9
+  slot    = -1
+  channel = -1
+  mask    = 0x3f
+  pset_prefix = sebpriv
 
   PARAMETERS
   {
-    name         = sebprivXX
-    type         = TPC
-    fragment_id  = 1
   }
 }
 
 ADD_CONFIG
 {
-  crate    = 1
-  slot     = 0
-  channel  = 0
-  mask     = 0xffffffffffffffff
+  crate     = 1>>9
+  slot      = 0
+  channel   = -1
+  mask      = 0x0
+  pset_name = registration
+
+  PARAMETERS
+  {
+    name        = sebprivXX
+    type        = TPC
+    fragment_id = 1
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 1>>9
+  slot      = 1
+  channel   = -1
+  mask      = 0x0
+  pset_name = nu_stream
 
   PARAMETERS
   {
@@ -46,10 +61,11 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 2
-  slot     = 0
-  channel  = 0
-  mask     = 0xffffffffffffffff
+  crate     = 1>>9
+  slot      = 2
+  channel   = -1
+  mask      = 0x0
+  pset_name = sn_stream
 
   PARAMETERS
   {
@@ -60,10 +76,11 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 3
-  slot     = 0
-  channel  = 0
-  mask     = 0xffffffffffffffff
+  crate     = 1>>9
+  slot      = 3
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_controller
 
   PARAMETERS
   {
@@ -75,10 +92,11 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 4
-  slot     = 0
-  channel  = 0
-  mask     = 0xffffffffffffffff
+  crate     = 1>>9
+  slot      = 4
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_nu
 
   PARAMETERS
   {
@@ -90,10 +108,11 @@ ADD_CONFIG
 
 ADD_CONFIG
 {
-  crate    = 5
-  slot     = 0
-  channel  = 0
-  mask     = 0xffffffffffffffff
+  crate     = 1>>9
+  slot      = 5
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_sn
 
   PARAMETERS
   {
@@ -102,3 +121,4 @@ ADD_CONFIG
     bus       = 0x4
   }
 }
+
