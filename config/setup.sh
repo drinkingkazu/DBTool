@@ -6,6 +6,7 @@ me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 `python $me/python/clean_env.py DYLD_LIBRARY_PATH`
 `python $me/python/clean_env.py PYTHONPATH`
 `python $me/python/clean_env.py PATH`
+export PGSQL_DIR=/usr/local/pgsql/
 
 if [[ -z $FORCE_DBTOOL_DIR ]]; then
     # If DBTOOL_DIR not set, try to guess

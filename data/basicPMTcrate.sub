@@ -1,0 +1,159 @@
+DEFINE_CONFIG
+{
+  name = basicPMTcrate
+  id   = 0
+  mask = 0x400
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = -1
+  channel  = -1
+  mask     = 0xfffff
+  pset_prefix = crate
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = 0>>2
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = 3
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+    framesize = 25599
+    trigmask0 = 0   # ??? (if you know, fill-in)
+    trigmask1 = 0   # Enable PMT-FEM trigger ... 0x0=NONE, 0x1=Beam, 0x4=Cosmic, 0x8=ALL
+    trigmask8 = 58 #(0x2+0x8+0x20+0x10)=58 #0x2 # Enable external-input trigger ... 0x0=NONE, 0x2=EXT, 0x38=BNB
+
+    prescale0 = 0
+    prescale1 = 0
+    prescale8 = 0
+    g1start   = 0x1
+    g1end     = 0x1
+    g1width   = 0x20
+    g1delay   = 0x10
+    g2start   = 0x1
+    g2end     = 0x20
+    g2width   = 0x20
+    g2delay   = 0x10
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = 4
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+    timesize = 3199
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = 5
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = 6>>9
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+    channels = 40
+
+    enable_top    = 0xffff # 3 switches to enable 3 sockets in the front panel of PMT-FEM module.
+    enable_middle = 0xffff # Each socket has 16 channels, and 16-bit word is used to enable
+    enable_bottom = 0xffff # individual channels per socket. Easier way to enable channels by
+                          # channel number is introduced in the later part.
+
+    # Overall channel configuration
+    # Parameters specified here is applied to all channels.
+    # If you wish to tune parameter value channel-wise, see the later part.
+    #
+    pmt_precount = 3      # pre-count for discriminators
+    pmt_words    = 20     # Number of PMT-words to read-in
+    pmt_deadtime = 24     # Dead-time in 64MHz sample count
+    threshold0   = 4      # Discriminator 0 threshold
+    threshold1   = 400    # Discriminator 1 threshold (cosmic)
+    threshold3   = 1000   # Discriminator 3 threshold (beam)
+
+    # Parameters for PMT-Trigger condition
+    #
+    pmt_width    = 5      # Sample width to issue PMT-Trigger
+    cos_mult     = 1      # Disc. 1 multiplicity condition for cosmic trigger
+    cos_thres    = 200    # Disc. 1 max adc sum  condition for cosmic trigger
+    beam_mult    = 1      # Disc. 3 multiplicity condition for beam trigger
+    beam_thres   = 1      # Disc. 3 max adc sum  condition for beam trigger
+    # Beamgate parameters
+    # This is somewhat confusing, but you can see detailed diagram and explanation
+    # in PMTFrontEndModule.h. Take a look at there.
+    #
+    pmt_gate_size  = 1500 # Beamgate readout window size in 64MHz clock
+    pmt_beam_size  = 102  # Beamgate spill width in 64 MHz clock
+    pmt_beam_delay = 256  # Beamgate spill start time from the readout window start in 64MHz clock
+
+    # Channel-wise parameter configuration
+    # The following allows you to configure some parameters channel-wise.
+    # "chwise_enable" is an array of channel numbers you wish to enable & configure.
+    # Other "chwise_*" parameters must have the same length and sets self-descriptive parameters.
+    # Commented out by default.
+    #
+    #chwise_enable     = [0,   2,   7   ]  # Channel numbers to be enabled
+    #chwise_deadtime   = [44,  44,  44  ]  # Deadtime for enabled channels (64MHz clock)
+    #chwise_words      = [40,  40,  40  ]  # Number of samples to readout  (64MHz clock)
+    #chwise_threshold1 = [20,  20,  20  ]  # Disc. 1 (cosmic) threshold    (ADC count)
+    #chwise_threshold3 = [1000,1000,1000]  # Disc. 3 (beam)   threshold    (ADC count)
+
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = 10>>20
+  channel  = -1
+  mask     = 0x0
+  pset_prefix = slot
+
+  PARAMETERS
+  {
+  }
+}

@@ -1,0 +1,139 @@
+DEFINE_CONFIG
+{
+  name = basicPMTseb
+  id   = 0
+  mask = 0x400
+}
+
+ADD_CONFIG
+{
+  crate    = 10
+  slot     = -1
+  channel  = -1
+  mask     = 0x7f
+  pset_prefix = sebpriv
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 10
+  slot      = 0
+  channel   = -1
+  mask      = 0x0
+  pset_name = registration
+
+  PARAMETERS
+  {
+    name        = sebprivXX
+    type        = PMT
+    fragment_id =  10
+    interruptGPS = true
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 10
+  slot      = 1
+  channel   = -1
+  mask      = 0x0
+  pset_name = nu_stream
+
+  PARAMETERS
+  {
+    source               = dma_pmt
+    dma_buffer_size      = 80
+    maxpoll              = 1e8
+    timesize             = 3199
+    dmastrategy          = disrespect
+    delay_after_trigger  = 0
+    max_internal_trigger = 0
+    circular_buffer_size = 1e9
+    configMem_shmKey     = 31998
+
+    sink                 = assembler
+    port                 = 33421
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 10
+  slot      = 2
+  channel   = -1
+  mask      = 0x0
+  pset_name = sn_stream
+
+  PARAMETERS
+  {
+    source  = NONE
+    sink    = NONE
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 10
+  slot      = 3
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_controller
+
+  PARAMETERS
+  {
+    vendor_id = 0x1172
+    device_id = 0x4
+    bus       = 0x3
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 10
+  slot      = 4
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_nu
+
+  PARAMETERS
+  {
+    vendor_id = 0x1172
+    device_id = 0x4
+    bus       = 0x44
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 10
+  slot      = 5
+  channel   = -1
+  mask      = 0x0
+  pset_name = neviscard_sn
+
+  PARAMETERS
+  {
+    vendor_id = 0x1172
+    device_id = 0x4
+    bus       = 0x4
+  }
+}
+
+ADD_CONFIG
+{
+  crate     = 10
+  slot      = 6
+  channel   = -1
+  mask      = 0x0
+  pset_name = gps
+
+  PARAMETERS
+  {
+    enabled   = true
+  }
+}
+

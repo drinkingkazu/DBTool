@@ -1,13 +1,31 @@
 DEFINE_CONFIG { name = sample }
 
 ADD_CONFIG{
-  name      = sample_seb
+  name      = basicTPCseb
   config_id = 0
   mask      = 0x3fe
 }
 
 ADD_CONFIG{
-  name      = sample_crate
+  name      = basicTPCcrate
   config_id = 0
   mask      = 0x3fe
+}
+
+ADD_CONFIG{
+  name      = basicPMTseb
+  config_id = 0
+  mask      = 0x400
+}
+
+ADD_CONFIG{
+  name      = basicPMTcrate
+  config_id = 0
+  mask      = 0x400
+}
+
+ADD_CONFIG{
+  name      = basicAssembler
+  config_id = 0
+  mask      = 0x1
 }

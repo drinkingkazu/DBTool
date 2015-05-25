@@ -1,0 +1,68 @@
+DEFINE_CONFIG
+{
+  name = basicAssembler
+  id   = 0
+  mask = 0x1
+}
+
+ADD_CONFIG
+{
+  crate    = 0
+  slot     = -1
+  channel  = -1
+  mask     = 0x7
+  pset_name = basicAssembler
+
+  PARAMETERS
+  {
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 0
+  slot     = 0
+  channel  = -1
+  mask     = 0x0
+  pset_name = registration
+
+  PARAMETERS
+  {
+    seb_names = [ "sebpriv01", "sebpriv02", "sebpriv03", "sebpriv04", "sebpriv05", "sebpriv06", "sebpriv07", "sebpriv08", "sebpriv09", "sebpriv10" ]
+    seb_types = [ "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "TPC", "PMT" ]
+    seb_ports = [ 33421, 33421, 33421, 33421, 33421, 33421, 33421, 33421, 33421, 33421 ]
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 0
+  slot     = 1
+  channel  = -1
+  mask     = 0x0
+  pset_name = process_and_ship
+
+  PARAMETERS
+  {
+    events_per_subrun  = 100
+    output_directory   = "/data/tmp"
+    output_file_header = "physics_data"
+    shmKey = 31598
+    shmSize = 2e5
+  }
+}
+
+ADD_CONFIG
+{
+  crate    = 0
+  slot     = 2
+  channel  = -1
+  mask     = 0x0
+  pset_name = fragment_reception
+
+  PARAMETERS
+  {
+    assembler_max_wait = 1000
+    port_timeout = 5e3
+  }
+}
