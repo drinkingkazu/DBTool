@@ -15,13 +15,13 @@ case `uname -n` in
     source /home/uboonedaq/.sqlaccess/prod_conf.sh
     ;;
     (*)
-    if [[ -z $DBTOOL_DIR/config/${USER}_conf.sh ]]; then
+    if [[ -e $DBTOOL_DIR/config/${USER}_conf.sh ]]; then
 	echo Sourcing a user specific DB config script...
 	source $DBTOOL_DIR/config/${USER}_conf.sh
     else
 	echo No special setup done for the server `uname -n`
     fi
-    (*)
+    ;;
 esac
 
 # Abort if ROOT not installed. Let's check rootcint for this.
