@@ -26,22 +26,23 @@ list( GET LINKDEF 0 LINKDEF )
 list( REMOVE_ITEM MYHEADERS ${LINKDEF} )
 
 # Pre process to generate dictionary source code + getting compiler/linker flags
-execute_process(COMMAND pg_config --includedir OUTPUT_VARIABLE PGINC OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND pg_config --libdir OUTPUT_VARIABLE PGLIB OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND rootcint -f ${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.cxx -c -I${PGINC} -I. ${MYHEADERS} ${LINKDEF})
-execute_process(COMMAND root-config --libs OUTPUT_VARIABLE ROOTLIB OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND root-config --cflags OUTPUT_VARIABLE ROOTINC OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND pg_config --includedir OUTPUT_VARIABLE PSQL_INCDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND pg_config --libdir OUTPUT_VARIABLE PSQL_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND root-config --incdir OUTPUT_VARIABLE ROOT_INCDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND root-config --libdir OUTPUT_VARIABLE ROOT_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND rootcint -f ${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.cxx -c -I${PSQL_INCDIR} -I${ROOT_INCDIR} -I. ${MYHEADERS} ${LINKDEF})
+set(PSQL_LIB "-L${PSQL_LIBDIR} -lpq")
+set(ROOT_LIB "-L${ROOT_LIBDIR} -lCore -lCint -lRIO")
 
 # Set include dirs
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${PGINC})
-set(CMAKE_SHARED_LINKER_FLAGS "${ROOTLIB} -L${PGLIB} -lpq")
-set(CMAKE_CXX_FLAGS "${ROOTINC} -I${PGINC}/include")
-#MESSAGE("CMAKE_SHARED_LINKER_FLAGS:" ${CMAKE_SHARED_LINKER_FLAGS})
-#MESSAGE("CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS})
+include_directories(${PSQL_INCDIR})
+include_directories(${ROOT_INCDIR})
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Generate a package library ... make sure dictionary comes the end
 add_library(UBOnlineDBI SHARED ${MYSOURCES} ${DICT_NAME}.cxx)
+target_link_libraries(UBOnlineDBI ${PSQL_LIB} ${ROOT_LIB} )
 set_target_properties( UBOnlineDBI
 		       PROPERTIES
 	               LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib
