@@ -15,7 +15,7 @@ namespace ubpsql{
     }
   }
   
-  void FPSet::append(const std::string& key, 
+  void FPSet::Append(const std::string& key, 
 		     const std::string& param)
   { 
     auto const leaf_iter = _leaf.find(key);
@@ -37,50 +37,70 @@ namespace ubpsql{
     return;
   }
   
-  void FPSet::append(const FPSet& pset)
+  void FPSet::Append(const FPSet& pset)
   {
-    auto const leaf_iter = _leaf.find(pset.name());
+    auto const leaf_iter = _leaf.find(pset.Name());
     if(leaf_iter != _leaf.end()) {
       Print(msg::kWARNING,__FUNCTION__,
 	    Form("Overriding key \"%s\" (\"%s\"=>FPSet)",
-		 pset.name().c_str(),(*leaf_iter).second.c_str())
+		 pset.Name().c_str(),(*leaf_iter).second.c_str())
 	    );
-      _leaf.erase(pset.name());
+      _leaf.erase(pset.Name());
     }
-    auto const node_iter = _node.find(pset.name());
+    auto const node_iter = _node.find(pset.Name());
     if(node_iter != _node.end()){
       Print(msg::kWARNING,__FUNCTION__,
 	    Form("Overriding key \"%s\" (FPSet=>FPSet\")",
-		 pset.name().c_str())
+		 pset.Name().c_str())
 	    );
     }
-    _node.insert(std::make_pair(pset.name(),pset));
+    _node.insert(std::make_pair(pset.Name(),pset));
     return;
   }
   
-  void FPSet::append(const std::string& key,
+  void FPSet::Append(const std::string& key,
 		     const std::map<std::string,std::string>& pset)
   {
     FPSet p(key);
     for(auto const& key_value : pset)
-      p.append(key_value.first,key_value.second);
-    append(p);
+      p.Append(key_value.first,key_value.second);
+    Append(p);
   }
 
-  void FPSet::dump(std::string& content,size_t level) const
+  void FPSet::Dump(std::string& content,size_t level) const
   {
     std::string space;
     for(size_t i=0; i<(level*2); ++i) space += " ";
-    content += (space + name() + ":{\n");
+    content += (space + Name() + ":{\n");
     for(auto const& key_value : _leaf)
       
       content += (space + "  " + key_value.first + " : " + key_value.second + "\n");
     
     for(auto const& key_pset : _node)
 
-      key_pset.second.dump(content,(level+1));
+      key_pset.second.Dump(content,(level+1));
 
     content += (space + "}\n");
+  }
+
+  std::vector<std::string> FPSet::ListNodes() const
+  {
+    std::vector<std::string> res;
+    res.reserve(_node.size());
+
+    for(auto const& name_pset : _node)
+      res.push_back(name_pset.first);
+    return res;
+  }
+
+  const FPSet& FPSet::GetNode(const std::string node_name) const
+  {
+    auto iter = _node.find(node_name);
+    if(iter == _node.end()){
+      Print(msg::kERROR,__FUNCTION__,Form("Node: \"%s\" does not exist...",node_name.c_str()));
+      throw FhiclError();
+    }
+    return (*iter).second;
   }
 
   FhiclMaker::FhiclMaker() 
@@ -91,7 +111,7 @@ namespace ubpsql{
   {
     if(pset._node.find(name) == pset._node.end()) {
       FPSet tmp(name);
-      pset.append(tmp);
+      pset.Append(tmp);
     }
     return pset._node[name];
   }
@@ -103,7 +123,7 @@ namespace ubpsql{
     auto& crate_pset = CratePSet(pset,crate_name);
     if(crate_pset._node.find(slot_name) == crate_pset._node.end()) {
       FPSet tmp(slot_name);
-      crate_pset.append(tmp);
+      crate_pset.Append(tmp);
     }
     return crate_pset._node[slot_name];
   }
@@ -116,7 +136,7 @@ namespace ubpsql{
     auto& slot_pset = SlotPSet(pset,crate_name,slot_name);
     if(slot_pset._node.find(channel_name) == slot_pset._node.end()) {
       FPSet tmp(channel_name);
-      slot_pset.append(tmp);
+      slot_pset.Append(tmp);
     }    
     return slot_pset._node[channel_name];
   }
@@ -218,7 +238,7 @@ namespace ubpsql{
       for(auto const& key_value : params){
 	if(key_value.first == kPSET_NAME_KEY) continue;
 	if(key_value.first == kPSET_NAME_PREFIX_KEY) continue;
-	target_pset.append(key_value.first,key_value.second);
+	target_pset.Append(key_value.first,key_value.second);
       }
     }
     return pset;
@@ -232,7 +252,7 @@ namespace ubpsql{
 
       auto sub_cfg_pset = this->FhiclParameterSet(cfg.Get(sub_cfg_name));
 
-      pset.append(sub_cfg_pset);
+      pset.Append(sub_cfg_pset);
       
     }
     return pset;

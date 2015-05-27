@@ -29,29 +29,33 @@ namespace ubpsql {
 
     virtual ~FPSet(){}
 
-    void append(const std::string& key, 
+    const std::string& Name() const { return _name; }
+    
+    void Append(const std::string& key, 
 		const std::string& param);
 
-    void append(const FPSet& pset);
+    void Append(const FPSet& pset);
 
-    void append(const std::string& key,
+    void Append(const std::string& key,
 		const std::map<std::string,std::string>& pset);
 
-    const std::string& name() const { return _name; }
-
-    void clear(std::string new_name="") { 
+    void Clear(std::string new_name="") { 
       if(!new_name.empty()) _name = new_name;
       _leaf.clear();
       _node.clear();
     }
 
-    void dump(std::string& content,size_t level=0) const;
+    void Dump(std::string& content,size_t level=0) const;
 
     inline bool operator< (const FPSet& rhs) const
-    { return _name < rhs.name(); }
+    { return _name < rhs.Name(); }
 
-    std::string dump() const
-    { std::string res; dump(res); return res;}
+    std::string Dump() const
+    { std::string res; Dump(res); return res;}
+
+    std::vector<std::string> ListNodes() const;
+
+    const FPSet& GetNode(const std::string node_name) const;
     
   protected:
 

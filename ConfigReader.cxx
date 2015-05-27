@@ -296,8 +296,12 @@ namespace ubpsql {
 	std::string param_value = param.substr(param.find(",")+1,(param.size()-param.find(",")-2));
 	if(param_value.find("\"\"\"")==0)
 	  param_value = param_value.substr(2,param_value.size()-2);
+	else if(param_value.find("\"")==0)
+	  param_value = param_value.substr(1,param_value.size()-1);
 	if(param_value.rfind("\"")<param_value.size() && param_value.rfind("\"\"\"")==(param_value.size()-3))
 	  param_value = param_value.substr(0,param_value.size()-2);
+	else if(param_value.rfind("\"")<param_value.size())
+	  param_value = param_value.substr(0,param_value.size()-1);
 	/*
 	if(param_value.find("\"") == 0) {
 	  if(param_value.find("\"\"\"")==0) param_value = param_value.substr(2,param_value.size()-2);

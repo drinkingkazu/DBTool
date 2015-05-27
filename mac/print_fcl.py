@@ -22,6 +22,10 @@ if not reader.ExistRunConfig(sys.argv[1]):
 cfg = reader.RunConfigFromName(sys.argv[1])
 
 fcl_maker = ubpsql.FhiclMaker()
-fcl_pset  = fcl_maker.FhiclParameterSet(cfg)
-fcl_txt   = fcl_pset.dump()
+run_pset  = fcl_maker.FhiclParameterSet(cfg)
+fcl_txt   = ''
+#fcl_txt   = run_pset.Dump()
+sub_pset_v = run_pset.ListNodes()
+for x in xrange(sub_pset_v.size()):
+    fcl_txt += run_pset.GetNode(sub_pset_v[x]).Dump()
 print fcl_txt
