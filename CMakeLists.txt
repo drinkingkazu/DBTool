@@ -34,7 +34,7 @@ execute_process(COMMAND root-config --cflags OUTPUT_VARIABLE ROOTINC OUTPUT_STRI
 
 # Set include dirs
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories($ENV{PGSQL_DIR}/include)
+include_directories(${PGINC})
 set(CMAKE_SHARED_LINKER_FLAGS "${ROOTLIB} -L${PGLIB} -lpq")
 set(CMAKE_CXX_FLAGS "${ROOTINC} -I${PGINC}/include")
 #MESSAGE("CMAKE_SHARED_LINKER_FLAGS:" ${CMAKE_SHARED_LINKER_FLAGS})
@@ -46,6 +46,12 @@ set_target_properties( UBOnlineDBI
 		       PROPERTIES
 	               LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib
 )
+if (APPLE)
+   set_property(TARGET UBOnlineDBI PROPERTY PREFIX "lib")
+   set_property(TARGET UBOnlineDBI PROPERTY OUTPUT_NAME "UBOnlineDBI.so")
+   set_property(TARGET UBOnlineDBI PROPERTY SUFFIX "")
+endif()
+
 
 # Generate a rootmap file
 add_custom_command( TARGET UBOnlineDBI
