@@ -56,8 +56,7 @@ namespace ubpsql {
 
     /**
        Setter for configuration string (configure host, database, user, and password in 1 string).
-       Note you do not have to configure if the default connection info suffices except for
-       kCUSTOM_USER which has no default connection info.
+       Note you do not have to configure if the default connection info suffices.
     */
     void Configure(const std::string config_string)
     { _conn_config = config_string; }

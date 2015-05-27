@@ -1,4 +1,4 @@
-
+SET ROLE uboonedaq_admin;
 -- ---
 -- Globals
 -- ---

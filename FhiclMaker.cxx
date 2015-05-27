@@ -2,7 +2,8 @@
 #define DBTOOL_FHICLMAKER_CXX
 
 #include "FhiclMaker.h"
-#include "DBEnv.h"
+#include "DBConstants.h"
+#include "DBException.h"
 namespace ubpsql{
 
   FPSet::FPSet(std::string name)

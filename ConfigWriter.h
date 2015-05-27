@@ -28,7 +28,7 @@ namespace ubpsql {
     
     /// Default constructor
     ConfigWriter() : ConfigReader()
-    { _user_type = kCUSTOM_USER; }
+    { _user_type = kUBDAQ_WRITER; }
 
     /// Default destructor
     virtual ~ConfigWriter(){};

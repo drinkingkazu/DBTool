@@ -2,7 +2,7 @@
 #define DBTOOL_RUNCONFIG_CXX
 
 #include "RunConfig.h"
-
+#include "DBException.h"
 namespace ubpsql {
 
   void RunConfig::ls() const

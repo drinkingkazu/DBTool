@@ -2,6 +2,7 @@
 #define DBTOOL_DBCONN_CXX
 
 #include "DBConn.h"
+#include "DBConnInfo.h"
 #include <unistd.h>
 
 namespace ubpsql{
@@ -34,13 +35,12 @@ namespace ubpsql{
 
     SetVerbosity(msg::kNORMAL);
 
-    Configure( DBI_CONFIG[_user_type] );
+    Configure( DBConnInfo::Get().GetConnString(user_type) );
   }
 
   bool DBConn::Connect()
   {
     if(_conn) {
-
       if(!IsConnected()) PQreset(_conn);
       else return true;
     }

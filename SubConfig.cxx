@@ -2,6 +2,8 @@
 #define DBTOOL_SUBCONFIG_CXX
 
 #include "SubConfig.h"
+#include "DBException.h"
+#include "DBConstants.h"
 
 namespace ubpsql {
   

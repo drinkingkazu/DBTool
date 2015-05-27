@@ -2,6 +2,8 @@
 #define DBTOOL_CPARAMS_CXX
 
 #include "CParams.h"
+#include "DBException.h"
+#include "DBConstants.h"
 #include <sstream>
 namespace ubpsql {
   

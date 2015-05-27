@@ -15,8 +15,6 @@
 #define DBTOOL_CPARAMS_H
 
 #include "DBBase.h"
-#include "DBEnv.h"
-#include "DBException.h"
 #include <iostream>
 #include <string>
 #include <map>

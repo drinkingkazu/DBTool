@@ -28,7 +28,7 @@ namespace ubpsql {
   public:
     
     /// Default constructor
-    DBAppBase(){ _user_type = kCUSTOM_USER; _conn=0; };
+    DBAppBase(){ _user_type = kUBDAQ_READER; _conn=0; };
     
     /// Default destructor
     virtual ~DBAppBase(){};
