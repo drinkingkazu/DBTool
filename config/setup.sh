@@ -5,6 +5,7 @@ export DBTOOL_DIR="$( cd "$( dirname "$me" )" && pwd )"
 export LD_LIBRARY_PATH=$DBTOOL_DIR/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$DBTOOL_DIR/python:$PYTHONPATH
 
+dbtool_cmake_flag=""
 case `uname -n` in
     (*ubdaq-prod*)
     echo Setting up for ubdaq-prod machines...
@@ -14,6 +15,7 @@ case `uname -n` in
     setup cmake v3_2_1
     setup root v5_34_25a -q e7:prof
     source /home/uboonedaq/.sqlaccess/prod_conf.sh
+    dbtool_cmake_flag="-DCMAKE_CXX_COMPILER=c++"
     ;;
     (*)
     if [[ -e $DBTOOL_DIR/config/${USER}_conf.sh ]]; then
@@ -57,7 +59,7 @@ fi
 
 mkdir -p $DBTOOL_DIR/build
 cd $DBTOOL_DIR/build
-cmake $DBTOOL_DIR
+cmake $DBTOOL_DIR $dbtool_cmake_flag
 echo ===============================================
 echo === No error? Ready to build! Type \"make\" ===
 echo ===============================================
