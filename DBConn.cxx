@@ -171,7 +171,9 @@ namespace ubpsql{
       case PGRES_NONFATAL_ERROR:
 	Print(msg::kWARNING,__FUNCTION__,PQresultErrorMessage(res));
 	throw QueryError();
+#ifdef PG_INT64_TYPE
       case PGRES_SINGLE_TUPLE:
+#endif
       case PGRES_TUPLES_OK:
 	done=true;
 	remove_res=false;

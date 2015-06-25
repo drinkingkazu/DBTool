@@ -41,8 +41,6 @@ namespace ubpsql {
   
   class SubConfig : public DBBase {
 
-    friend class SubConfig;
-
   public:
 
     SubConfig(const std::string& name="",

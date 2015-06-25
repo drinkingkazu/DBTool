@@ -1,6 +1,6 @@
 #ifndef DBTOOL_DBCONINFO_H
 #define DBTOOL_DBCONINFO_H
-
+#include <stdlib.h>
 #include <vector>
 #include <string>
 #include "DBEnv.h"

@@ -9,7 +9,8 @@ case `uname -n` in
     (*ubdaq-prod*)
     echo Setting up for ubdaq-prod machines...
     source /uboonenew/setup_online.sh
-    setup postgresql v9_1_14
+#    setup postgresql v9_3_6 -q p279
+    setup postgresql v9_1_14 
     setup cmake v3_2_1
     setup root v5_34_25a -q e7:prof
     source /home/uboonedaq/.sqlaccess/prod_conf.sh
