@@ -34,7 +34,7 @@ namespace ubpsql {
     virtual ~DeathStar(){};
 
     /// Method to insert a new sub configuration
-    int CreateSubConfiguration(const SubConfig& cfg);
+    int CreateSubConfiguration(const std::string& name);
 
     /// Don't use this
     void SuperBeam();

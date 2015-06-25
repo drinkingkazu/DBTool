@@ -325,8 +325,10 @@ namespace ubpsql {
     if(!res) return false;
 
     bool exist=false;
-    if(PQntuples(res))
-      exist = (std::string(PQgetvalue(res,0,0)) == "t");
+    if(PQntuples(res)){
+      std::string str_bool(PQgetvalue(res,0,0));
+      exist = (str_bool == "t");
+    }
     PQclear(res);
 
     return exist;
@@ -339,10 +341,11 @@ namespace ubpsql {
     if(!res) return false;
 
     bool exist=false;
-    if(PQntuples(res))
-      exist = (std::string(PQgetvalue(res,0,0)) == "t");
+    if(PQntuples(res)){
+      std::string str_bool(PQgetvalue(res,0,0));
+      exist = (str_bool == "t");
+    }
     PQclear(res);
-
     return exist;
   }
 

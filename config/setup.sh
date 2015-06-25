@@ -22,6 +22,7 @@ case `uname -n` in
         echo Setting up test config db...
 	export DBTOOL_READER_DB="testrunconfdb";
 	export DBTOOL_WRITER_DB="testrunconfdb";
+	export DBTOOL_ADMIN_DB="testrunconfdb";
 	;;
     esac
 

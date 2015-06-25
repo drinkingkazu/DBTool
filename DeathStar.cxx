@@ -5,15 +5,15 @@
 
 namespace ubpsql {
 
-  int DeathStar::CreateSubConfiguration(const SubConfig& cfg)
+  int DeathStar::CreateSubConfiguration(const std::string& name)
   {
-    if(this->ExistSubConfig(cfg.ID().Name())) {
+    if(this->ExistSubConfig(name)){
       Print(msg::kWARNING,__FUNCTION__,
-	    Form("SubConfig \"%s\" already exists...",cfg.ID().Name().c_str()));
+	    Form("SubConfig \"%s\" already exists...",name.c_str()));
       return -1;
     }
 
-    PGresult* res = _conn->Execute(Form("SELECT * FROM CreateSubConfiguration('%s');",cfg.ID().Name().c_str()));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM CreateSubConfiguration('%s');",name.c_str()));
     if(!res) return -1;
     int id = std::atoi(PQgetvalue(res,0,0));
     PQclear(res);
