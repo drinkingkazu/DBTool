@@ -2,8 +2,6 @@
 
 me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export DBTOOL_DIR="$( cd "$( dirname "$me" )" && pwd )"
-export LD_LIBRARY_PATH=$DBTOOL_DIR/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$DBTOOL_DIR/python:$PYTHONPATH
 
 dbtool_cmake_flag=""
 case `uname -n` in
@@ -15,6 +13,18 @@ case `uname -n` in
     setup cmake v3_2_1
     setup root v5_34_25a -q e7:prof
     source /home/uboonedaq/.sqlaccess/prod_conf.sh
+
+    case `whoami` in
+	(uboonedaq)
+        echo Setting up production config db...
+	;;
+	(*)
+        echo Setting up test config db...
+	export DBTOOL_READER_DB="testrunconfdb";
+	export DBTOOL_WRITER_DB="testrunconfdb";
+	;;
+    esac
+
     dbtool_cmake_flag="-DCMAKE_CXX_COMPILER=c++"
     ;;
     (*)
@@ -56,6 +66,10 @@ if [[ -z `command -v cmake` ]]; then
     echo
     return;
 fi
+
+export PATH=$DBTOOL_DIR/bin:$PATH
+export LD_LIBRARY_PATH=$DBTOOL_DIR/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$DBTOOL_DIR/python:$PYTHONPATH
 
 mkdir -p $DBTOOL_DIR/build
 cd $DBTOOL_DIR/build

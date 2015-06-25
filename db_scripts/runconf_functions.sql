@@ -648,9 +648,6 @@ $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 -------------------------------------------------------------
 
-DROP FUNCTION IF EXISTS CleanSubConfigurationID( cfg_name TEXT,
-       	  	  	   		         cfg_id   INT);
-
 DROP FUNCTION IF EXISTS CleanSubConfig( cfg_name TEXT,
        	  	  	   	        cfg_id   INT);
 

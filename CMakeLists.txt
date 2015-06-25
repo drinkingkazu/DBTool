@@ -58,7 +58,7 @@ endif()
 # Generate a rootmap file
 add_custom_command( TARGET UBOnlineDBI
 		    POST_BUILD
-		    COMMAND rlibmap ARGS -f  -o ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap -l ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.dylib -c ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h
+		    COMMAND rlibmap ARGS -f  -o ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap -l ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.so -c ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h
 		    )
 set_directory_properties( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap" )
 #set_directory_properties( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.h;${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.cxx" )
