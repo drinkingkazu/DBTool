@@ -45,6 +45,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION RunExist( run INT ) RETURNS BOOLEAN AS $$
+DECLARE
+  res BOOLEAN;
+BEGIN
+  res := FALSE;
+  SELECT TRUE FROM MainRun WHERE RunNumber = run INTO res;
+  IF res IS NULL OR NOT res THEN
+    RETURN FALSE;
+  END IF;
+  RETURN TRUE;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION RunExist( run INT, subrun INT ) RETURNS BOOLEAN AS $$
+DECLARE
+  res BOOLEAN;
+BEGIN
+  res := FALSE;
+  SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun INTO res;
+  IF res IS NULL OR NOT res THEN
+    RETURN FALSE;
+  END IF;
+  RETURN TRUE;
+END;
+$$ LANGUAGE PLPGSQL;
+
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION InsertNewSubRun( run INT,
@@ -55,11 +81,10 @@ CREATE OR REPLACE FUNCTION InsertNewSubRun( run INT,
 DECLARE
 rtype INT;
 BEGIN
-     IF NOT EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run) THEN
-     	RAISE EXCEPTION 'Run % does not exist!', run;
-     ELSE IF EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun) THEN
+     IF NOT RunExist(run,subrun) THEN
      	RAISE EXCEPTION 'Run % SubRun % already exist!', run, subrun;
-     ELSE IF NOT EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = (subrun-1)) THEN
+     END IF;	
+     IF subrun > 0 AND RunExist(run,(subrun-1)) THEN
      	RAISE EXCEPTION 'Run % SubRun % should exist but not...', run, subrun;
      END IF;
 
@@ -94,7 +119,7 @@ BEGIN
      SELECT tstart TimeStart FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun LIMIT 1;
 
      IF ts < tstart THEN
-       RAISE EXCEPTION 'Start time cannot be in future w.r.t. end time...'
+       RAISE EXCEPTION 'Start time cannot be in future w.r.t. end time...';
      END IF;
 
      UPDATE MainRun SET TimeEnd=ts WHERE RunNumber=run AND SubRunNumber=subrun;
