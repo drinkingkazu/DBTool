@@ -34,10 +34,10 @@ namespace ubpsql {
     virtual ~ConfigWriter(){};
 
     /// Create a new run number in the database
-    bool InsertNewRun(unsigned int config_id);
+    int InsertNewRun(unsigned int config_id);
 
     /// Create a new sub run number in the database
-    bool InsertNewSubRun(unsigned int config_id, unsigned int run);
+    int InsertNewSubRun(unsigned int config_id, unsigned int run);
 
     /// Method to insert a new sub configuration
     bool InsertSubConfiguration(const SubConfig& cfg);

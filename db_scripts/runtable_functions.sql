@@ -13,7 +13,11 @@ DECLARE
     lastrun mainrun.RunNumber%TYPE;
 BEGIN
      SELECT INTO lastrun GetLastRun();
-   
+
+     IF lastrun IS NULL THEN
+       lastrun := 0;
+     END IF;
+
      INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES(lastrun+1,1,CfgID,333, 'now');
 
 
@@ -76,7 +80,7 @@ $$ LANGUAGE PLPGSQL;
 CREATE OR REPLACE FUNCTION InsertNewSubRun( run INT,
 					    subrun INT,
 					    ts TIMESTAMP,
-					    te TIMESTAMP,
+					    te TIMESTAMP DEFAULT NULL,
 					    CfgID INT DEFAULT -1) RETURNS INT AS $$
 DECLARE
 rtype INT;
@@ -88,8 +92,12 @@ BEGIN
      	RAISE EXCEPTION 'Run % SubRun % should exist but not...', run, subrun;
      END IF;
 
-     IF te < ts THEN
-     	RAISE EXCEPTION 'EndTime cannot be smaller than StartTime!';
+     IF te IS NULL THEN
+       te := ts;
+     ELSE
+       IF te < ts THEN
+     	 RAISE EXCEPTION 'EndTime cannot be smaller than StartTime!';
+       END IF;
      END IF;
 
      IF CfgID = -1 THEN

@@ -105,24 +105,26 @@ namespace ubpsql {
     return status;
   }
 
-  bool ConfigWriter::InsertNewRun(unsigned int config_id)
+  int ConfigWriter::InsertNewRun(unsigned int config_id)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT InsertNewRun(%d);",config_id));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM InsertNewRun(%d);",config_id));
     if(!res) return false;
 
+    int id = std::atoi(PQgetvalue(res,0,0));
     PQclear(res);
-    return true;
+    return id;
   }
 
-  bool ConfigWriter::InsertNewSubRun(unsigned int config_id, unsigned int run)
+  int ConfigWriter::InsertNewSubRun(unsigned int config_id, unsigned int run)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT InsertNewSubRun(%d,%d);",config_id,run));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM InsertNewSubRun(%d,%d);",config_id,run));
     if(!res) return false;
-    
+
+    int id = std::atoi(PQgetvalue(res,0,0));
     PQclear(res);
-    return true;
+    return id; 
   }
 
   bool ConfigWriter::CleanMainConfig(const std::string& name)
