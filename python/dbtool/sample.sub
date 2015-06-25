@@ -1,0 +1,21 @@
+
+#
+ #
+SUB_CONFIG_START tako 1
+slot : 0xc000
+buffer_size : 1e6
+SUB_CONFIG_END
+
+SUB_CONFIG_START boke 1
+  slot        :  0x200
+  buffer_size :  1e7
+  tako        => 1
+SUB_CONFIG_END
+
+SUB_CONFIG_START boke 4
+  slot        :  0x200
+  buffer_size :  1e7
+  tako        => 1
+SUB_CONFIG_END
+
+

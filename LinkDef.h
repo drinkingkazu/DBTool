@@ -18,7 +18,6 @@
 #pragma link C++ class ubpsql::InvalidUser+;
 #pragma link C++ class ubpsql::ConnectionError+;
 #pragma link C++ class ubpsql::ConfigError+;
-#pragma link C++ class ubpsql::FhiclError+;
 
 #pragma link C++ class ubpsql::DBBase+;
 #pragma link C++ class ubpsql::DBAppBase+;
@@ -28,14 +27,12 @@
 #pragma link C++ class ubpsql::ConfigReader+;
 #pragma link C++ class ubpsql::ConfigWriter+;
 #pragma link C++ class std::map<string,string>+;
-#pragma link C++ class ubpsql::CParams+;
-#pragma link C++ class ubpsql::CParamsKey+;
-#pragma link C++ class std::map<ubpsql::CParamsKey,ubpsql::CParams>+;
+#pragma link C++ class ubpsql::SubConfigID+;
 #pragma link C++ class ubpsql::SubConfig+;
 #pragma link C++ class std::vector<ubpsql::SubConfig>+;
-#pragma link C++ class ubpsql::RunConfig+;
-#pragma link C++ class ubpsql::FPSet+;
-#pragma link C++ class ubpsql::FhiclMaker+;
+#pragma link C++ class std::vector<ubpsql::SubConfigID>+;
+#pragma link C++ class std::set<ubpsql::SubConfigID>+;
+#pragma link C++ class ubpsql::MainConfig+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 

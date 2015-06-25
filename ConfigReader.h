@@ -15,7 +15,7 @@
 #define DBTOOL_CONFIGREADER_H
 
 #include "DBAppBase.h"
-#include "RunConfig.h"
+#include "MainConfig.h"
 
 namespace ubpsql {
   /**
@@ -53,32 +53,38 @@ namespace ubpsql {
     // Run-Config functions
     //
     /// List Run-Config name
-    std::vector<std::string> RunConfigNames();
+    std::vector<std::string> MainConfigNames();
     /// List Run-Config ID
-    std::vector<unsigned int> RunConfigIDs();
+    std::vector<unsigned int> MainConfigIDs();
     /// List All Sub-Config name/ID pair for a given MainConfig name
-    std::vector<std::pair<std::string,unsigned int> >  SubConfigNameAndIDs(const std::string& cfg_name);
+    //std::vector<std::pair<std::string,unsigned int> >  ListSubConfigs(const std::string& cfg_name);
     /// Existence checker.
-    bool ExistRunConfig(const std::string& cfg_name);
+    bool ExistMainConfig(const std::string& cfg_name);
     /// Existence checker.
-    bool ExistRunConfig(const unsigned int cfg_id);
+    bool ExistMainConfig(const unsigned int cfg_id);
     /// Run-Config Name=>ID
-    unsigned int RunConfigID(const std::string& cfg_name);
+    unsigned int MainConfigID(const std::string& cfg_name);
     /// Run-Config ID=>Name
-    std::string RunConfigName(const unsigned int cfg_id);
+    std::string MainConfigName(const unsigned int cfg_id);
+    /// Sub-Config getter
+    SubConfig GetSubConfig(const std::string& scfg_name, const unsigned int scfg_id);
     /// Run-Config getter
-    RunConfig RunConfigFromName(const std::string& cfg_name);
+    MainConfig GetMainConfig(const std::string& cfg_name);
     /// Run-Config getter
-    RunConfig RunConfigFromID(const unsigned int cfg_id)
-    { return RunConfigFromName( RunConfigName(cfg_id) ); }
+    MainConfig GetMainConfig(const unsigned int cfg_id)
+    { return GetMainConfig( MainConfigName(cfg_id) ); }
     /// Run-Config getter
-    RunConfig RunConfigFromRunNumber(const unsigned int run,
+    MainConfig MainConfigFromRunNumber(const unsigned int run,
 				     const unsigned int subrun=kINVALID_UINT)
-    { return RunConfigFromName( RunConfigName(RunNumber2ConfigID(run,subrun)) ); }
+    { return GetMainConfig( MainConfigName(RunNumber2ConfigID(run,subrun)) ); }
 
     //
     // Sub-Config functions
     //
+    /// List Sub-Configs for a specific MainConfig name
+    std::vector<std::pair<std::string,unsigned int> > ListSubConfigs(const std::string& cfg_name);
+    /// List Sub-Configs for a specific MainConfig id
+    std::vector<std::pair<std::string,unsigned int> > ListSubConfigs(const unsigned int id);
     /// List all Sub-Configs
     std::vector<std::string> SubConfigNames();
     /// List Sub-Config IDs

@@ -10,12 +10,11 @@
 #include "PQMessenger.h"
 #include "DBException.h"
 #include "DBConn.h"
-#include "CParams.h"
 #include "SubConfig.h"
-#include "RunConfig.h"
+#include "MainConfig.h"
 #include "ConfigReader.h"
 #include "ConfigWriter.h"
-#include "FhiclMaker.h"
+
 // Class forward declaration here
 namespace ubpsql{
 
@@ -25,7 +24,6 @@ namespace ubpsql{
   class ConnectionError;
   class TableDataError; 
   class ConfigError;
-  class FhiclError;
   class DBBase;
   class DBAppBase;
 
@@ -37,12 +35,8 @@ namespace ubpsql{
   class ConfigReader;    // Run configuration database read interface
   class ConfigWriter;    // Run configuration database write interface
 
-  class CParams;
-  class CParamsKey;
   class SubConfig;
-  class RunConfig;
-  class FhiclMaker;
-  class FPSet;
+  class MainConfig;
 }
 //ADD_EMPTY_CLASS ... do not change this comment line
 #endif

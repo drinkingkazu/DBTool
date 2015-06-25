@@ -32,6 +32,7 @@ execute_process(COMMAND root-config --incdir OUTPUT_VARIABLE ROOT_INCDIR OUTPUT_
 execute_process(COMMAND root-config --libdir OUTPUT_VARIABLE ROOT_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND rootcint -f ${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.cxx -c -I${PSQL_INCDIR} -I${ROOT_INCDIR} -I. ${MYHEADERS} ${LINKDEF})
 set(PSQL_LIB "-L${PSQL_LIBDIR} -lpq")
+#set(ROOT_LIB "-L${ROOT_LIBDIR} -lCore -lCint -lRIO")
 set(ROOT_LIB "-L${ROOT_LIBDIR} -lCore -lCint -lRIO")
 
 # Set include dirs

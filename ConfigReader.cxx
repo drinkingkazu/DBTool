@@ -79,11 +79,11 @@ namespace ubpsql {
   // MainConfigTable functions
   //----------------------------------------------------------------------------------------
 
-  std::vector<std::string> ConfigReader::RunConfigNames()
+  std::vector<std::string> ConfigReader::MainConfigNames()
   {
     std::vector<std::string> config_ids;
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute("SELECT DISTINCT ConfigName,ConfigID FROM MainConfigTable ORDER BY ConfigID DESC;");
+    PGresult* res = _conn->Execute("SELECT * FROM ListMainConfigs();");
     if(!res)  return config_ids;
 
     for(size_t i=0; i<PQntuples(res); ++i)
@@ -93,32 +93,34 @@ namespace ubpsql {
     return config_ids;
   }
 
-  std::vector<unsigned int> ConfigReader::RunConfigIDs()
+  std::vector<unsigned int> ConfigReader::MainConfigIDs()
   {
     std::vector<unsigned int> config_ids;
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute("SELECT DISTINCT ConfigID FROM MainConfigTable ORDER BY ConfigID;");
+    PGresult* res = _conn->Execute("SELECT * FROM ListMainConfigs();");
     if(!res)  return config_ids;
 
     for(size_t i=0; i<PQntuples(res); ++i)
-      config_ids.push_back(atoi(PQgetvalue(res,i,0)));
+      config_ids.push_back(atoi(PQgetvalue(res,i,1)));
 
     PQclear(res);
     return config_ids;
   }
 
-  std::vector<std::pair<std::string,unsigned int> >  ConfigReader::SubConfigNameAndIDs(const std::string& cfg_name)
+  std::vector<std::pair<std::string,unsigned int> >  ConfigReader::ListSubConfigs(const std::string& cfg_name)
+  { return ListSubConfigs(MainConfigID(cfg_name));; }
+
+  std::vector<std::pair<std::string,unsigned int> >  ConfigReader::ListSubConfigs(const unsigned int id)
   {
-    if(!ExistRunConfig(cfg_name)) {
-      Print(msg::kERROR,__FUNCTION__,Form("MainConfig \"%s\" does not exist!",cfg_name.c_str()));
+    if(!ExistMainConfig(id)) {
+      Print(msg::kERROR,__FUNCTION__,Form("MainConfig ID %d does not exist!",id));
       throw TableDataError();
     }
 
     std::vector<std::pair<std::string,unsigned int> > result;
     if(!Connect()) throw ConnectionError();
     std::string cmd("");
-    cmd += "SELECT B.SubConfigName, A.SubConfigID FROM MainConfigTable AS A JOIN ConfigLookUp AS B ";
-    cmd += Form(" ON A.SubConfigType = B.SubConfigType AND A.ConfigName='%s';",cfg_name.c_str());
+    cmd += Form("SELECT * FROM ListSubConfigs(%d);",id);
     PGresult* res = _conn->Execute(cmd);
 
     if(res && PQntuples(res))
@@ -158,33 +160,37 @@ namespace ubpsql {
   }  
   */
 
-  bool ConfigReader::ExistRunConfig(const std::string& cfg_name)
+  bool ConfigReader::ExistMainConfig(const std::string& cfg_name)
   {
     bool exist=false;
     if(cfg_name.empty()) return exist;
 
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ConfigID FROM MainConfigTable WHERE ConfigName = '%s';",cfg_name.c_str()));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ExistMainConfig('%s');",cfg_name.c_str()));
     if(!res) return exist;
 
-    exist = (PQntuples(res));
+    if(PQntuples(res))
+      exist = (std::string(PQgetvalue(res,0,0)) == "t");
     PQclear(res);
+
     return exist;
   }
 
-  bool ConfigReader::ExistRunConfig(const unsigned int cfg_id)
+  bool ConfigReader::ExistMainConfig(const unsigned int cfg_id)
   {
     bool exist=false;
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ConfigID FROM MainConfigTable WHERE ConfigID = '%d';",cfg_id));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ExistMainConfig(%d);",cfg_id));
     if(!res) return exist;
 
-    exist = (PQntuples(res));
+    if(PQntuples(res))
+      exist = (std::string(PQgetvalue(res,0,0)) == "t");
     PQclear(res);
+
     return exist;
   }
 
-  unsigned int ConfigReader::RunConfigID(const std::string& cfg_name)
+  unsigned int ConfigReader::MainConfigID(const std::string& cfg_name)
   {
     unsigned int id=0;
     if(!Connect()) throw ConnectionError();
@@ -198,7 +204,7 @@ namespace ubpsql {
     return id;
   }
 
-  std::string ConfigReader::RunConfigName(const unsigned int cfg_id) 
+  std::string ConfigReader::MainConfigName(const unsigned int cfg_id) 
   {
     std::string name("");
     if(!Connect()) throw ConnectionError();
@@ -212,148 +218,70 @@ namespace ubpsql {
     return name;
   }
 
-  RunConfig ConfigReader::RunConfigFromName(const std::string& cfg_name)
+  SubConfig ConfigReader::GetSubConfig(const std::string& scfg_name,
+				       const unsigned int scfg_id)
   {
-    if(!ExistRunConfig(cfg_name)){
+    if(!ExistSubConfig(scfg_name,scfg_id)){
+      Print(msg::kERROR,__FUNCTION__,
+	    Form("SubConfig %s w/ ID %d does not exist!",
+		 scfg_name.c_str(),
+		 scfg_id)
+	    );
+      throw QueryError();
+    }
+
+    SubConfig result(scfg_name,scfg_id);
+
+    std::string query;
+
+    query = Form("SELECT ParamName, ParamValue FROM ListParameters('%s',%d);",
+		 scfg_name.c_str(),
+		 scfg_id);
+    
+    PGresult* res = _conn->Execute(query);
+
+    if(!res) throw QueryError();
+      
+    for(size_t i=0; i<PQntuples(res); ++i)
+
+      result.Append(PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+
+    PQclear(res);
+
+    query = Form("SELECT SubConfigName, SubConfigID FROM ListParameterSets('%s',%d);",
+		 scfg_name.c_str(),
+		 scfg_id);
+
+    res = _conn->Execute(query);
+
+    if(!res) throw QueryError();
+
+    std::vector<std::pair<std::string,unsigned int> > name_and_id_v;
+    for(size_t i=0; i<PQntuples(res); ++i)
+
+      name_and_id_v.emplace_back(PQgetvalue(res,i,0),std::atoi(PQgetvalue(res,i,1)));
+
+    for(auto const& name_and_id : name_and_id_v)
+
+      result.Append(GetSubConfig(name_and_id.first,name_and_id.second));
+
+    PQclear(res);
+
+    return result;
+  }
+
+  MainConfig ConfigReader::GetMainConfig(const std::string& cfg_name)
+  {
+    if(!ExistMainConfig(cfg_name)){
       Print(msg::kERROR,__FUNCTION__,Form("MainConfig %s does not exist!",cfg_name.c_str()));
       throw QueryError();
     }
 
-    RunConfig result(cfg_name);
-    for(auto const& name_id : SubConfigNameAndIDs(result.Name())) {
-
-      SubConfig d(name_id.first,name_id.second);
-
-      if(!Connect()) throw ConnectionError();
-      std::string cmd("");
-      cmd += "SELECT Crate,Slot,Channel,each(params) FROM ";
-      cmd += Form("GetCrateSlotChannelConfig('%s','%s')",
-		  result.Name().c_str(),
-		  d.Name().c_str());
-      cmd += " ORDER BY Crate, Slot, Channel;";
-      PGresult* res = _conn->Execute(cmd);
-
-      if(!res) throw QueryError();
-
-      if(!PQntuples(res)) {
-	Print(msg::kERROR,Form("SubConfig (name=\"%s\",id=%d) returned null result!",
-			       d.Name().c_str(),
-			       d.ConfigID()
-			       )
-	      );
-	throw TableDataError();
-      }
-
-      CParamsKey key;
-      CParams p;
-      std::string pset_name_prefix;
-      for(size_t i=0; i<PQntuples(res); ++i) {
-
-	int crate = std::atoi(PQgetvalue(res,i,0));
-	int slot  = std::atoi(PQgetvalue(res,i,1));
-	int ch    = std::atoi(PQgetvalue(res,i,2));
-
-	CParamsKey tmp_key(crate,slot,ch);
-	if(!i) key = CParamsKey(crate,slot,ch);
-	else if(key!=tmp_key) {
-	  if(p.Name().empty()) {
-	    
-	    if(key.IsCrate()){
-	      if(pset_name_prefix.empty()) p.Name(Form("Crate%02d",key.Crate()));
-	      else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Crate()));
-	    }
-	    else if(key.IsSlot()){
-	      if(pset_name_prefix.empty()) p.Name(Form("Slot%02d",key.Slot()));
-	      else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
-	    }
-	    else if(key.IsChannel()){
-	      if(pset_name_prefix.empty()) p.Name(Form("Ch%02d",key.Channel()));
-	      else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
-	    }
-	  }
-	  
-	  if(p.Name().empty()){
-	    std::cout<<"Cannot have an empty name!"<<std::endl;
-	    key.ls();
-	    throw TableDataError();
-	  }
-	  d.insert(std::make_pair(key,p));
-	  key = tmp_key;
-	  pset_name_prefix="";
-	  p.clear();
-	}
-
-	std::string param = PQgetvalue(res,i,3);
-	if( param.size()<3 
-	    || param.find('(') != 0 || param.rfind(')') != (param.size()-1)
-	    || param.find(',') > param.size() ) {
-	  Print(msg::kERROR,__FUNCTION__,Form("Unexpected HSTORE expression: %s",param.c_str()));
-	  throw TableDataError();
-	}
-
-	param = param.substr(1,param.size()-1);
-	std::string param_key   = param.substr(0,param.find(","));
-	std::string param_value = param.substr(param.find(",")+1,(param.size()-param.find(",")-2));
-	if(param_value.find("\"\"\"")==0)
-	  param_value = param_value.substr(2,param_value.size()-2);
-	else if(param_value.find("\"")==0)
-	  param_value = param_value.substr(1,param_value.size()-1);
-	if(param_value.rfind("\"")<param_value.size() && param_value.rfind("\"\"\"")==(param_value.size()-3))
-	  param_value = param_value.substr(0,param_value.size()-2);
-	else if(param_value.rfind("\"")<param_value.size())
-	  param_value = param_value.substr(0,param_value.size()-1);
-	/*
-	if(param_value.find("\"") == 0) {
-	  if(param_value.find("\"\"\"")==0) param_value = param_value.substr(2,param_value.size()-2);
-	  else if(param_value.size()>1) param_value = param_value.substr(1,param_value.size()-1);
-        }
-	if(param_value.rfind("\"")<param_value.size()) {
-	  if(param_value.rfind("\"\"\"")==(param_value.size()-3)) param_value = param_value.substr(0,param_value.size()-2);
-	  else param_value = param_value.substr(0,param_value.size()-1);
-	}
-	*/
-	size_t pos = param_value.find("\"\"");
-	while(pos < param_value.size()) {
-	  param_value.replace(pos, 2, "\"");
-	  pos = param_value.find("\"\"");
-	}
-
-	if(param_key == kPSET_NAME_KEY)
-	  p.Name(param_value);
-	else if(param_key == kPSET_NAME_PREFIX_KEY)
-	  pset_name_prefix = param_value;
-	else
-	  p.append(param_key,param_value);
-	
-      }
+    MainConfig result(cfg_name);
+    for(auto const& name_id : ListSubConfigs(result.Name()))
       
-      if(!d.contains(key)) {
-	if(p.Name().empty()) {
-	  
-	  if(key.IsCrate()){
-	    if(pset_name_prefix.empty()) p.Name(Form("Crate%02d",key.Crate()));
-	    else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Crate()));
-	  }
-	  else if(key.IsSlot()){
-	    if(pset_name_prefix.empty()) p.Name(Form("Slot%02d",key.Slot()));
-	    else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
-	  }
-	  else if(key.IsChannel()){
-	    if(pset_name_prefix.empty()) p.Name(Form("Ch%02d",key.Channel()));
-	    else p.Name(Form("%s%02d",pset_name_prefix.c_str(),key.Slot()));
-	  }
-	}
-	
-	if(p.Name().empty()){
-	  std::cout<<"Cannot have an empty name!"<<std::endl;
-	  key.ls();
-	  throw TableDataError();
-	}
-	d.insert(std::make_pair(key,p));
-      }
+      result.AddSubConfig(this->GetSubConfig(name_id.first,name_id.second));
 
-      result.AddSubConfig(d);
-    }
     return result;
   }
 
@@ -393,27 +321,28 @@ namespace ubpsql {
   bool ConfigReader::ExistSubConfig(std::string sub_config_name)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ExistSubConfig('%s');",sub_config_name.c_str()));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ExistSubConfig('%s');",sub_config_name.c_str()));
     if(!res) return false;
 
-    int scfg_id = -1;
+    bool exist=false;
     if(PQntuples(res))
-      scfg_id = std::atoi(PQgetvalue(res,0,0));
+      exist = (std::string(PQgetvalue(res,0,0)) == "t");
     PQclear(res);
-    if(scfg_id<=0) return false;
-    return true;
+
+    return exist;
   }
 
   bool ConfigReader::ExistSubConfig(std::string sub_config_name, unsigned int id)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ExistSubConfig('%s',%d);",sub_config_name.c_str(),id));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ExistSubConfig('%s',%d);",sub_config_name.c_str(),id));
     if(!res) return false;
 
     bool exist=false;
     if(PQntuples(res))
-      exist = std::atoi(PQgetvalue(res,0,0));
+      exist = (std::string(PQgetvalue(res,0,0)) == "t");
     PQclear(res);
+
     return exist;
   }
 

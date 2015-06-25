@@ -90,18 +90,6 @@ namespace ubpsql {
     { return "\033[91mInvalid config handling!\033[0m";}
   };
 
-  /**
-     \class FhiclError
-     Exception for invalid handling within ubpsql::FPSet or ubpsql::FhiclMaker
-   */
-  class FhiclError : public DBException{
-  public:
-    FhiclError() : DBException() {}
-    ~FhiclError() throw() {}
-    virtual const char* what() const throw()
-    { return "\033[91mInvalid FPSet/FhiclMaker Operation!\033[0m";}
-  };
-
 }
 #endif
 /** @} */ // end of doxygen group 

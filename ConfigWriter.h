@@ -33,12 +33,14 @@ namespace ubpsql {
     /// Default destructor
     virtual ~ConfigWriter(){};
 
-    /**
-       Create New Configuration Type, i.e. PMTFEM, TPCFEM, Laser... to be used sparingly.
-       Needs list of defined hstore keys that will later be checked via triggers when inserting new configs
-       takes list of strings that it then converts to hstore values. Needs to know the total number of channels 
-     */
-    bool CreateConfigType(const std::string config_name);
+    /// Create a new run number in the database
+    bool InsertNewRun(unsigned int config_id);
+
+    /// Create a new sub run number in the database
+    bool InsertNewSubRun(unsigned int config_id, unsigned int run);
+
+    /// Method to insert a new sub configuration
+    bool InsertSubConfiguration(const SubConfig& cfg);
 
     /// Remove a specific sub-config ID
     bool CleanSubConfig(const std::string cfg_name, unsigned int cfg_id);
@@ -46,24 +48,9 @@ namespace ubpsql {
     /// Remove sub-config
     bool CleanSubConfig(const std::string cfg_name);
 
-    /// Create a new run number in the database
-    bool InsertNewRun(unsigned int config_id);
-
-    /// Create a new sub run number in the database
-    bool InsertNewSubRun(unsigned int config_id, unsigned int run);
-
-    /// Method to insert a new configuration ID with default parameters sets
-    bool InsertSubConfiguration(const SubConfig& cfg);
-
-    /// Method to check if a candidate configuration is valid
-    bool CheckNewSubConfiguration(const SubConfig &data);
-
-    /// Method to fill sub-config parameters to a configuration set
-    bool FillSubConfiguration(const SubConfig &data);
-
     /// Method to create a run configuration. Return value >= 0 represents a new main-config ID
-    int InsertMainConfiguration(const RunConfig& cfg);
-
+    int InsertMainConfiguration(const MainConfig& cfg);
+    
     /// Drop MainConfig
     bool CleanMainConfig(const std::string& name);
 

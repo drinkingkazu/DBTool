@@ -5,17 +5,69 @@
 #include <stdlib.h>
 namespace ubpsql {
 
-  bool ConfigWriter::CreateConfigType(const std::string config_name)
+  bool ConfigWriter::InsertSubConfiguration(const SubConfig& cfg)
   {
-    if(!Connect()) throw ConnectionError();
+    std::string params_hstore,psets_hstore;
+    TString value="";
+    size_t ctr = 0;
 
-    // Form a command string
-    std::string cmd(Form("SELECT CreateSubConfiguration('%s');",config_name.c_str()));
+    params_hstore = "'";
+    auto const& params = cfg.Parameters();
+    ctr = params.size();
+    value = "";
+    for(auto const& param : params) {
+      value = param.second;
+      value = value.ReplaceAll("\"","\\\"");
+      if( ctr ) params_hstore += Form(" \"%s\"=>\"%s\",", param.first.c_str(), value.Data());
+      else params_hstore += Form(" \"%s\"=>\"%s\"", param.first.c_str(), value.Data());
+      --ctr;
+    }
+    params_hstore += " '::HSTORE";
 
-    PGresult* res = _conn->Execute(cmd);
-    if(!res) return false;
+    psets_hstore = "'";
+    auto const& psets = cfg.ListSubConfigIDs();
+    ctr = psets.size();
+    value = "";
+    for(auto const& pset : psets) {
+      if( ctr ) psets_hstore += Form(" \"%s\"=>%d,", pset.first.c_str(), pset.second);
+      else psets_hstore += Form(" \"%s\"=>%d", pset.first.c_str(), pset.second);
+      --ctr;
+    }
+    psets_hstore += " '::HSTORE";
+
+    std::string query;
+
+    query = Form("SELECT InsertSubConfiguration('%s',%d,%s,%s);",
+		 cfg.ID().Name().c_str(),
+		 cfg.ID().ID(),
+		 params_hstore.c_str(),
+		 psets_hstore.c_str());
+
+    PGresult* res = _conn->Execute(query);
     PQclear(res);
     return true;
+  }
+
+  int ConfigWriter::InsertMainConfiguration(const MainConfig& cfg)
+  {
+    std::string query("SELECT * FROM InsertMainConfiguration('");
+    size_t ctr = 0;
+
+    auto const& sub_config_v = cfg.ListSubConfigIDs();
+    ctr = sub_config_v.size();
+    for(auto const& sub_config : sub_config_v) {
+      if( ctr ) query += Form(" \"%s\"=>%d,", sub_config.first.c_str(),sub_config.second);
+      else query += Form(" \"%s\"=>%d", sub_config.first.c_str(),sub_config.second);
+      --ctr;
+    }
+    query += " '::HSTORE,'";
+    query += cfg.Name() + "');";
+
+    PGresult* res = _conn->Execute(query);
+    if(!res) return -1;
+    int id = std::atoi(PQgetvalue(res,0,0));
+    PQclear(res);
+    return id;
   }
 
   bool ConfigWriter::CleanSubConfig(const std::string cfg_name, unsigned int cfg_id)
@@ -66,250 +118,11 @@ namespace ubpsql {
     return true;
   }
 
-  bool ConfigWriter::InsertSubConfiguration(const SubConfig& cfg)
-  {
-    auto const& config_id   = cfg.ConfigID();
-    auto const& config_name = cfg.Name();
-
-    CParams crate_default, slot_default, channel_default;
-
-    if(cfg.contains(-999,-1,-1)){
-      crate_default = cfg.GetParams(-999,-1,-1);
-    }
-    if(cfg.contains(-1,-999,-1))
-       slot_default = cfg.GetParams(-1,-999,-1);
-    if(cfg.contains(-1,-1,-999))
-       channel_default = cfg.GetParams(-1,-1,-999);
-
-    if(!Connect()) throw ConnectionError();
-    std::string cmd(Form("SELECT InsertSubConfiguration('%s'::TEXT,%d::INT,",config_name.c_str(),config_id));
-
-    size_t ctr = 0;
-
-    cmd += "'";
-    ctr = crate_default.size() - 1;
-    TString value="";
-    for(auto const& param : crate_default) {
-      value = param.second;
-      value = value.ReplaceAll("\"","\\\"");
-      if( ctr ) cmd += Form(" \"%s\"=>\"%s\",", param.first.c_str(), value.Data());
-      else cmd += Form(" \"%s\"=>\"%s\"", param.first.c_str(), value.Data());
-      --ctr;
-    }
-    cmd += " '::HSTORE,";
-
-    cmd += "'";
-    ctr = slot_default.size() - 1;
-    for(auto const& param : slot_default) {
-      value = param.second;
-      value = value.ReplaceAll("\"","\\\"");
-      if( ctr ) cmd += Form(" \"%s\"=>\"%s\",", param.first.c_str(), value.Data());
-      else cmd += Form(" \"%s\"=>\"%s\"", param.first.c_str(), value.Data());
-      --ctr;
-    }
-    cmd += " '::HSTORE,";
-
-    cmd += "'";
-    ctr = channel_default.size() - 1;
-    for(auto const& param : channel_default) {
-      value = param.second;
-      value = value.ReplaceAll("\"","\\\"");
-      if( ctr ) cmd += Form(" \"%s\"=>\"%s\",", param.first.c_str(), value.Data());
-      else cmd += Form(" \"%s\"=>\"%s\"", param.first.c_str(), value.Data());
-      --ctr;
-    }
-    cmd += " '::HSTORE,";
-
-    std::string byte_repr("");
-
-    byte_repr = "";
-    cmd += "'";
-    for(size_t i=0; i<64; ++i)
-      byte_repr = std::to_string((crate_default.Mask() >> i) & 0x1) + byte_repr;
-    cmd += byte_repr + "'::BIT(64),";
-
-    byte_repr = "";
-    cmd += "'";
-    for(size_t i=0; i<64; ++i)
-      byte_repr = std::to_string((slot_default.Mask() >> i) & 0x1) + byte_repr;
-    cmd += byte_repr + "'::BIT(64),";
-
-    byte_repr = "";
-    cmd += "'";
-    for(size_t i=0; i<64; ++i)
-      byte_repr = std::to_string((channel_default.Mask() >> i) & 0x1) + byte_repr;
-    cmd += byte_repr + "'::BIT(64));";
-
-    PGresult* res = _conn->Execute(cmd);
-    if(!res) return false;
-    
-    PQclear(res);
-    return true;
-  }
-
-  bool ConfigWriter::FillSubConfiguration(const SubConfig &data)
-  {
-    if(!Connect()) throw ConnectionError();
-    auto const& cfg_name = data.Name();
-    auto const  cfg_id   = data.ConfigID();
-    for(auto const& key_params : data) {
-      auto const& key    = key_params.first;
-      auto const& params = key_params.second;
-      if(key.IsDefaultCrate()   ||
-	 key.IsDefaultChannel() ||
-	 key.IsDefaultSlot()) continue;
-
-      Print(msg::kDEBUG,__FUNCTION__,
-	    Form("Filling SubConfig \"%s\" (ID=%d) ... Crate=%d Slot=%d Ch=%d",
-		 cfg_name.c_str(),
-		 cfg_id,
-		 key.Crate(),
-		 key.Slot(),
-		 key.Channel()));
-
-      std::string cmd(Form("SELECT FillSubConfiguration('%s'::TEXT, %d::INT, %d::INT, %d::INT, %d::INT,",
-			   cfg_name.c_str(),
-			   cfg_id,
-			   key.Crate(),
-			   key.Slot(),
-			   key.Channel())
-		      );
-
-      cmd += "'";
-      std::string byte_repr = "";
-      for(size_t i=0; i<64; ++i)
-	byte_repr = std::to_string((params.Mask()>>i) & 0x1) + byte_repr;
-      cmd += byte_repr + "'::BIT(64),'";
-
-      for(auto const& key_value : params){
-	std::string value(key_value.second.c_str());
-        size_t pos = value.find("\"");
-	while( value.size() > 0 && pos != std::string::npos ) {
-	  value.replace( pos, 1, "\\\"", 0, 2 );
-          pos += 2;
-          pos = value.find("\"", pos);
-	}
-
-	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), value.c_str());
-	
-      }
-
-      cmd += Form(" \"%s\"=>\"%s\"",kPSET_NAME_KEY.c_str(),params.Name().c_str());
-
-      cmd += " '::HSTORE); ";
-      
-      PGresult* res = _conn->Execute(cmd);
-
-      if(!res) return false;
-      PQclear(res);
-    }
-    return true;
-  }
-
-  bool ConfigWriter::CheckNewSubConfiguration(const SubConfig &data)
-  {
-    if(!Connect()) throw ConnectionError();
-    bool good = true;
-    auto const& cfg_name = data.Name();
-    auto const  cfg_id   = data.ConfigID();
-    for(auto const& key_params : data) {
-      auto const& key    = key_params.first;
-      auto const& params = key_params.second;
-      std::string cmd(Form("SELECT CheckNewSubConfiguration('%s'::TEXT, %d::INT, %d::INT, %d::INT, %d::INT",
-			   cfg_name.c_str(),
-			   cfg_id,
-			   key.Crate(),
-			   key.Slot(),
-			   key.Channel()
-			   )
-		      );
-      cmd += "'";
-
-      for(auto const& key_value : params)
-	cmd += Form(" \"%s\"=>\"%s\",", key_value.first.c_str(), key_value.second.c_str());
-
-      cmd += Form(" \"%s\"=>\"%s\"",kPSET_NAME_KEY.c_str(),params.Name().c_str());
-
-      cmd += " '::HSTORE); ";
-      
-      PGresult* res = _conn->Execute(cmd);
-      if(!res) return false;
-      
-      if(PQntuples(res))
-	good = good && (std::atoi(PQgetvalue(res,0,0)) == 0);
-      PQclear(res);
-      if(!good) break;
-    }
-    return good;
-  }
-
-  int ConfigWriter::InsertMainConfiguration(const RunConfig& cfg)
-  {
-    if(this->ExistRunConfig(cfg.Name())) {
-      Print(msg::kERROR,__FUNCTION__,Form("Main config %s already exist!",cfg.Name().c_str()));
-      return -1;
-    }
-    try {
-      for(auto const& name : cfg.List()) {
-	if(!(this->ExistSubConfig(name))) {
-	  Print(msg::kERROR,__FUNCTION__,Form("Sub-Config \"%s\" not found!",name.c_str()));
-	  return -1;
-	}
-	if(!(this->ExistSubConfig(name,cfg.Get(name).ConfigID()))){
-	  Print(msg::kERROR,__FUNCTION__,Form("Sub-Config \"%s\" w/ ID=%d not found!",
-						name.c_str(),
-						cfg.Get(name).ConfigID())
-		);
-	  return -1;
-	}
-      }
-    }catch(ConfigError& e) {
-      return -1;
-    }
-    if(!cfg.List().size()) {
-      Print(msg::kERROR,__FUNCTION__,"Input data is empty...");
-      return -1;
-    }
-
-    std::string cmd("");
-    cmd += "SELECT InsertMainConfiguration('";
-    for(auto const& n : cfg.List()) {
-      cmd += ("\"" + n + "\"");
-      cmd += "=>";
-      cmd += std::to_string(cfg.Get(n).ConfigID());
-      cmd += ",";
-    }
-    cmd  = cmd.substr(0,cmd.size()-1);
-    cmd += "'::HSTORE,'";
-
-    for(auto const& n : cfg.List()) {
-      auto const& d = cfg.Get(n);
-      cmd += ("\"" + n + "\"");
-      cmd += "=>";
-      std::string byte_repr="";
-      for(size_t i=0; i<(8*sizeof(size_t)); ++i)
-	byte_repr = std::to_string((d.Mask() >> i) & 0x1) + byte_repr;
-      cmd += "\"" + byte_repr + "\",";
-    }
-    cmd = cmd.substr(0,cmd.size()-1);
-    cmd += "'::HSTORE,'" + cfg.Name() + "');";
-
-    int val=-1;
-    PGresult* res = _conn->Execute(cmd);
-    if(!res) return val;
-
-    if(PQntuples(res))
-      val = std::atoi(PQgetvalue(res,0,0));
-
-    PQclear(res);
-    return val;
-  }
-
   bool ConfigWriter::CleanMainConfig(const std::string& name)
   {
     if(!Connect()) throw ConnectionError();
     Print(msg::kWARNING,__FUNCTION__,Form("Joining the Dark Side to destroy a MainConfig."));
-    if(!(this->ExistRunConfig(name))) {
+    if(!(this->ExistMainConfig(name))) {
       Print(msg::kERROR,__FUNCTION__,Form("MainConfig \"%s\" does not exist!",name.c_str()));
       return false;
     }

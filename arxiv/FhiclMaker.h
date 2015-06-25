@@ -19,7 +19,7 @@ namespace ubpsql {
 
   class FhiclMaker;
 
-  class FPSet : public DBBase{
+  class FPSet : public DBBase {
 
     friend class FhiclMaker;
 

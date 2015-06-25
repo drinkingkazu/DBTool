@@ -93,6 +93,7 @@ basicTPCcrate:
   slot18: @local::slot4
 }
 
+
 basicPMTseb:
 {
   registration:
@@ -150,6 +151,7 @@ basicPMTseb:
   {
     enabled:   true
   }
+
 }
 
 basicPMTcrate:
@@ -242,10 +244,11 @@ basicPMTcrate:
     #chwise_threshold1: [20,  20,  20  ]  # Disc. 1 (cosmic) threshold    (ADC count)
     #chwise_threshold3: [1000,1000,1000]  # Disc. 3 (beam)   threshold    (ADC count)
   }
+  empty_slot: {}
   slot7:  @local::slot6
   slot8:  @local::slot6
   slot9:  @local::slot6
-  slot10:{}
+  slot10: @local::empty_slot
   slot11:{}
   slot12:{}
   slot13:{}

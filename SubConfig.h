@@ -14,74 +14,88 @@
 #ifndef DBTOOL_SUBCONFIG_H
 #define DBTOOL_SUBCONFIG_H
 
-#include "CParams.h"
 #include <set>
-
+#include <TString.h>
+#include "DBBase.h"
 namespace ubpsql {
 
-  /**
-     \class SubConfig
-  */
-  class SubConfig : public std::map<ubpsql::CParamsKey,ubpsql::CParams>,
-		    public DBBase {
-    
+  class SubConfigID : public std::pair<std::string,unsigned int> {
   public:
-    
-    /// Default constructor
-    SubConfig(std::string name = "",
-	       int    config_id = -1,
-	       size_t mask      = 0x0);
+    SubConfigID(const std::string& name="",
+		const unsigned int id=kINVALID_UINT);
 
-    /// Default destructor
+    const std::string& Name() const { return this->first; }
+
+    unsigned int ID() const { return this->second; }
+
+    inline bool operator<(const SubConfigID& rhs) const
+    {
+      if( this->first  < rhs.Name() ) return true;
+      if( this->first  > rhs.Name() ) return false;
+      if( this->second < rhs.ID()   ) return true;
+      if( this->second > rhs.ID()   ) return false;
+      return false;
+    }
+    
+  };
+  
+  class SubConfig : public DBBase {
+
+    friend class SubConfig;
+
+  public:
+
+    SubConfig(const std::string& name="",
+	      const unsigned int id=kINVALID_UINT);
+
     virtual ~SubConfig(){}
-    
-    const std::string& Name() const { return fName; }
-    
-    int    ConfigID() const { return fConfigID; }
-    size_t Mask()     const { return fMask;     }
 
-    bool contains(const CParamsKey& p) const
-    { return (this->find(p) != this->end()); }
+    const SubConfigID& ID() const { return _id; }
 
-    bool contains(const int crate,
-		  const int slot,
-		  const int channel) const
-    { CParamsKey p(crate,slot,channel); return contains(p);}
+    void Append(const std::string& key, 
+		const std::string& param);
 
-    const CParams& GetParams( const int crate,
-			      const int slot,
-			      const int channel) const;
+    void Append(const SubConfig& scfg);
 
-    void ls() const;
+    void Clear() {
+      _leaf.clear();
+      _node.clear();
+    }
 
-    void append(const CParamsKey& key,const CParams& value);
-
-    inline bool operator== (const SubConfig& rhs) const
-    { return ( fName == rhs.Name() && fConfigID == rhs.ConfigID() ); }
-
-    inline bool operator!= (const SubConfig& rhs) const
-    { return !( (*this) == rhs ); }
+    void Dump(std::string& content,size_t level=0) const;
 
     inline bool operator< (const SubConfig& rhs) const
     {
-      if( fName     < rhs.Name    () ) return true;
-      if( fName     > rhs.Name    () ) return false;
-      if( fConfigID < rhs.ConfigID() ) return true;
-      if( fConfigID > rhs.ConfigID() ) return false;
-      return false;
+      return (_id < rhs.ID());
     }
 
-    inline bool operator> (const SubConfig& rhs) const
-    { return !((*this)<rhs); }
+    std::string Dump() const
+    { std::string res; Dump(res); return res;}
 
-  private:
+    std::vector<std::string> ListParameters() const;
+
+    const std::map<std::string,std::string>& Parameters() const;
     
-    std::string fName;
-    int    fConfigID;
-    size_t fMask;
+    std::vector<std::string> ListSubConfigs() const;
+
+    std::vector< ubpsql::SubConfigID > ListSubConfigIDs() const;
+
+    std::set< ubpsql::SubConfigID > Dependencies() const;
+
+    const SubConfig& GetSubConfig(const std::string node_name) const;
+    
+  protected:
+
+    SubConfigID _id;
+    
+    std::map<std::string,std::string>   _leaf;
+
+    std::map<std::string,ubpsql::SubConfig> _node;
+
   };
+
 }
-                                                                    
+
 #ifndef __GCCXML__
 namespace std {
   template <>

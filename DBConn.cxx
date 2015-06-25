@@ -154,7 +154,7 @@ namespace ubpsql{
   PGresult* DBConn::Execute(const std::string &cmd)
   {
     if(!IsConnected() && !Connect()) return 0;
-    
+
     Print(msg::kINFO,__FUNCTION__,cmd);
     PGresult* res = PQexec(_conn,cmd.c_str());
     
@@ -171,7 +171,7 @@ namespace ubpsql{
       case PGRES_NONFATAL_ERROR:
 	Print(msg::kWARNING,__FUNCTION__,PQresultErrorMessage(res));
 	throw QueryError();
-	//case PGRES_SINGLE_TUPLE:
+      case PGRES_SINGLE_TUPLE:
       case PGRES_TUPLES_OK:
 	done=true;
 	remove_res=false;

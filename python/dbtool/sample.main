@@ -1,0 +1,9 @@
+
+#
+ #
+MAIN_CONFIG_START MyMain5
+  tako => 1
+  boke => 4
+MAIN_CONFIG_END
+
+

@@ -7056,3 +7056,179 @@ ERROR:  Syntax error near '\' at position 279 at character 160
 STATEMENT:  SELECT FillSubConfiguration('pmt_config'::TEXT, 17::INT, 10::INT, -1::INT, -1::INT,'0000000000000000000000000000000000000000000000000000000111111000'::BIT(64),' "circular_buffer_size"=>"10e9", "dma_buffer_size"=>"120000", "fragment_id"=>"1", "nu_stream_sink"=>"assembler", "nu_stream_source"=>"dma_pmt", "port"=>"31423", "recipe"=>"onepmtcard", "sn_stream_sink"=>"NONE", "sn_stream_source"=>"NONE", "trigger_source"=>"INT", "type"=>"\"PMT"\", "name"=>"" '::HSTORE); 
 ERROR:  ++++++++++ Configuration pmt_config with ID 18 is already defined! +++++++++++
 STATEMENT:  SELECT InsertSubConfiguration('pmt_config'::TEXT,18::INT,' '::HSTORE,' '::HSTORE,' '::HSTORE,'0000000000000000000000000000000000000000000000000000000000000000'::BIT(64),'0000000000000000000000000000000000000000000000000000000000000000'::BIT(64),'0000000000000000000000000000000000000000000000000000000000000000'::BIT(64));
+LOG:  database system was interrupted; last known up at 2015-06-19 09:17:32 CDT
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  record with zero length at 0/2424108
+LOG:  redo is not required
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  loop variable of loop over rows must be a record or row variable or list of scalar variables at character 497
+STATEMENT:  CREATE OR REPLACE FUNCTION ListParameters(SubConfigName TEXT, SubConfigID INT)
+	       	  	  RETURNS TABLE (ParamName TEXT, ParamValue TEXT) AS $$
+	DECLARE
+	  myquery TEXT;
+	  params HSTORE;
+	BEGIN
+	  IF NOT ExistSubConfig(SubConfigName, SubConfigID) THEN
+	    RAISE EXCEPTION '+++++++++ SubConfig % with ID % does not exist!  +++++++++', SCfgName, SCfgID;
+	  END IF;
+	
+	  myquery := 'SELECT Parameters FROM ' || SubConfigName || ' WHERE ConfigID = ' || SfgID || ';';
+	  EXECUTE myquery INTO params;
+	
+	  FOR pair IN SELECT (each(params)).*
+	  LOOP
+	    RETURN QUERY SELECT pair.key::TEXT, pair.value::TEXT;
+	  END LOOP;
+	  RETURN;
+	END;
+	$$ LANGUAGE PLPGSQL;
+ERROR:  parameter name "subconfigname" used more than once
+CONTEXT:  compilation of PL/pgSQL function "listparametersets" near line 1
+STATEMENT:  CREATE OR REPLACE FUNCTION ListParameterSets(SubConfigName TEXT, SubConfigID INT)
+	       	  	  RETURNS TABLE (SubConfigName TEXT, SubConfigID INT) AS $$
+	DECLARE
+	  myquery TEXT;
+	  psets HSTORE;
+	BEGIN
+	  IF NOT ExistSubConfig(SubConfigName, SubConfigID) THEN
+	    RAISE EXCEPTION '+++++++++ SubConfig % with ID % does not exist!  +++++++++', SCfgName, SCfgID;
+	  END IF;
+	
+	  myquery := 'SELECT ParameterSets FROM ' || SubConfigName || ' WHERE ConfigID = ' || SfgID || ';';
+	  EXECUTE myquery INTO psets;
+	
+	  FOR pair IN SELECT (each(psets)).*
+	  LOOP
+	    RETURN QUERY SELECT pair.key::TEXT, pair.value::INT;
+	  END LOOP;
+	  RETURN;
+	END;
+	$$ LANGUAGE PLPGSQL;
+ERROR:  parameter name "subconfigname" used more than once
+CONTEXT:  compilation of PL/pgSQL function "listparametersets" near line 1
+STATEMENT:  CREATE OR REPLACE FUNCTION ListParameterSets(SubConfigName TEXT, SubConfigID INT)
+	       	  	  RETURNS TABLE (SubConfigName TEXT, SubConfigID INT) AS $$
+	DECLARE
+	  myquery  TEXT;
+	  psets  HSTORE;
+	  pair   RECORD;
+	BEGIN
+	  IF NOT ExistSubConfig(SubConfigName, SubConfigID) THEN
+	    RAISE EXCEPTION '+++++++++ SubConfig % with ID % does not exist!  +++++++++', SCfgName, SCfgID;
+	  END IF;
+	
+	  myquery := 'SELECT ParameterSets FROM ' || SubConfigName || ' WHERE ConfigID = ' || SfgID || ';';
+	  EXECUTE myquery INTO psets;
+	
+	  FOR pair IN SELECT (each(psets)).*
+	  LOOP
+	    RETURN QUERY SELECT pair.key::TEXT, pair.value::INT;
+	  END LOOP;
+	  RETURN;
+	END;
+	$$ LANGUAGE PLPGSQL;
+ERROR:  cannot change name of input parameter "subconfigname"
+HINT:  Use DROP FUNCTION first.
+STATEMENT:  CREATE OR REPLACE FUNCTION ListParameters(SCfgName TEXT, SCfgID INT)
+	       	  	  RETURNS TABLE (ParamName TEXT, ParamValue TEXT) AS $$
+	DECLARE
+	  myquery TEXT;
+	  params HSTORE;
+	  pair   RECORD;
+	BEGIN
+	  IF NOT ExistSubConfig(SubConfigName, SubConfigID) THEN
+	    RAISE EXCEPTION '+++++++++ SubConfig % with ID % does not exist!  +++++++++', SCfgName, SCfgID;
+	  END IF;
+	
+	  myquery := 'SELECT Parameters FROM ' || SCfgName || ' WHERE ConfigID = ' || SCfgID || ';';
+	  EXECUTE myquery INTO params;
+	
+	  FOR pair IN SELECT (each(params)).*
+	  LOOP
+	    RETURN QUERY SELECT pair.key::TEXT, pair.value::TEXT;
+	  END LOOP;
+	  RETURN;
+	END;
+	$$ LANGUAGE PLPGSQL;
+ERROR:  cannot change name of input parameter "subconfigname"
+HINT:  Use DROP FUNCTION first.
+STATEMENT:  CREATE OR REPLACE FUNCTION ListParameters(SCfgName TEXT, SCfgID INT)
+	       	  	  RETURNS TABLE (ParamName TEXT, ParamValue TEXT) AS $$
+	DECLARE
+	  myquery TEXT;
+	  params HSTORE;
+	  pair   RECORD;
+	BEGIN
+	  IF NOT ExistSubConfig(SCfgName, SCfgID) THEN
+	    RAISE EXCEPTION '+++++++++ SubConfig % with ID % does not exist!  +++++++++', SCfgName, SCfgID;
+	  END IF;
+	
+	  myquery := 'SELECT Parameters FROM ' || SCfgName || ' WHERE ConfigID = ' || SCfgID || ';';
+	  EXECUTE myquery INTO params;
+	
+	  FOR pair IN SELECT (each(params)).*
+	  LOOP
+	    RETURN QUERY SELECT pair.key::TEXT, pair.value::TEXT;
+	  END LOOP;
+	  RETURN;
+	END;
+	$$ LANGUAGE PLPGSQL;
+ERROR:  cannot change name of input parameter "subconfigname"
+HINT:  Use DROP FUNCTION first.
+STATEMENT:  CREATE OR REPLACE FUNCTION ListParameters(SCfgName TEXT, SCfgID INT)
+	       	  	  RETURNS TABLE (ParamName TEXT, ParamValue TEXT) AS $$
+	DECLARE
+	  myquery TEXT;
+	  params HSTORE;
+	  pair   RECORD;
+	BEGIN
+	  IF NOT ExistSubConfig(SCfgName, SCfgID) THEN
+	    RAISE EXCEPTION '+++++++++ SubConfig % with ID % does not exist!  +++++++++', SCfgName, SCfgID;
+	  END IF;
+	
+	  myquery := 'SELECT Parameters FROM ' || SCfgName || ' WHERE ConfigID = ' || SCfgID || ';';
+	  EXECUTE myquery INTO params;
+	
+	  FOR pair IN SELECT (each(params)).*
+	  LOOP
+	    RETURN QUERY SELECT pair.key::TEXT, pair.value::TEXT;
+	  END LOOP;
+	  RETURN;
+	END;
+	$$ LANGUAGE PLPGSQL;
+ERROR:  function listmainconfig() does not exist at character 15
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+STATEMENT:  SELECT * FROM ListMainConfig();
+WARNING:  ++++++++++++ Sub-Config kazus w/ ID 1 currently in use within MainConfigTable! ++++++++++++
+ERROR:  ++++++++++ Configuration tako does not exist! +++++++++++
+STATEMENT:  SELECT InsertSubConfiguration('tako',1,' "buffer_size"=>"1e6", "slot"=>"0xc000", '::HSTORE,' '::HSTORE);
+ERROR:  query has no destination for result data
+HINT:  If you want to discard the results of a SELECT, use PERFORM instead.
+CONTEXT:  PL/pgSQL function insertsubconfiguration(text,integer,hstore,hstore) line 11 at SQL statement
+STATEMENT:  SELECT InsertSubConfiguration('tako',1,' "buffer_size"=>"1e6", "slot"=>"0xc000", '::HSTORE,' '::HSTORE);
+ERROR:  syntax error at or near "PERFORM" at character 1
+STATEMENT:  PERFORM InsertSubConfiguration('tako',1,' "buffer_size"=>"1e6", "slot"=>"0xc000", '::HSTORE,' '::HSTORE);
+ERROR:  syntax error at or near "PERFORM" at character 1
+STATEMENT:  PERFORM InsertSubConfiguration('tako',1,' "buffer_size"=>"1e6", "slot"=>"0xc000", '::HSTORE,' '::HSTORE);
+ERROR:  syntax error at or near "PERFORM" at character 1
+STATEMENT:  PERFORM InsertSubConfiguration('tako',1,' "buffer_size"=>"1e6", "slot"=>"0xc000", '::HSTORE,' '::HSTORE);
+ERROR:  query has no destination for result data
+HINT:  If you want to discard the results of a SELECT, use PERFORM instead.
+CONTEXT:  PL/pgSQL function insertsubconfiguration(text,integer,hstore,hstore) line 11 at SQL statement
+STATEMENT:  SELECT InsertSubConfiguration('tako',1,' "buffer_size"=>"1e6", "slot"=>"0xc000", '::HSTORE,' '::HSTORE);
+ERROR:  syntax error at or near "','" at character 72
+STATEMENT:  SELECT * FROM InsertMainConfiguration(' "boke"=>1, "tako"=>1, '::HSTORE','MyMain3');
+ERROR:  invalid input syntax for integer: "MyMain3" at character 30
+STATEMENT:  SELECT * FROM ListSubConfigs('MyMain3');
+ERROR:  invalid input syntax for integer: "MyMain3" at character 30
+STATEMENT:  SELECT * FROM ListSubConfigs('MyMain3');
+ERROR:  invalid input syntax for integer: "MyMain3" at character 30
+STATEMENT:  SELECT * FROM ListSubConfigs('MyMain3');
+ERROR:  invalid input syntax for integer: "MyMain3" at character 30
+STATEMENT:  SELECT * FROM ListSubConfigs('MyMain3');
+ERROR:  function listsubconfig(unknown) does not exist at character 15
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+STATEMENT:  SELECT * FROM ListSubConfig('MyMain3');
+ERROR:  invalid input syntax for integer: "MyMain3" at character 30
+STATEMENT:  SELECT * FROM ListSubConfigs('MyMain3');
