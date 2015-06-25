@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from MainConfigParser import MainConfigParser
-from MainConfigUploader import MainConfigUploader
+from dbtool import MainConfigParser
+from dbtool import MainConfigUploader
 import sys
 
 parser=MainConfigParser()

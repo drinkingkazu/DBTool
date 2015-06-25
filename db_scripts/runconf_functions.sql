@@ -441,10 +441,10 @@ CREATE OR REPLACE FUNCTION InsertSubConfiguration( config_name TEXT,
   BEGIN
 
   IF NOT ExistSubConfig(config_name) THEN
-    SELECT CreateSubConfiguration(config_name) INTO myrec;
-    IF NOT ExistSubConfig(config_name) THEN
-      RAISE EXCEPTION '++++++++++ Configuration % does not exist! +++++++++++', config_name;
-    END IF;
+    --SELECT CreateSubConfiguration(config_name) INTO myrec;
+    --IF NOT ExistSubConfig(config_name) THEN
+    RAISE EXCEPTION '++++++++++ Configuration % does not exist! +++++++++++', config_name;
+    --END IF;
   END IF;
 
   IF ExistSubConfig(config_name, config_id) THEN

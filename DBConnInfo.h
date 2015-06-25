@@ -12,7 +12,7 @@ namespace ubpsql {
     DBConnInfo();
     static DBConnInfo* _me;
     std::vector<std::string> _conn_str_v;
-
+    std::vector<std::string> _role_str_v;
   public:
     static const DBConnInfo& Get()
     {
@@ -22,6 +22,9 @@ namespace ubpsql {
 
     const std::string& GetConnString(const DBI_USER_t type) const
     { return _conn_str_v[type]; }
+
+    const std::string& GetRoleString(const DBI_USER_t type) const
+    { return _role_str_v[type]; }
   
   };
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from SubConfigParser import SubConfigParser
-from SubConfigUploader import SubConfigUploader
+from dbtool import SubConfigParser
+from dbtool import SubConfigUploader
 import sys
 
 parser=SubConfigParser()
