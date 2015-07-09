@@ -146,11 +146,10 @@ class SubConfigUploader(UBPyBase):
 
         # Check if any slot is colliding
         slot = [ 'none' ] * 21
-        biLoc = [ 'tpc', 'pmt', 'shaper' ]
         for islot in xrange( 21 ):
             for imodule in EnabledModules:
                 loc = int(Params[imodule]['slot'], 0)
-                if imodule in biLoc:
+                if imodule in [ 'tpc', 'pmt', 'shaper' ]:
                     if ( loc & ( 1 << islot ) ):
                         if slot[islot] == 'none':
                             slot[islot] = imodule
