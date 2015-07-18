@@ -26,13 +26,13 @@ list( GET LINKDEF 0 LINKDEF )
 list( REMOVE_ITEM MYHEADERS ${LINKDEF} )
 
 # Pre process to generate dictionary source code + getting compiler/linker flags
+#execute_process(COMMAND pg_config --includedir-server OUTPUT_VARIABLE PSQL_INCDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND pg_config --includedir OUTPUT_VARIABLE PSQL_INCDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND pg_config --libdir OUTPUT_VARIABLE PSQL_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND root-config --incdir OUTPUT_VARIABLE ROOT_INCDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND root-config --libdir OUTPUT_VARIABLE ROOT_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND rootcint -f ${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.cxx -c -I${PSQL_INCDIR} -I${ROOT_INCDIR} -I. ${MYHEADERS} ${LINKDEF})
 set(PSQL_LIB "-L${PSQL_LIBDIR} -lpq")
-#set(ROOT_LIB "-L${ROOT_LIBDIR} -lCore -lCint -lRIO")
 set(ROOT_LIB "-L${ROOT_LIBDIR} -lCore -lCint -lRIO")
 
 # Set include dirs
@@ -58,7 +58,7 @@ endif()
 # Generate a rootmap file
 add_custom_command( TARGET UBOnlineDBI
 		    POST_BUILD
-		    COMMAND rlibmap ARGS -f  -o ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap -l ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.dylib -c ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h
+		    COMMAND rlibmap ARGS -f  -o ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap -l ${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.so -c ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h
 		    )
 set_directory_properties( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/lib/libUBOnlineDBI.rootmap" )
 #set_directory_properties( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.h;${CMAKE_CURRENT_BINARY_DIR}/${DICT_NAME}.cxx" )

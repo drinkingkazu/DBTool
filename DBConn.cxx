@@ -35,7 +35,8 @@ namespace ubpsql{
 
     SetVerbosity(msg::kNORMAL);
 
-    Configure( DBConnInfo::Get().GetConnString(user_type) );
+    Configure( DBConnInfo::Get().GetConnString(user_type),
+	       DBConnInfo::Get().GetRoleString(user_type) );
   }
 
   bool DBConn::Connect()
@@ -86,6 +87,12 @@ namespace ubpsql{
 
       if(IsConnected()){
 	PQsetNoticeProcessor(_conn,modNoticeProcessor,_voidarg);
+	if(!_conn_role.empty()) {
+	  std::string query("SET ROLE ");
+	  query += _conn_role;
+	  query += ";";
+	  PQclear(Execute(query));
+	}
 	return true;
       }
 
@@ -171,7 +178,9 @@ namespace ubpsql{
       case PGRES_NONFATAL_ERROR:
 	Print(msg::kWARNING,__FUNCTION__,PQresultErrorMessage(res));
 	throw QueryError();
+#ifdef PG_INT64_TYPE
       case PGRES_SINGLE_TUPLE:
+#endif
       case PGRES_TUPLES_OK:
 	done=true;
 	remove_res=false;

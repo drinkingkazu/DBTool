@@ -3,3 +3,4 @@ from dbtool import ubpsql
 
 ubpsql.ConfigReader().Connect()
 ubpsql.ConfigWriter().Connect()
+ubpsql.DeathStar().Connect()

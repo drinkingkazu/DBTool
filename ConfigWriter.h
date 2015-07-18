@@ -69,9 +69,6 @@ namespace ubpsql {
     /// Drop MainConfig
     bool CleanMainConfig(const std::string& name);
 
-    /// Don't use this
-    void SuperLaser();
-      
   };
 }
 

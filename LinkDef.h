@@ -26,6 +26,7 @@
 
 #pragma link C++ class ubpsql::ConfigReader+;
 #pragma link C++ class ubpsql::ConfigWriter+;
+#pragma link C++ class ubpsql::DeathStar+;
 #pragma link C++ class std::map<string,string>+;
 #pragma link C++ class ubpsql::SubConfigID+;
 #pragma link C++ class ubpsql::SubConfig+;

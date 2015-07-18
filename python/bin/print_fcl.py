@@ -22,6 +22,9 @@ if not reader.ExistMainConfig(sys.argv[1]):
 
 cfg = reader.GetMainConfig(sys.argv[1])
 
-print cfg.Dump()
+fout=open('%s.fcl' % cfg.Name(),'w')
+fout.write(cfg.Dump())
+fout.close()
+
 
 

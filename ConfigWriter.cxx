@@ -78,6 +78,13 @@ namespace ubpsql {
 
   bool ConfigWriter::InsertSubConfiguration(const SubConfig& cfg)
   {
+    if(!(this->ExistSubConfig(cfg.ID().Name())))  {
+      Print(msg::kERROR,__FUNCTION__,
+	    Form("SubConfig \"%s\" does not exist yet. Create one from the DeathStar...",cfg.ID().Name().c_str())
+	    );
+      return false;
+    }
+
     std::string params_hstore,psets_hstore;
     TString value="";
     size_t ctr = 0;
@@ -185,16 +192,6 @@ namespace ubpsql {
     return result;
   }
 
-  void ConfigWriter::SuperLaser()
-  {
-    if(!Connect()) throw ConnectionError();
-    Print(msg::kWARNING,__FUNCTION__,Form("Death Star is completed. Attempting to destroy Endor via SuperLaser."));
-    PGresult* res = _conn->Execute("SELECT CleanConfigDB();");
-    Print(msg::kWARNING,__FUNCTION__,Form("Bahahahaha!"));
-    if(res) PQclear(res);
-    return;
-  }
-  
 }
 
 #endif

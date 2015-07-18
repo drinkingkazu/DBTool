@@ -58,8 +58,8 @@ namespace ubpsql {
        Setter for configuration string (configure host, database, user, and password in 1 string).
        Note you do not have to configure if the default connection info suffices.
     */
-    void Configure(const std::string config_string)
-    { _conn_config = config_string; }
+    void Configure(const std::string& config_string, const std::string& role_string)
+    { _conn_config = config_string; _conn_role = role_string; }
 
     /// Verbosity setting
     virtual void SetVerbosity(msg::MSGLevel_t level)
@@ -97,6 +97,10 @@ namespace ubpsql {
     const char* GetShellUser()
     { return _user_shell.c_str();}
 
+    /// Getter for a role
+    const char* GetRole()
+    { return _conn_role.c_str();}
+
     /**
        Function to execute a query string. 
        The caller of this function is responsible for calling PQclear function to
@@ -109,6 +113,7 @@ namespace ubpsql {
     PGconn* _conn;            ///< PostgreSQL connection instance
     DBI_USER_t  _user_type;   ///< User type
     std::string _conn_config; ///< DB connection info string
+    std::string _conn_role;   ///< DB role
     std::string _user_shell;  ///< Shell user name of this program executer
 
     /// Waiting time between re-connection trials in seconds

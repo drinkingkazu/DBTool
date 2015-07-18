@@ -60,6 +60,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION RunExist( run INT ) RETURNS BOOLEAN AS $$
+DECLARE
+  res BOOLEAN;
+BEGIN
+  res := FALSE;
+  SELECT TRUE FROM MainRun WHERE RunNumber = run INTO res;
+  IF res IS NULL OR NOT res THEN
+    RETURN FALSE;
+  END IF;
+  RETURN TRUE;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION RunExist( run INT, subrun INT ) RETURNS BOOLEAN AS $$
+DECLARE
+  res BOOLEAN;
+BEGIN
+  res := FALSE;
+  SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun INTO res;
+  IF res IS NULL OR NOT res THEN
+    RETURN FALSE;
+  END IF;
+  RETURN TRUE;
+END;
+$$ LANGUAGE PLPGSQL;
+
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 --CREATE OR REPLACE FUNCTION InsertNewSubRun( run INT,
@@ -103,8 +129,11 @@ DECLARE
 tstart TIMESTAMP;
 causality BOOLEAN;
 BEGIN
-     IF NOT ExistRun(run,subrun) THEN
-     	RAISE EXCEPTION 'Run % SubRun % does not exist!', run, subrun;
+     IF NOT RunExist(run,subrun) THEN
+     	RAISE EXCEPTION 'Run % SubRun % already exist!', run, subrun;
+     END IF;	
+     IF subrun > 0 AND RunExist(run,(subrun-1)) THEN
+     	RAISE EXCEPTION 'Run % SubRun % should exist but not...', run, subrun;
      END IF;
 
      SELECT INTO tstart TimeStart FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun;

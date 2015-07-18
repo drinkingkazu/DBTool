@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from dbtool import ubpsql
 
-writer = ubpsql.ConfigWriter()
+ds = ubpsql.DeathStar()
 
-writer.SuperLaser()
+ds.SuperBeam()
