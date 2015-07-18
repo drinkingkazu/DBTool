@@ -46,8 +46,8 @@ namespace ubpsql{
       else return true;
     }
     
-    Print(msg::kNORMAL,"Connecting to PostgreSQL server using:");
-    Print(msg::kNORMAL,_conn_config.c_str());
+    Print(msg::kDEBUG,"Connecting to PostgreSQL server using:");
+    Print(msg::kDEBUG,_conn_config.c_str());
     unsigned char ntrials=0;
     while(true) {
 

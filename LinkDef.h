@@ -24,6 +24,8 @@
 #pragma link C++ class ubpsql::PQMessenger+;
 #pragma link C++ class ubpsql::DBConn+;
 
+#pragma link C++ class ubpsql::RunInfo+;
+
 #pragma link C++ class ubpsql::ConfigReader+;
 #pragma link C++ class ubpsql::ConfigWriter+;
 #pragma link C++ class ubpsql::DeathStar+;

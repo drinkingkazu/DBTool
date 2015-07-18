@@ -42,7 +42,11 @@ namespace ubpsql {
     /// Getter for last run number
     unsigned int GetLastRun();
     /// Getter for last sub-run number
-    unsigned int GetLastSubRun(unsigned int run);
+    unsigned int GetLastSubRun(const unsigned int run);
+    /// Getter for a run info
+    RunInfo GetRunInfo(const unsigned int run);
+    /// Getter for a list of run info
+    std::vector< ubpsql::RunInfo > ListRunInfo(const std::vector<unsigned int>& run_list);
     /// Existence checker
     bool ExistRun(const unsigned int run,
 		  const unsigned int subrun=kINVALID_UINT);

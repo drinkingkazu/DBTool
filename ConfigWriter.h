@@ -44,11 +44,22 @@ namespace ubpsql {
     unsigned int InsertNewRun(const unsigned int cfg_id);
 
     /// Insert a new sub-run number with an existing main-config name
-    unsigned int InsertNewSubRun(const std::string& cfg_name);
+    unsigned int InsertNewSubRun(const std::string& cfg_name,
+				 const unsigned int run);
 
     /// Insert a new sub-run number with an existing main-config id
-    unsigned int InsertNewSubRun(const unsigned int cfg_id);
+    unsigned int InsertNewSubRun(const unsigned int cfg_id,
+				 const unsigned int run);
 
+    bool UpdateStartTime(const unsigned int  run,
+			 const unsigned int  subrun,
+			 const unsigned long time_sec,
+			 const unsigned int  time_usec);
+
+    bool UpdateStopTime(const unsigned int  run,
+			const unsigned int  subrun,
+			const unsigned long time_sec,
+			const unsigned int  time_usec);
 
     //
     // Config table related

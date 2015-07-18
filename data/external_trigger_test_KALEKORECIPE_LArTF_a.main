@@ -1,0 +1,8 @@
+
+MAIN_CONFIG_START external_trigger_test_KALEKORECIPE_LArTF_a
+
+  dispatcherevb => 1
+  online_monitornear1 => 1
+  assemblerAppevb => 1
+
+MAIN_CONFIG_END

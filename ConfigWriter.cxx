@@ -2,6 +2,7 @@
 #define DBTOOL_CONFIGWRITER_CXX
 
 #include "ConfigWriter.h"
+#include <TTimeStamp.h>
 #include <stdlib.h>
 namespace ubpsql {
 
@@ -28,25 +29,28 @@ namespace ubpsql {
     PGresult* res = _conn->Execute(Form("SELECT InsertNewSubRun(%d,%d);",config_id,run));
     if(!res) return false;
 
-    unsigned int run = atoi(PQgetvalue(res,0,0));
+    auto subrun = atoi(PQgetvalue(res,0,0));
     PQclear(res);
-    return run;
+    return subrun;
   }
 
   //-------------------------------------------------------------------------------------------
   unsigned int ConfigWriter::InsertNewSubRun(const std::string& cfg_name, const unsigned int run)
-  { return InsertNewSubRun( this->MainConfigID(cfg_name, run) ); }
+  { return InsertNewSubRun( this->MainConfigID(cfg_name), run); }
 
   //-------------------------------------------------------------------------------------------
-  bool ConfigWriter::UpdateStartTime( unsigned int run,
-				      unsigned int subrun.
-				      unsigned long time )
+  bool ConfigWriter::UpdateStartTime( const unsigned int  run,
+				      const unsigned int  subrun,
+				      const unsigned long time_sec,
+				      const unsigned int  time_usec )
   {
     if(!(this->ExistRun(run,subrun)))
       throw RunNotFoundError();
     
     if(!Connect()) throw ConnectionError();
-    TTimeStamp ts(time,0);
+
+    TTimeStamp ts(time_t(time_sec + time_usec/1000000),
+		  Int_t(time_usec % 1000000));
     PGresult* res = _conn->Execute(Form("SELECT UpdateStartTime(%d,%d,'%s'::TIMESTAMP);",
 					run, subrun, ts.AsString("q")));
     if(!res) return false;
@@ -55,14 +59,17 @@ namespace ubpsql {
     return success;
   }
 
-  bool ConfigWriter::UpdateStopTime( unsigned int run,
-				     unsigned int subrun,
-				     unsigned long time ) {
+  bool ConfigWriter::UpdateStopTime( const unsigned int  run,
+				     const unsigned int  subrun,
+				     const unsigned long time_sec,
+				     const unsigned int  time_usec)
+  {
     if(!(this->ExistRun(run,subrun)))
       throw RunNotFoundError();
     
     if(!Connect()) throw ConnectionError();
-    TTimeStamp ts(time,0);
+    TTimeStamp ts(time_t(time_sec + time_usec/1000000),
+		  Int_t(time_usec%1000000));
     PGresult* res = _conn->Execute(Form("SELECT UpdateStopTime(%d,%d,'%s'::TIMESTAMP);",
 					run, subrun, ts.AsString("q")));
     if(!res) return false;

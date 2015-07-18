@@ -35,8 +35,8 @@ CREATE TABLE  MainRun  (
    RunNumber    INT NOT NULL   DEFAULT 0 , -- 'Run Number',
    SubRunNumber INT NOT NULL DEFAULT 0, -- 'Sub Run Number',
    RunType      SMALLINT  NOT NULL DEFAULT 0 , -- 'Defines what type of run we''re running. Can connect to Confi',
-   TimeStart  TIMESTAMP  NOT NULL DEFAULT NULL,
-   TimeStop   TIMESTAMP NULL DEFAULT NULL,
+   TimeStart  TIMESTAMP  DEFAULT NULL,
+   TimeStop   TIMESTAMP DEFAULT NULL,
    ConfigID   INT  NOT NULL DEFAULT 0 , -- 'Stores Configuration ID', --REFERENCES  MainConfigTable  ( ConfigID )
 -- KEY ( ConfigID ),
   PRIMARY KEY ( RunNumber,SubRunNumber )

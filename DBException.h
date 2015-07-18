@@ -75,6 +75,7 @@ namespace ubpsql {
     ~RunNotFoundError() throw() {}
     virtual const char* what() const throw()
     { return "\033[91mRun/SubRun specified not ound!\033[00m"; }
+  };
 
   /**
      \class TableDataError
@@ -99,7 +100,7 @@ namespace ubpsql {
     virtual const char* what() const throw()
     { return "\033[91mInvalid config handling!\033[00m";}
   };
-
+  
 }
 #endif
 /** @} */ // end of doxygen group 

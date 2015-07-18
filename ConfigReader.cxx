@@ -20,31 +20,47 @@ namespace ubpsql {
     return run;
   }
 
-  unsigned int ConfigReader::GetLastSubRun(unsigned int run)
+  unsigned int ConfigReader::GetLastSubRun(const unsigned int run)
   {
     if(!Connect()) throw ConnectionError();
     PGresult* res = _conn->Execute(Form("SELECT GetLastSubRun(%d);",run));
-    if(!res) return std::numeric_limits<unsigned int>::max();
+    if(!res) throw RunNotFoundError();
 
     unsigned int subrun = atoi(PQgetvalue(res,0,0));
     PQclear(res);
     return subrun;
   }
 
+  RunInfo ConfigReader::GetRunInfo(const unsigned int run)
+  {
+
+    
+    return RunInfo();
+  }
+
+  std::vector< ubpsql::RunInfo > ConfigReader::ListRunInfo(const std::vector<unsigned int>& run_list)
+  {
+    std::vector<ubpsql::RunInfo> res;
+    for(auto const& run : run_list) res.emplace_back(GetRunInfo(run));
+    return res;
+  }
+
   bool ConfigReader::ExistRun(const unsigned int run,
 			      const unsigned int subrun)
   {
     if(!Connect()) throw ConnectionError();
-    std::string query = Form("SELECT 1 FROM MainRunTable WHERE RunNumber = %d",run);
+    std::string query = Form("SELECT ExistRun(%d",run);
     if(subrun!=kINVALID_UINT)
-      query += Form(" AND SubRunNumber = %d",subrun);
-    query += ";";
+      query += Form(",%d",subrun);
+    query += ");";
 
     PGresult* res = _conn->Execute(query);
 
     bool exist = false;
-    if(res && PQntuples(res))
-      exist = std::atoi(PQgetvalue(res,0,0));
+    if(res && PQntuples(res)) {
+      std::string resstr(PQgetvalue(res,0,0));
+      exist = (resstr == "t" || resstr == "true");
+    }
     if(res) PQclear(res);
     return exist;
   }

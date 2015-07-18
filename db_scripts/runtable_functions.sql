@@ -6,11 +6,15 @@ CREATE OR REPLACE FUNCTION ExistRun(run INT, subrun INT DEFAULT NULL) RETURNS BO
 DECLARE
   run_exist BOOLEAN;
 BEGIN
-  run_exist := FALSE;
+
   IF subrun IS NULL THEN
     SELECT INTO run_exist TRUE FROM MainRun WHERE RunNumber = run;
   ELSE
     SELECT INTO run_exist TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun;
+  END IF;
+
+  IF run_exist IS NULL THEN
+    run_exist = FALSE;
   END IF;
 
   RETURN run_exist;
@@ -29,7 +33,7 @@ DECLARE
 BEGIN
      SELECT INTO lastrun GetLastRun();
    
-     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES (lastrun+1,1,CfgID,333, 'now');
+     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun+1,0,CfgID,-1);
 
 
     RETURN lastrun+1;
@@ -54,7 +58,7 @@ BEGIN
 
      SELECT INTO lastsubrun GetLastSubRun(lastrun);
 
-     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES (lastrun,lastsubrun+1,CfgID,333,'now');
+     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun,lastsubrun+1,CfgID,-1);
 
     RETURN lastsubrun+1;
 END;
@@ -180,6 +184,9 @@ BEGIN
     
     SELECT INTO lastrun RunNumber FROM MainRun  ORDER BY RunNumber DESC LIMIT 1;
 
+    IF lastrun IS NULL THEN
+      lastrun := 0;
+    END IF;
     RETURN lastrun;
 END;
 $$ LANGUAGE plpgsql;
@@ -191,7 +198,11 @@ CREATE OR REPLACE FUNCTION GetLastSubRun(run INT) RETURNS integer AS $$
 DECLARE
     lastsubrun mainrun.SubRunNumber%TYPE;
 BEGIN
-    
+
+    IF NOT ExistRun(run) THEN
+      RAISE EXCEPTION '++++++++++ Run % not found... ++++++++++',run;
+    END IF;
+
     SELECT INTO lastsubrun SubRunNumber FROM MainRun WHERE RunNumber=run ORDER BY SubRunNumber DESC LIMIT 1;
 
     RETURN lastsubrun;
@@ -201,5 +212,7 @@ $$ LANGUAGE plpgsql;
 --CREATE TRIGGER mainconfigcheck BEFORE INSERT OR UPDATE ON mainconfigtable
 --    FOR EACH ROW EXECUTE PROCEDURE mainconfigcheck();
 
+-----------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 
