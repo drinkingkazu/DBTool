@@ -2,8 +2,6 @@
 
 me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export DBTOOL_DIR="$( cd "$( dirname "$me" )" && pwd )"
-export LD_LIBRARY_PATH=$DBTOOL_DIR/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$DBTOOL_DIR/python:$PYTHONPATH
 
 case `uname -n` in
     (*ubdaq-prod*)
@@ -53,6 +51,10 @@ if [[ -z `command -v cmake` ]]; then
     echo
     return;
 fi
+
+export PATH=$DBTOOL_DIR/bin:$PATH
+export LD_LIBRARY_PATH=$DBTOOL_DIR/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$DBTOOL_DIR/python:$PYTHONPATH
 
 mkdir -p $DBTOOL_DIR/build
 cd $DBTOOL_DIR/build

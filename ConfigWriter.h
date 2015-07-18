@@ -33,12 +33,27 @@ namespace ubpsql {
     /// Default destructor
     virtual ~ConfigWriter(){};
 
-    /// Create a new run number in the database
-    bool InsertNewRun(unsigned int config_id);
+    //
+    // Run table related
+    //
 
-    /// Create a new sub run number in the database
-    bool InsertNewSubRun(unsigned int config_id, unsigned int run);
+    /// Insert a new run number with an existing main-config name
+    unsigned int InsertNewRun(const std::string& cfg_name);
 
+    /// Insert a new run number with an existing main-config id
+    unsigned int InsertNewRun(const unsigned int cfg_id);
+
+    /// Insert a new sub-run number with an existing main-config name
+    unsigned int InsertNewSubRun(const std::string& cfg_name);
+
+    /// Insert a new sub-run number with an existing main-config id
+    unsigned int InsertNewSubRun(const unsigned int cfg_id);
+
+
+    //
+    // Config table related
+    //
+    
     /// Method to insert a new sub configuration
     bool InsertSubConfiguration(const SubConfig& cfg);
 

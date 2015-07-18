@@ -2,6 +2,21 @@ SET ROLE uboonedaq_admin;
 
 -- CREATE LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION ExistRun(run INT, subrun INT DEFAULT NULL) RETURNS BOOLEAN AS $$
+DECLARE
+  run_exist BOOLEAN;
+BEGIN
+  run_exist := FALSE;
+  IF subrun IS NULL THEN
+    SELECT INTO run_exist TRUE FROM MainRun WHERE RunNumber = run;
+  ELSE
+    SELECT INTO run_exist TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun;
+  END IF;
+
+  RETURN run_exist;
+
+END;
+$$ LANGUAGE plpgsql;
 
 
 --CREATE OR REPLACE FUNCTION testfunc(integer) RETURNS integer AS $PROC$
@@ -14,7 +29,7 @@ DECLARE
 BEGIN
      SELECT INTO lastrun GetLastRun();
    
-     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES(lastrun+1,1,CfgID,333, 'now');
+     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES (lastrun+1,1,CfgID,333, 'now');
 
 
     RETURN lastrun+1;
@@ -39,7 +54,7 @@ BEGIN
 
      SELECT INTO lastsubrun GetLastSubRun(lastrun);
 
-     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES(lastrun,lastsubrun+1,CfgID,333,'now');
+     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart) VALUES (lastrun,lastsubrun+1,CfgID,333,'now');
 
     RETURN lastsubrun+1;
 END;
@@ -47,36 +62,36 @@ $$ LANGUAGE plpgsql;
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION InsertNewSubRun( run INT,
-					    subrun INT,
-					    ts TIMESTAMP,
-					    te TIMESTAMP,
-					    CfgID INT DEFAULT -1) RETURNS INT AS $$
-DECLARE
-rtype INT;
-BEGIN
-     IF NOT EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run) THEN
-     	RAISE EXCEPTION 'Run % does not exist!', run;
-     ELSE IF EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun) THEN
-     	RAISE EXCEPTION 'Run % SubRun % already exist!', run, subrun;
-     ELSE IF NOT EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = (subrun-1)) THEN
-     	RAISE EXCEPTION 'Run % SubRun % should exist but not...', run, subrun;
-     END IF;
-
-     IF te < ts THEN
-     	RAISE EXCEPTION 'EndTime cannot be smaller than StartTime!';
-     END IF;
-
-     IF CfgID = -1 THEN
-       SELECT INTO CfgID ConfigID FROM MainRun  ORDER BY RunNumber,SubRunNumber DESC LIMIT 1;
-     END IF;
-
-     SELECT INTO rtype RunType FROM MainRun  ORDER BY RunNumber,SubRunNumber DESC LIMIT 1;
-
-     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart,TimeStop) VALUES (run,subrun,CfgID,rtype,ts,te);
-     RETURN 0;
-END;
-$$ LANGUAGE plpgsql;
+--CREATE OR REPLACE FUNCTION InsertNewSubRun( run INT,
+--					    subrun INT,
+--					    ts TIMESTAMP,
+--					    te TIMESTAMP,
+--					    CfgID INT DEFAULT -1) RETURNS INT AS $$
+--DECLARE
+--rtype INT;
+--BEGIN
+--     IF NOT EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run) THEN
+--     	RAISE EXCEPTION 'Run % does not exist!', run;
+--     ELSE IF EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun) THEN
+--     	RAISE EXCEPTION 'Run % SubRun % already exist!', run, subrun;
+--     ELSE IF NOT EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = (subrun-1)) THEN
+--     	RAISE EXCEPTION 'Run % SubRun % should exist but not...', run, subrun;
+--     END IF;
+--
+--     IF te < ts THEN
+--     	RAISE EXCEPTION 'EndTime cannot be smaller than StartTime!';
+--     END IF;
+--
+--     IF CfgID = -1 THEN
+--       SELECT INTO CfgID ConfigID FROM MainRun  ORDER BY RunNumber,SubRunNumber DESC LIMIT 1;
+--     END IF;
+--
+--     SELECT INTO rtype RunType FROM MainRun  ORDER BY RunNumber,SubRunNumber DESC LIMIT 1;
+--
+--     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType,TimeStart,TimeStop) VALUES (run,subrun,CfgID,rtype,ts,te);
+--     RETURN 0;
+--END;
+--$$ LANGUAGE plpgsql;
 
 -----------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -86,18 +101,41 @@ CREATE OR REPLACE FUNCTION UpdateStopTime( run INT,
 					   ts TIMESTAMP) RETURNS integer AS $$
 DECLARE
 tstart TIMESTAMP;
+causality BOOLEAN;
 BEGIN
-     IF NOT EXISTS (SELECT TRUE FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun) THEN
+     IF NOT ExistRun(run,subrun) THEN
      	RAISE EXCEPTION 'Run % SubRun % does not exist!', run, subrun;
      END IF;
 
-     SELECT tstart TimeStart FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun LIMIT 1;
+     SELECT INTO tstart TimeStart FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun;
 
      IF ts < tstart THEN
-       RAISE EXCEPTION 'Start time cannot be in future w.r.t. end time...'
+       RAISE EXCEPTION 'Start time cannot be in future w.r.t. end time...';
      END IF;
 
      UPDATE MainRun SET TimeEnd=ts WHERE RunNumber=run AND SubRunNumber=subrun;
+
+     RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION UpdateStartTime( run INT,
+                                            subrun INT,
+					    ts TIMESTAMP) RETURNS integer AS $$
+DECLARE
+tend TIMESTAMP;
+BEGIN
+     IF NOT ExistRun(run,subrun) THEN 
+     	RAISE EXCEPTION 'Run % SubRun % does not exist!', run, subrun;
+     END IF;
+
+     SELECT tend TimeStop FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun LIMIT 1;
+
+     IF ts > tend THEN
+       RAISE EXCEPTION 'Start time cannot be in future w.r.t. end time...';
+     END IF;
+
+     UPDATE MainRun SET TimeStart=ts WHERE RunNumber=run AND SubRunNumber=subrun;
 
      RETURN 0;
      

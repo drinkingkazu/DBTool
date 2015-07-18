@@ -37,8 +37,8 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
-DROP FUNCTIONS IF EXISTS MainConfigName(MCfgName TEXT)/
-CREATE OR REPLACE FUNCTION MainConfigName(MCfgName TEXT) RETURNS TEXT AS $$
+DROP FUNCTIONS IF EXISTS MainConfigID(MCfgName TEXT)/
+CREATE OR REPLACE FUNCTION MainConfigID(MCfgName TEXT) RETURNS TEXT AS $$
 DECLARE
   res INT;
 BEGIN
@@ -211,6 +211,22 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+CREATE OR REPLACE FUNCTION ListAllMainConfigs()
+       	  	  RETURNS TABLE (ConfigName TEXT, ConfigID INT, Enabled BOOLEAN) AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  FOR rec IN SELECT DISTINCT MainConfigTable.ConfigName,
+	       	      	     MainConfigTable.ConfigID,
+		       	     MainConfigTable.Enabled
+	     FROM MainConfigTable
+  LOOP
+      RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.Enabled::BOOLEAN;
+  END LOOP;
+END;
+$$ LANGUAGE PLPGSQL;
+
 CREATE OR REPLACE FUNCTION ListMainConfigs() RETURNS TABLE (ConfigName TEXT, ConfigID INT) AS $$
 DECLARE
   rec RECORD;
@@ -219,6 +235,54 @@ BEGIN
   LOOP
     RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT;
   END LOOP;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION DisableMainConfig(MCfg TEXT) RETURNS INT AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  IF NOT ExistMainConfig(MCfg) THEN
+    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
+  END IF;
+
+  UPDATE MainConfigTable SET Enabled = FALSE WHERE ConfigName = MCfg;
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION EnableMainConfig(MCfg TEXT) RETURNS INT AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  IF NOT ExistMainConfig(MCfg) THEN
+    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
+  END IF;
+
+  UPDATE MainConfigTable SET Enabled = TRUE WHERE ConfigName = MCfg;
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION DisableMainConfig(MCfgID INT) RETURNS INT AS $$
+DECLARE
+  MCfgName TEXT;
+BEGIN
+  SELECT INTO MCfgName MainConfigName(MCfgID);
+  SELECT DisableMainConfig(MCfgName);
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION EnableMainConfig(MCfgID INT) RETURNS INT AS $$
+DECLARE
+  MCfgName TEXT;
+BEGIN
+  SELECT INTO MCfgName MainConfigName(MCfgID);
+  SELECT EnableMainConfig(MCfgName);
+  RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
 
@@ -593,7 +657,7 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration( subconfigparameters HSTORE,
 
     -- 3rd CHECK:
     ---- Avoid making another main config entry with identical contents
-    FOR myrec IN SELECT * FROM ListMainConfigs()
+      FOR myrec IN SELECT * FROM ListAllMainConfigs()
     LOOP
       SELECT COUNT(TRUE) FROM MainConfigTable WHERE ConfigID = myrec.ConfigID INTO SubConfigCount;
       IF NOT SubConfigCount = ARRAY_LENGTH(AKEYS(subconfigparameters),1)

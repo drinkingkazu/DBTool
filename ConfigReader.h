@@ -38,6 +38,7 @@ namespace ubpsql {
     //
     // Run-Control functions
     //
+    
     /// Getter for last run number
     unsigned int GetLastRun();
     /// Getter for last sub-run number

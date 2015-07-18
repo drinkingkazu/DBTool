@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS  MainConfigTable ;
 CREATE TABLE  MainConfigTable  (
    ConfigID       INT NOT NULL   DEFAULT 0,
    ConfigName     VARCHAR NULL DEFAULT NULL,
+   Enabled        BOOLEAN NOT NULL DEFAULT TRUE,
    SubConfigType  INT  NOT NULL DEFAULT 0 , -- 'Specifies which subtable we want',
    SubConfigID    INT  NOT NULL DEFAULT 0,
    userID  VARCHAR NULL DEFAULT NULL,

@@ -27,7 +27,7 @@ namespace ubpsql {
     DBException() : std::exception() {}
     ~DBException() throw(){};
     virtual const char* what() const throw() 
-    {return "\033[91mException occurred\033[0m";}
+    {return "\033[91mException occurred\033[00m";}
   };
 
   /**
@@ -39,7 +39,7 @@ namespace ubpsql {
     InvalidUser() : DBException() {}
     ~InvalidUser() throw(){};
     virtual const char* what() const throw()
-    { return "\033[91mInvalid DB Connection User Type\033[0m"; }
+    { return "\033[91mInvalid DB Connection User Type\033[00m"; }
   };
 
   /**
@@ -51,7 +51,7 @@ namespace ubpsql {
     ConnectionError() : DBException() {}
     ~ConnectionError() throw(){};
     virtual const char* what() const throw()
-    { return "\033[91mFailed to establish DB connection\033[0m";}
+    { return "\033[91mFailed to establish DB connection\033[00m";}
   };
 
   /**
@@ -63,8 +63,18 @@ namespace ubpsql {
     QueryError() : DBException() {}
     ~QueryError() throw() {}
     virtual const char* what() const throw()
-    { return "\033[91mFailed to execute the SQL query!\033[0m"; }
+    { return "\033[91mFailed to execute the SQL query!\033[00m"; }
   };
+
+  /**
+     \class RunNotFoundError
+  */
+  class RunNotFoundError : public DBException{
+  public:
+    RunNotFoundError() : DBException() {}
+    ~RunNotFoundError() throw() {}
+    virtual const char* what() const throw()
+    { return "\033[91mRun/SubRun specified not ound!\033[00m"; }
 
   /**
      \class TableDataError
@@ -75,7 +85,7 @@ namespace ubpsql {
     TableDataError() : DBException() {}
     ~TableDataError() throw() {}
     virtual const char* what() const throw()
-    { return "\033[91mInvalid table data content!\033[0m"; }
+    { return "\033[91mInvalid table data content!\033[00m"; }
   };
 
   /**
@@ -87,7 +97,7 @@ namespace ubpsql {
     ConfigError() : DBException() {}
     ~ConfigError() throw() {}
     virtual const char* what() const throw()
-    { return "\033[91mInvalid config handling!\033[0m";}
+    { return "\033[91mInvalid config handling!\033[00m";}
   };
 
 }

@@ -5,6 +5,77 @@
 #include <stdlib.h>
 namespace ubpsql {
 
+  //-------------------------------------------------------------------------------------------  
+  unsigned int ConfigWriter::InsertNewRun(const unsigned int config_id)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT InsertNewRun(%d);",config_id));
+    if(!res) return false;
+
+    unsigned int run = atoi(PQgetvalue(res,0,0));
+    PQclear(res);
+    return run;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  unsigned int ConfigWriter::InsertNewRun(const std::string& cfg_name)
+  { return InsertNewRun( this->MainConfigID(cfg_name) ); }
+
+  //-------------------------------------------------------------------------------------------
+  unsigned int ConfigWriter::InsertNewSubRun(const unsigned int config_id, const unsigned int run)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT InsertNewSubRun(%d,%d);",config_id,run));
+    if(!res) return false;
+
+    unsigned int run = atoi(PQgetvalue(res,0,0));
+    PQclear(res);
+    return run;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  unsigned int ConfigWriter::InsertNewSubRun(const std::string& cfg_name, const unsigned int run)
+  { return InsertNewSubRun( this->MainConfigID(cfg_name, run) ); }
+
+  //-------------------------------------------------------------------------------------------
+  bool ConfigWriter::UpdateStartTime( unsigned int run,
+				      unsigned int subrun.
+				      unsigned long time )
+  {
+    if(!(this->ExistRun(run,subrun)))
+      throw RunNotFoundError();
+    
+    if(!Connect()) throw ConnectionError();
+    TTimeStamp ts(time,0);
+    PGresult* res = _conn->Execute(Form("SELECT UpdateStartTime(%d,%d,'%s'::TIMESTAMP);",
+					run, subrun, ts.AsString("q")));
+    if(!res) return false;
+
+    bool success = !( atoi(PQgetvalue(res,0,0)));
+    return success;
+  }
+
+  bool ConfigWriter::UpdateStopTime( unsigned int run,
+				     unsigned int subrun,
+				     unsigned long time ) {
+    if(!(this->ExistRun(run,subrun)))
+      throw RunNotFoundError();
+    
+    if(!Connect()) throw ConnectionError();
+    TTimeStamp ts(time,0);
+    PGresult* res = _conn->Execute(Form("SELECT UpdateStopTime(%d,%d,'%s'::TIMESTAMP);",
+					run, subrun, ts.AsString("q")));
+    if(!res) return false;
+
+    bool success = !( atoi(PQgetvalue(res,0,0)));
+    return success;
+  }
+  
+
+  //
+  // Configuration related
+  //
+
   bool ConfigWriter::InsertSubConfiguration(const SubConfig& cfg)
   {
     std::string params_hstore,psets_hstore;
@@ -96,26 +167,6 @@ namespace ubpsql {
     bool status = std::atoi(PQgetvalue(res,0,0));
     PQclear(res);
     return status;
-  }
-
-  bool ConfigWriter::InsertNewRun(unsigned int config_id)
-  {
-    if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT InsertNewRun(%d);",config_id));
-    if(!res) return false;
-
-    PQclear(res);
-    return true;
-  }
-
-  bool ConfigWriter::InsertNewSubRun(unsigned int config_id, unsigned int run)
-  {
-    if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT InsertNewSubRun(%d,%d);",config_id,run));
-    if(!res) return false;
-    
-    PQclear(res);
-    return true;
   }
 
   bool ConfigWriter::CleanMainConfig(const std::string& name)
