@@ -29,8 +29,8 @@ CREATE OR REPLACE FUNCTION GetRunInfo(run INT, subrun INT)
        	  	        	   	   SubRunNumber INT,
 				  	   RunType   SMALLINT,
 				  	   ConfigID  INT,
-				  	   TimeStart TIMESTAMP,
-				  	   TimeStop   TIMESTAMP ) AS $$
+				  	   TimeStart DOUBLE PRECISION,
+				  	   TimeStop  DOUBLE PRECISION ) AS $$
 DECLARE
   myrec RECORD;
 BEGIN
@@ -42,7 +42,8 @@ BEGIN
   FOR myrec IN SELECT MainRun.RunNumber, MainRun.SubRunNumber,
       	       	      MainRun.RunType,
       	       	      MainRun.ConfigID,
-		      MainRun.TimeStart, MainRun.TimeStop FROM MainRun
+		      EXTRACT(EPOCH FROM MainRun.TimeStart) AS TimeStart,
+		      EXTRACT(EPOCH FROM MainRun.TimeStop ) AS TimeStop FROM MainRun
 		      WHERE MainRun.RunNumber = run AND MainRun.SubRunNumber = subrun
   LOOP
     RETURN QUERY SELECT myrec.RunNumber, myrec.SubRunNumber,

@@ -31,16 +31,25 @@ namespace ubpsql {
     return subrun;
   }
 
-  RunInfo ConfigReader::GetRunInfo(const unsigned int run)
+  RunInfo ConfigReader::GetRunInfo(const unsigned int run, const unsigned int subrun)
   {
-    return RunInfo();
-  }
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT * FROM GetRunInfo(%d,%d);",run,subrun));
+    if(!res) throw RunNotFoundError();
 
-  std::vector< ubpsql::RunInfo > ConfigReader::ListRunInfo(const std::vector<unsigned int>& run_list)
-  {
-    std::vector<ubpsql::RunInfo> res;
-    for(auto const& run : run_list) res.emplace_back(GetRunInfo(run));
-    return res;
+    short        runtype;
+    unsigned int config_id;
+    double       tstart;
+    double       tstop;
+    
+    runtype    = atoi(PQgetvalue(res,0,2));
+    config_id  = atoi(PQgetvalue(res,0,3));
+
+    tstart = atof(PQgetvalue(res,0,4));
+    tstop  = atof(PQgetvalue(res,0,5));
+
+    PQclear(res);
+    return RunInfo(run,subrun,runtype,config_id,tstart,tstop);
   }
 
   bool ConfigReader::ExistRun(const unsigned int run,
