@@ -49,10 +49,12 @@ namespace ubpsql {
     
     if(!Connect()) throw ConnectionError();
 
-    TTimeStamp ts(time_t(time_sec + time_usec/1000000),
-		  Int_t(time_usec % 1000000));
-    PGresult* res = _conn->Execute(Form("SELECT UpdateStartTime(%d,%d,'%s'::TIMESTAMP);",
-					run, subrun, ts.AsString("q")));
+    if(time_usec >= 1e7)
+      throw TableDataError();
+
+    PGresult* res = _conn->Execute(Form("SELECT UpdateStartTime(%d,%d,to_timestamp(%lu.%06d)::TIMESTAMP);",
+					run, subrun, time_sec, time_usec));
+    
     if(!res) return false;
 
     bool success = !( atoi(PQgetvalue(res,0,0)));
@@ -68,10 +70,13 @@ namespace ubpsql {
       throw RunNotFoundError();
     
     if(!Connect()) throw ConnectionError();
-    TTimeStamp ts(time_t(time_sec + time_usec/1000000),
-		  Int_t(time_usec%1000000));
-    PGresult* res = _conn->Execute(Form("SELECT UpdateStopTime(%d,%d,'%s'::TIMESTAMP);",
-					run, subrun, ts.AsString("q")));
+
+    if(time_usec >= 1e7)
+      throw TableDataError();
+    
+    PGresult* res = _conn->Execute(Form("SELECT UpdateStopTime(%d,%d,to_timestamp(%lu.%06d)::TIMESTAMP);",
+					run, subrun, time_sec, time_usec));
+
     if(!res) return false;
 
     bool success = !( atoi(PQgetvalue(res,0,0)));

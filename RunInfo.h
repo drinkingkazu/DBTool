@@ -6,13 +6,18 @@
 namespace ubpsql {
 
   class RunInfo {
+
   public:
+
     RunInfo(const unsigned int   run      = kINVALID_UINT,
 	    const unsigned int   subrun   = kINVALID_UINT,
 	    const unsigned short type     = kINVALID_USHORT,
 	    const TTimeStamp&    start_ts = kINVALID_TIMESTAMP,
 	    const TTimeStamp&    end_ts   = kINVALID_TIMESTAMP);
+
     ~RunInfo() {}
+
+    std::string Print() const;
 
   protected:
     unsigned int   _run;
@@ -21,5 +26,6 @@ namespace ubpsql {
     TTimeStamp     _start_ts;
     TTimeStamp     _end_ts;
   };
+
 }
 #endif

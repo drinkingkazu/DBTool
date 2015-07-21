@@ -16,7 +16,7 @@
 
 #include "DBAppBase.h"
 #include "MainConfig.h"
-
+#include "RunInfo.h"
 namespace ubpsql {
   /**
      \class ConfigReader

@@ -22,6 +22,39 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--
+DROP FUNCTION IF EXISTS GetRunInfo(INT,INT);
+CREATE OR REPLACE FUNCTION GetRunInfo(run INT, subrun INT)
+       	  	  	   RETURNS TABLE ( RunNumber INT,
+       	  	        	   	   SubRunNumber INT,
+				  	   RunType   SMALLINT,
+				  	   ConfigID  INT,
+				  	   TimeStart TIMESTAMP,
+				  	   TimeStop   TIMESTAMP ) AS $$
+DECLARE
+  myrec RECORD;
+BEGIN
+
+  IF NOT ExistRun(run,subrun) THEN
+    RAISE EXCEPTION 'Run % SubRun % does not exist!', run, subrun;
+  END IF;
+
+  FOR myrec IN SELECT MainRun.RunNumber, MainRun.SubRunNumber,
+      	       	      MainRun.RunType,
+      	       	      MainRun.ConfigID,
+		      MainRun.TimeStart, MainRun.TimeStop FROM MainRun
+		      WHERE MainRun.RunNumber = run AND MainRun.SubRunNumber = subrun
+  LOOP
+    RETURN QUERY SELECT myrec.RunNumber, myrec.SubRunNumber,
+    	   	 	myrec.RunType,
+    	   	 	myrec.ConfigID,
+			myrec.TimeStart, myrec.TimeStop;
+  END LOOP;
+
+  RETURN;
+
+END;
+$$ LANGUAGE PLPGSQL;
 
 --CREATE OR REPLACE FUNCTION testfunc(integer) RETURNS integer AS $PROC$
 --          ....
@@ -31,10 +64,9 @@ CREATE OR REPLACE FUNCTION InsertNewRun(CfgID INT)  RETURNS integer AS $$
 DECLARE
     lastrun mainrun.RunNumber%TYPE;
 BEGIN
-     SELECT INTO lastrun GetLastRun();
+    SELECT INTO lastrun GetLastRun();
    
-     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun+1,0,CfgID,-1);
-
+    INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun+1,0,CfgID,-1);
 
     RETURN lastrun+1;
 
@@ -146,7 +178,7 @@ BEGIN
        RAISE EXCEPTION 'Start time cannot be in future w.r.t. end time...';
      END IF;
 
-     UPDATE MainRun SET TimeEnd=ts WHERE RunNumber=run AND SubRunNumber=subrun;
+     UPDATE MainRun SET TimeStop=ts WHERE RunNumber=run AND SubRunNumber=subrun;
 
      RETURN 0;
 END;
@@ -162,7 +194,7 @@ BEGIN
      	RAISE EXCEPTION 'Run % SubRun % does not exist!', run, subrun;
      END IF;
 
-     SELECT tend TimeStop FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun LIMIT 1;
+     SELECT INTO tend TimeStop FROM MainRun WHERE RunNumber = run AND SubRunNumber = subrun LIMIT 1;
 
      IF ts > tend THEN
        RAISE EXCEPTION 'Start time cannot be in future w.r.t. end time...';
@@ -177,12 +209,18 @@ $$ LANGUAGE plpgsql;
 
 -----------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION GetLastRun() RETURNS integer AS $$
+DROP FUNCTION IF EXISTS GetLastRun();
+DROP FUNCTION IF EXISTS GetLastRun(SMALLINT);
+CREATE OR REPLACE FUNCTION GetLastRun(RefRunType SMALLINT DEFAULT NULL) RETURNS integer AS $$
 DECLARE
     lastrun mainrun.RunNumber%TYPE;
 BEGIN
-    
-    SELECT INTO lastrun RunNumber FROM MainRun  ORDER BY RunNumber DESC LIMIT 1;
+
+    IF RefRunType IS NULL THEN
+      SELECT INTO lastrun RunNumber FROM MainRun ORDER BY RunNumber DESC LIMIT 1;
+    ELSE
+      SELECT INTO lastrun RunNumber FROM MainRun WHERE MainRun.RunType = RefRunType ORDER BY RunNumber DESC LIMIT 1;
+    END IF;
 
     IF lastrun IS NULL THEN
       lastrun := 0;

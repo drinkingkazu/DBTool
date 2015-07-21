@@ -1,4 +1,5 @@
 .DS_Store
+*.log
 *.o
 *Cint.h
 *Cint.cxx

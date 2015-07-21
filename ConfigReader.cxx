@@ -33,8 +33,6 @@ namespace ubpsql {
 
   RunInfo ConfigReader::GetRunInfo(const unsigned int run)
   {
-
-    
     return RunInfo();
   }
 
