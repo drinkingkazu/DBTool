@@ -99,9 +99,13 @@ class SubConfigUploader(UBPyBase):
         # Now decide if this subconfig has something to be checked...
         if cfg.ID().Name() in sebAppsebConfigs:
             validated = self.CheckSebAppConfig( cfg )
+            if validated is False:
+                return False
 
         if cfg.ID().Name() == 'controller':
             validated = self.CheckController( cfg )
+            if validated is False:
+                return False
 
         return validated
     # Check( self, cfg )                
@@ -148,7 +152,10 @@ class SubConfigUploader(UBPyBase):
         slot = [ 'none' ] * 21
         for islot in xrange( 21 ):
             for imodule in EnabledModules:
-                loc = int(Params[imodule]['slot'], 0)
+                if imodule in [ 'tpc', 'pmt', 'shaper' ]:
+                    loc = int(Params[imodule]['slots'], 0)
+                else:
+                    loc = int(Params[imodule]['slot'], 0)
                 if imodule in [ 'tpc', 'pmt', 'shaper' ]:
                     if ( loc & ( 1 << islot ) ):
                         if slot[islot] == 'none':
