@@ -51,3 +51,4 @@ if new_run >= 0:
 else:
     error('Failed to insert a new run!')
     sys.exit(1)
+

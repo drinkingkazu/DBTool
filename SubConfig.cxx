@@ -103,7 +103,11 @@ namespace ubpsql{
   {
     std::string space;
     for(size_t i=0; i<(level*2); ++i) space += " ";
-    content += (space + this->ID().Name() + ":{\n");
+    if ( level == 0 )
+      content += (space + this->ID().Name() + ": [  {\n");
+    else
+      content += (space + this->ID().Name() + ":{\n");
+
     for(auto const& key_value : _leaf)
       
       content += (space + "  " + key_value.first + " : " + key_value.second + "\n");
@@ -112,7 +116,10 @@ namespace ubpsql{
 
       key_scfg.second.Dump(content,(level+1));
 
-    content += (space + "}\n");
+    if ( level == 0 )
+      content += (space + "}  ]\n");
+    else
+      content += (space + "}\n");
   }
 
   std::vector<std::string> SubConfig::ListParameters() const

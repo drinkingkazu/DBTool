@@ -38,8 +38,10 @@ namespace ubpsql {
   {
     std::string res;
 
-    for(auto const& name_cfg : _data)
+    for(auto const& name_cfg : _data) {
       res += name_cfg.second.Dump();
+      std::cout << "subconfig: " << name_cfg.first << std::endl;
+    }
 
     if(stack_main_cfg_name)
       res = this->Name() + " : {\n" + res + "\n}\n";
