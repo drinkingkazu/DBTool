@@ -16,11 +16,13 @@ DROP TABLE IF EXISTS  MainConfigTable ;
 CREATE TABLE  MainConfigTable  (
    ConfigID       INT NOT NULL   DEFAULT 0,
    ConfigName     VARCHAR NULL DEFAULT NULL,
-   Enabled        BOOLEAN NOT NULL DEFAULT TRUE,
    SubConfigType  INT  NOT NULL DEFAULT 0 , -- 'Specifies which subtable we want',
    SubConfigID    INT  NOT NULL DEFAULT 0,
-   userID  VARCHAR NULL DEFAULT NULL,
-   TimeStamp  TIMESTAMP NULL DEFAULT NULL,
+   RunType        SMALLINT NOT NULL DEFAULT -1,
+   Arxived        BOOLEAN NOT NULL DEFAULT TRUE,
+   Expert         BOOLEAN NOT NULL DEFAULT TRUE,
+   userID         VARCHAR NULL DEFAULT NULL,
+   TimeStamp      TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY ( ConfigID ,  SubConfigType )
 -- KEY ( SubConfigType ,  SubConfigID )
 ); -- 'This table stores all the configuration parameters';
@@ -35,10 +37,10 @@ CREATE TABLE  MainRun  (
    RunNumber    INT NOT NULL   DEFAULT 0 , -- 'Run Number',
    SubRunNumber INT NOT NULL DEFAULT 0, -- 'Sub Run Number',
    RunType      SMALLINT  NOT NULL DEFAULT 0 , -- 'Defines what type of run we''re running. Can connect to Confi',
-   TimeStart  TIMESTAMP  DEFAULT NULL,
-   TimeStop   TIMESTAMP DEFAULT NULL,
-   ConfigID   INT  NOT NULL DEFAULT 0 , -- 'Stores Configuration ID', --REFERENCES  MainConfigTable  ( ConfigID )
--- KEY ( ConfigID ),
+   TimeStart    TIMESTAMP  DEFAULT NULL,
+   TimeStop     TIMESTAMP DEFAULT NULL,
+   ConfigID     INT  NOT NULL DEFAULT 0 , -- 'Stores Configuration ID', --REFERENCES  MainConfigTable  ( ConfigID )
+   -- KEY ( ConfigID ),
   PRIMARY KEY ( RunNumber,SubRunNumber )
 ); -- 'This table is updated at the start of each run and stores co';
 

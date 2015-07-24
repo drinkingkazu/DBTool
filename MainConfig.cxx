@@ -8,7 +8,10 @@ namespace ubpsql {
   void MainConfig::ls() const
   {
     std::cout
-      << "  Main-Config Name: " << fName.c_str() << std::endl
+      << "  Main-Config Name: " << this->Name().c_str()
+      << " ... Type: " << this->RunType()
+      << " ... Expert: " << int(this->Expert())
+      << " ... Archived: " << int(this->Arxived()) << std::endl
       << "  Listing Sub-Config IDs... " << std::endl;
     for(auto const& d : _data)
       std::cout 

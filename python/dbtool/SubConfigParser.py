@@ -1,6 +1,7 @@
 from ROOT import ubpsql
 from UBPyBase import UBPyBase
 from UBPySQLException import ParseIException
+from colored_msg import error,info,debug
 import sys
 
 class SubConfigParser(UBPyBase):

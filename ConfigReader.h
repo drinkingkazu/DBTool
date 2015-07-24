@@ -56,10 +56,12 @@ namespace ubpsql {
     //
     // Run-Config functions
     //
-    /// List Run-Config name
-    std::vector<std::string> MainConfigNames();
-    /// List Run-Config ID
-    std::vector<unsigned int> MainConfigIDs();
+    /// List meta data for all configurations (not arxived ones)
+    std::vector<ubpsql::MainConfigMetaData> ListMainConfigs(short run_type = -1,
+							    bool  expert  = false,
+							    bool  arxived = false);
+    /// MainConfig meta data getter
+    MainConfigMetaData GetMainConfigMetaData(const std::string cfg_name);
     /// List All Sub-Config name/ID pair for a given MainConfig name
     //std::vector<std::pair<std::string,unsigned int> >  ListSubConfigs(const std::string& cfg_name);
     /// Existence checker.

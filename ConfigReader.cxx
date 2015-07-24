@@ -102,11 +102,62 @@ namespace ubpsql {
   // MainConfigTable functions
   //----------------------------------------------------------------------------------------
 
-  std::vector<std::string> ConfigReader::MainConfigNames()
+  MainConfigMetaData ConfigReader::GetMainConfigMetaData(const std::string cfg_name)
+  {
+    MainConfigMetaData data;
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT * FROM MainConfigMetaData('%s');",cfg_name.c_str()));
+    if(!res)  return data;
+
+    data.fName    = PQgetvalue(res,0,0);
+    data.fID      = atoi(PQgetvalue(res,0,1));
+    data.fRunType = atoi(PQgetvalue(res,0,2));
+    std::string arxived(PQgetvalue(res,0,3));
+    std::string expert(PQgetvalue(res,0,4));
+    data.fArxived = (arxived == "t" || arxived == "true" || arxived == "1");
+    data.fExpert  = (expert  == "t" || expert  == "true" || expert  == "1");
+    PQclear(res);
+    return data;
+  }
+  
+  std::vector<ubpsql::MainConfigMetaData>
+  ConfigReader::ListMainConfigs( short run_type,
+				 bool include_expert,
+				 bool include_arxived )
+  {
+    std::vector<ubpsql::MainConfigMetaData> config_v;
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute("SELECT * FROM ListAllMainConfigs();");
+    if(!res)  return config_v;
+
+    for(size_t i=0; i<PQntuples(res); ++i) {
+      MainConfigMetaData data;
+      data.fName    = PQgetvalue(res,i,0);
+      data.fID      = atoi(PQgetvalue(res,i,1));
+      data.fRunType = atoi(PQgetvalue(res,i,2));
+      std::string arxived(PQgetvalue(res,i,3));
+      std::string expert(PQgetvalue(res,i,4));
+      data.fArxived = (arxived == "t" || arxived == "true" || arxived == "1");
+      data.fExpert  = (expert  == "t" || expert  == "true" || expert  == "1");
+      if( run_type >= 0 && data.fRunType != run_type ) continue;
+      if( data.fExpert  && !include_expert  ) continue;
+      if( data.fArxived && !include_arxived ) continue;
+      config_v.emplace_back(data);
+    }
+    PQclear(res);
+    return config_v;
+  }
+
+  /*
+  std::vector<std::string> ConfigReader::MainConfigNames(bool include_expert)
   {
     std::vector<std::string> config_ids;
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute("SELECT * FROM ListMainConfigs();");
+    PGresult* res = nullptr;
+    if(include_expert)
+      res = _conn->Execute("SELECT * FROM ListMainConfigs(TRUE);");
+    else
+      res = _conn->Execute("SELECT * FROM ListMainConfigs(FALSE);");
     if(!res)  return config_ids;
 
     for(size_t i=0; i<PQntuples(res); ++i)
@@ -116,11 +167,15 @@ namespace ubpsql {
     return config_ids;
   }
 
-  std::vector<unsigned int> ConfigReader::MainConfigIDs()
+  std::vector<unsigned int> ConfigReader::MainConfigIDs(bool include_expert)
   {
     std::vector<unsigned int> config_ids;
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute("SELECT * FROM ListMainConfigs();");
+    PGresult* res = nullptr;
+    if(include_expert)
+      res = _conn->Execute("SELECT * FROM ListMainConfigs(TRUE);");
+    else
+      res = _conn->Execute("SELECT * FROM ListMainConfigs(FALSE);");
     if(!res)  return config_ids;
 
     for(size_t i=0; i<PQntuples(res); ++i)
@@ -129,7 +184,8 @@ namespace ubpsql {
     PQclear(res);
     return config_ids;
   }
-
+  */
+  
   std::vector<std::pair<std::string,unsigned int> >  ConfigReader::ListSubConfigs(const std::string& cfg_name)
   { return ListSubConfigs(MainConfigID(cfg_name));; }
 
@@ -301,6 +357,8 @@ namespace ubpsql {
     }
 
     MainConfig result(cfg_name);
+    result.SetMetaData(this->GetMainConfigMetaData(cfg_name));
+
     for(auto const& name_id : ListSubConfigs(result.Name()))
       
       result.AddSubConfig(this->GetSubConfig(name_id.first,name_id.second));

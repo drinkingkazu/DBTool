@@ -18,6 +18,21 @@
 #include <vector>
 namespace ubpsql {
 
+  struct MainConfigMetaData {
+    std::string  fName;
+    unsigned int fID;
+    bool         fArxived;
+    bool         fExpert;
+    short        fRunType;
+    MainConfigMetaData()
+      : fName()
+      , fID()
+      , fArxived(true)
+      , fExpert(true)
+      , fRunType(-1)
+    {}
+  };
+  
   /**
      \class MainConfig
      User defined class MainConfig ... these comments are used to generate
@@ -28,17 +43,32 @@ namespace ubpsql {
   public:
     
     /// Default constructor
-    MainConfig(std::string name){ fName=name; }
+    MainConfig(std::string name){ fMetaData.fName=name; }
     
     /// Default destructor
     virtual ~MainConfig(){}
+
+    /// MetaData setter
+    void SetMetaData(const MainConfigMetaData& data) { fMetaData = data; }
 
     /// Checker if a Sub-Config exists
     bool Exist(const std::string& name) const
     { return !(_data.find(name) == _data.end()); }
 
     /// Name getter
-    const std::string& Name() const { return fName;}
+    const std::string& Name() const { return fMetaData.fName;}
+
+    /// ID
+    unsigned int ID() const { return fMetaData.fID; }
+
+    /// Run Type
+    short RunType() const { return fMetaData.fRunType; }
+
+    /// Expert or not
+    bool Expert() const { return fMetaData.fExpert; }
+
+    /// Archived or not
+    bool Arxived() const { return fMetaData.fArxived; }
 
     /// Getter for a Sub-Config
     const SubConfig& Get(const std::string& name) const;
@@ -59,8 +89,8 @@ namespace ubpsql {
     void AddSubConfig(const SubConfig& cfg);
 
   private:
-    /// Name
-    std::string fName;
+    /// MetaData
+    MainConfigMetaData fMetaData;
 
     /// Hidden config data
     std::map<std::string,ubpsql::SubConfig> _data;

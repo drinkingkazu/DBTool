@@ -37,12 +37,13 @@ namespace ubpsql {
     // Run table related
     //
 
-    /// Create a new run number in the database
+    /// Create a new run number in the database with an existing main-config id
     unsigned int InsertNewRun(unsigned int config_id);
 
-    /// Create a new run number in the database
+    /// Create a new run number in the database with an existing main-config name
     unsigned int InsertNewRun(const std::string& cfg_name);
 
+    /// Insert a new sub-run number with an existing main-config name
     unsigned int InsertNewSubRun(const std::string& cfg_name,
 				 const unsigned int run);
 
@@ -50,15 +51,17 @@ namespace ubpsql {
     unsigned int InsertNewSubRun(const unsigned int cfg_id,
 				 const unsigned int run);
 
+    /// Update run start time
     bool UpdateStartTime(const unsigned int  run,
 			 const unsigned int  subrun,
 			 const unsigned long time_sec,
-			 const unsigned int  time_usec);
+			 const unsigned int  time_usec = 0);
 
+    /// Update run stop time
     bool UpdateStopTime(const unsigned int  run,
 			const unsigned int  subrun,
 			const unsigned long time_sec,
-			const unsigned int  time_usec);
+			const unsigned int  time_usec = 0);
 
     //
     // Config table related

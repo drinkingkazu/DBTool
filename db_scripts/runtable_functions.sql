@@ -64,10 +64,23 @@ $$ LANGUAGE PLPGSQL;
 CREATE OR REPLACE FUNCTION InsertNewRun(CfgID INT)  RETURNS integer AS $$
 DECLARE
     lastrun mainrun.RunNumber%TYPE;
+    enabled BOOLEAN;
+    confRunType SMALLINT;
 BEGIN
     SELECT INTO lastrun GetLastRun();
+
+    IF NOT ExistMainConfig(CfgID) THEN
+      RAISE EXCEPTION '+++++++++++ MainConfig w/ ID % does not exist... ++++++++++', CfgID;
+    END IF;
+
+    SELECT INTO enabled Archived FROM MainConfigTable WHERE ConfigID = CfgID;
+    IF NOT enabled THEN
+      RAISE EXCEPTION '+++++++++++ MainCOnfig w/ ID % is arxived! (you cannot use it) +++++++++++++',CfgID;
+    END IF;
+
+    SELECT INTO confRunType RunType FROM MainConfigTable WHERE ConfigID = CfgID;
    
-    INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun+1,0,CfgID,-1);
+    INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun+1,0,CfgID,confRunType);
 
     RETURN lastrun+1;
 
@@ -77,21 +90,39 @@ $$ LANGUAGE plpgsql;
 -------------------------------------------------------------------------------
 ---- determine what the relation between ConfitType and ConfigID is.
 --------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION InsertNewSubRun(CfgID INT,run INT DEFAULT -1) RETURNS integer AS $$
+DROP FUNCTION IF EXISTS InsertNewSubRun(INT,INT);
+CREATE OR REPLACE FUNCTION InsertNewSubRun(run INT DEFAULT -1, CfgID INT DEFAULT -1) RETURNS integer AS $$
 DECLARE
     lastrun mainrun.RunNumber%TYPE;
     lastsubrun mainrun.SubRunNumber%TYPE;
+    confRunType SMALLINT;
+    enabled BOOLEAN;
 BEGIN
 
-     IF run = -1  THEN
-	  SELECT INTO lastrun GetLastRun();
-     ELSE 
-          lastrun := run;
-     END IF;    
+    IF run <0 THEN
+      SELECT INTO lastrun GetLastRun();
+    ELSE 
+      lastrun := run;
+    END IF;    
 
-     SELECT INTO lastsubrun GetLastSubRun(lastrun);
+    SELECT INTO lastsubrun GetLastSubRun(lastrun);
 
-     INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun,lastsubrun+1,CfgID,-1);
+    IF CfgID <0 THEN
+      SELECT INTO CfgID ConfigID FROM MainRun WHERE RunNumber = lastrun AND SubRunNumber = lastsubrun;
+    END IF;
+
+    IF NOT ExistMainConfig(CfgID) THEN
+      RAISE EXCEPTION '+++++++++++ MainConfig w/ ID % does not exist... ++++++++++', CfgID;
+    END IF;
+
+    SELECT INTO enabled Archived FROM MainConfigTable WHERE ConfigID = CfgID;
+    IF NOT enabled THEN
+      RAISE EXCEPTION '+++++++++++ MainCOnfig w/ ID % is arxived! (you cannot use it) +++++++++++++',CfgID;
+    END IF;
+
+    SELECT INTO confRunType RunType FROM MainConfigTable WHERE ConfigID = CfgID;
+
+    INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (lastrun,lastsubrun+1,CfgID,confRunType);
 
     RETURN lastsubrun+1;
 END;

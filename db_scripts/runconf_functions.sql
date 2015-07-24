@@ -37,7 +37,7 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
-DROP FUNCTIONS IF EXISTS MainConfigID(MCfgName TEXT);
+DROP FUNCTION IF EXISTS MainConfigID(MCfgName TEXT);
 CREATE OR REPLACE FUNCTION MainConfigID(MCfgName TEXT) RETURNS TEXT AS $$
 DECLARE
   res INT;
@@ -211,34 +211,67 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+DROP FUNCTIOn IF EXISTS ListAllMainConfigs();
 CREATE OR REPLACE FUNCTION ListAllMainConfigs()
-       	  	  RETURNS TABLE (ConfigName TEXT, ConfigID INT, Enabled BOOLEAN) AS $$
+       	  	  RETURNS TABLE (ConfigName TEXT, ConfigID INT, RunType SMALLINT, Expert BOOLEAN, Arxived BOOLEAN) AS $$
 DECLARE
   rec RECORD;
 BEGIN
 
   FOR rec IN SELECT DISTINCT MainConfigTable.ConfigName,
 	       	      	     MainConfigTable.ConfigID,
-		       	     MainConfigTable.Enabled
+			     MainConfigTable.RunType,
+			     MainConfigTable.Expert,
+		       	     MainConfigTable.Arxived
 	     FROM MainConfigTable
   LOOP
-      RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.Enabled::BOOLEAN;
+      RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.RunType::SMALLINT, rec.Expert::BOOLEAN, rec.Arxived::BOOLEAN;
   END LOOP;
 END;
 $$ LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION ListMainConfigs() RETURNS TABLE (ConfigName TEXT, ConfigID INT) AS $$
+DROP FUNCTION IF EXISTS ListMainConfigs();
+CREATE OR REPLACE FUNCTION ListMainConfigs()
+       	  	  RETURNS TABLE (ConfigName TEXT, ConfigID INT, RunType SMALLINT, Expert BOOLEAN, Arxived BOOLEAN) AS $$
 DECLARE
   rec RECORD;
 BEGIN
-  FOR rec IN SELECT DISTINCT MainConfigTable.ConfigName, MainConfigTable.ConfigID FROM MainConfigTable
+  FOR rec IN SELECT DISTINCT MainConfigTable.ConfigName,
+      	     	    	     MainConfigTable.ConfigID,
+			     MainConfigTable.RunType,
+			     MainConfigTable.Expert,
+			     MainConfigTable.Arxived
+      	     FROM MainConfigTable
+	     WHERE NOT Arxived
   LOOP
-    RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT;
+    RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.RunType::SMALLINT, rec.Expert::BOOLEAN, rec.Arxived::BOOLEAN;	
   END LOOP;
 END;
 $$ LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION DisableMainConfig(MCfg TEXT) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION MainConfigMetaData(CfgName TEXT)
+       	  	  RETURNS TABLE (ConfigName TEXT, ConfigID INT, RunType SMALLINT, Expert BOOLEAN, Arxived BOOLEAN) AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+  IF NOT ExistMainConfig(CfgName) THEN
+    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
+  END IF;
+  FOR rec IN SELECT DISTINCT MainConfigTable.ConfigName,
+      	     	    	     MainConfigTable.ConfigID,
+			     MainConfigTable.RunType,
+			     MainConfigTable.Expert,
+			     MainConfigTable.Arxived
+      	     FROM MainConfigTable
+	     WHERE ConfigName = CfgName
+	     LIMIT 1
+  LOOP
+    RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.RunType::SMALLINT, rec.Expert::BOOLEAN, rec.Arxived::BOOLEAN;
+  END LOOP;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION MakeExpertConfig(MCfg TEXT) RETURNS INT AS $$
 DECLARE
   rec RECORD;
 BEGIN
@@ -247,12 +280,12 @@ BEGIN
     RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
   END IF;
 
-  UPDATE MainConfigTable SET Enabled = FALSE WHERE ConfigName = MCfg;
+  UPDATE MainConfigTable SET Expert = TRUE WHERE ConfigName = MCfg;
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION EnableMainConfig(MCfg TEXT) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION MakeNonExpertConfig(MCfg TEXT) RETURNS INT AS $$
 DECLARE
   rec RECORD;
 BEGIN
@@ -261,27 +294,75 @@ BEGIN
     RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
   END IF;
 
-  UPDATE MainConfigTable SET Enabled = TRUE WHERE ConfigName = MCfg;
+  UPDATE MainConfigTable SET Expert = FALSE WHERE ConfigName = MCfg;
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION DisableMainConfig(MCfgID INT) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION MainExpertConfig(MCfgID INT) RETURNS INT AS $$
 DECLARE
   MCfgName TEXT;
 BEGIN
   SELECT INTO MCfgName MainConfigName(MCfgID);
-  SELECT DisableMainConfig(MCfgName);
+  SELECT MakeExpertConfig(MCfgName);
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION EnableMainConfig(MCfgID INT) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION MakeNonExpertConfig(MCfgID INT) RETURNS INT AS $$
 DECLARE
   MCfgName TEXT;
 BEGIN
   SELECT INTO MCfgName MainConfigName(MCfgID);
-  SELECT EnableMainConfig(MCfgName);
+  SELECT MakeNonExpertConfig(MCfgName);
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION ArxiveMainConfig(MCfg TEXT) RETURNS INT AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  IF NOT ExistMainConfig(MCfg) THEN
+    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
+  END IF;
+
+  UPDATE MainConfigTable SET Arxived = TRUE WHERE ConfigName = MCfg;
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION ActivateMainConfig(MCfg TEXT) RETURNS INT AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  IF NOT ExistMainConfig(MCfg) THEN
+    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
+  END IF;
+
+  UPDATE MainConfigTable SET Arxived = FALSE WHERE ConfigName = MCfg;
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION ArxiveMainConfig(MCfgID INT) RETURNS INT AS $$
+DECLARE
+  MCfgName TEXT;
+BEGIN
+  SELECT INTO MCfgName MainConfigName(MCfgID);
+  SELECT ArxiveMainConfig(MCfgName);
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION ActivateMainConfig(MCfgID INT) RETURNS INT AS $$
+DECLARE
+  MCfgName TEXT;
+BEGIN
+  SELECT INTO MCfgName MainConfigName(MCfgID);
+  SELECT ActivateMainConfig(MCfgName);
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
@@ -613,10 +694,12 @@ $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 
 ------------------------------------------------------------------------
-
+DROP FUNCTION IF EXISTS InsertMainConfiguration(HSTORE,TEXT);
 CREATE OR REPLACE FUNCTION InsertMainConfiguration( subconfigparameters HSTORE,
-       	  	  	   			    confname text DEFAULT 'no_name') RETURNS INT AS $$
-  DECLARE
+       	  	  	   			    confname text,
+						    confRunType SMALLINT)
+		  RETURNS INT AS $$
+DECLARE
   myrec RECORD;
   ctr INT;
   ColumnPair1 RECORD;
@@ -627,7 +710,7 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration( subconfigparameters HSTORE,
   query text;  
   SubConfT INT;
   localconfigexists INT;
-  BEGIN    
+BEGIN    
     -- 1st CHECK: check if the provided Config ID already exsits in the MainConfigTable or not
     IF  (confname <> 'no_name' ) AND EXISTS (SELECT ConfigID FROM MainConfigTable WHERE MainConfigTable.ConfigName = confname)
         THEN RAISE EXCEPTION '+++++++++++++ Config with name % already exists in MainConfigTable! +++++++++++++',confname;
@@ -702,12 +785,15 @@ CREATE OR REPLACE FUNCTION InsertMainConfiguration( subconfigparameters HSTORE,
     INSERT INTO MainconfigTable ( ConfigID,
       			    	  SubConfigType,
 				  SubConfigID, 
-				  ConfigName) VALUES
-				  ( newconfig, SubConfT, CAST(myrec.value AS INT), confname );
+				  ConfigName,
+				  RunType,
+				  Arxived,
+				  Expert) VALUES
+				  ( newconfig, SubConfT, CAST(myrec.value AS INT), confname, CAST(confRunType AS SMALLINT), FALSE, TRUE );
     END LOOP;
 
    RETURN newconfig;
-   END;
+END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 -------------------------------------------------------------

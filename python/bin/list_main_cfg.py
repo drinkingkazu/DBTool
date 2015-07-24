@@ -3,7 +3,7 @@ from dbtool import ubpsql
 import sys
 reader = ubpsql.ConfigReader()
 
-cfgs = reader.MainConfigNames()
+cfgs = reader.ListMainConfigs()
 
 detail=False
 if len(sys.argv)>1:
@@ -12,7 +12,7 @@ if len(sys.argv)>1:
 print
 print '  Registered Main-Configs:'
 for x in xrange(cfgs.size()):
-    print '    %s' % cfgs[x]
+    print '    %s' % cfgs[x].fName
     if not detail: continue
     sub_cfgs = reader.ListSubConfigs(cfgs[x])
     for y in xrange(sub_cfgs.size()):

@@ -35,6 +35,8 @@
 #pragma link C++ class std::vector<ubpsql::SubConfig>+;
 #pragma link C++ class std::vector<ubpsql::SubConfigID>+;
 #pragma link C++ class std::set<ubpsql::SubConfigID>+;
+#pragma link C++ class ubpsql::MainConfigMetaData+;
+#pragma link C++ class std::vector<ubpsql::MainConfigMetaData>+;
 #pragma link C++ class ubpsql::MainConfig+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
