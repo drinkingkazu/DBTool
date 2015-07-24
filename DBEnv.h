@@ -1,7 +1,6 @@
 #ifndef DBTOOL_DBENV_H
 #define DBTOOL_DBENV_H
 
-
 #include <string>
 
 namespace ubpsql{
@@ -14,6 +13,13 @@ namespace ubpsql{
     kDBI_USER_MAX
   };
 
+  /// ENUM to define a run type
+  enum RunType_t {
+    kPHYSICS=0,   ///< PHYSICS dude
+    kCALIBRATION, ///< CALIBRATION ma'am
+    kTEST,        ///< TEST sucker
+    kRunTypeMax   ///< max
+  };
 }
 
 #endif

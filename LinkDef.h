@@ -11,7 +11,7 @@
 
 #pragma link C++ namespace ubpsql;
 #pragma link C++ namespace ubpsql::msg;
-
+#pragma link C++ enum   ubpsql::RunType_t+;
 #pragma link C++ class std::pair<string,unsigned int>+;
 #pragma link C++ class std::vector<std::pair<string,unsigned int> >+;
 #pragma link C++ class ubpsql::DBException+;

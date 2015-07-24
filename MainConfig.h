@@ -14,6 +14,7 @@
 #ifndef DBTOOL_MAINCONFIG_H
 #define DBTOOL_MAINCONFIG_H
 
+#include "DBEnv.h"
 #include "SubConfig.h"
 #include <vector>
 namespace ubpsql {

@@ -61,6 +61,7 @@ $$ LANGUAGE PLPGSQL;
 --          ....
 --$PROC$ LANGUAGE plpgsql;
 
+DROP FUNCTION IF EXISTS InsertNewRun(CfgID INT);
 CREATE OR REPLACE FUNCTION InsertNewRun(CfgID INT)  RETURNS integer AS $$
 DECLARE
     lastrun mainrun.RunNumber%TYPE;
@@ -73,7 +74,7 @@ BEGIN
       RAISE EXCEPTION '+++++++++++ MainConfig w/ ID % does not exist... ++++++++++', CfgID;
     END IF;
 
-    SELECT INTO enabled Archived FROM MainConfigTable WHERE ConfigID = CfgID;
+    SELECT INTO enabled Arxived FROM MainConfigTable WHERE ConfigID = CfgID;
     IF NOT enabled THEN
       RAISE EXCEPTION '+++++++++++ MainCOnfig w/ ID % is arxived! (you cannot use it) +++++++++++++',CfgID;
     END IF;
@@ -115,7 +116,7 @@ BEGIN
       RAISE EXCEPTION '+++++++++++ MainConfig w/ ID % does not exist... ++++++++++', CfgID;
     END IF;
 
-    SELECT INTO enabled Archived FROM MainConfigTable WHERE ConfigID = CfgID;
+    SELECT INTO enabled Arxived FROM MainConfigTable WHERE ConfigID = CfgID;
     IF NOT enabled THEN
       RAISE EXCEPTION '+++++++++++ MainCOnfig w/ ID % is arxived! (you cannot use it) +++++++++++++',CfgID;
     END IF;

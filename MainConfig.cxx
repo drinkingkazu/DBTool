@@ -11,7 +11,7 @@ namespace ubpsql {
       << "  Main-Config Name: " << this->Name().c_str()
       << " ... Type: " << this->RunType()
       << " ... Expert: " << int(this->Expert())
-      << " ... Archived: " << int(this->Arxived()) << std::endl
+      << " ... Arxived: " << int(this->Arxived()) << std::endl
       << "  Listing Sub-Config IDs... " << std::endl;
     for(auto const& d : _data)
       std::cout 

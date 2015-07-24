@@ -88,6 +88,50 @@ namespace ubpsql {
   // Configuration related
   //
 
+  bool ConfigWriter::ActivateMainConfiguration(const std::string name)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT ActivateMainConfig('%s');",name.c_str()));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;
+  }
+
+  bool ConfigWriter::ActivateMainConfiguration(const unsigned int id)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT ActivateMainConfig(%d);",id));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;
+  }
+
+  bool ConfigWriter::ArxivMainConfiguration(const std::string name)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT ArxivMainConfig('%s');",name.c_str()));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;
+  }
+
+  bool ConfigWriter::ArxivMainConfiguration(const unsigned int id)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT ArxivMainConfig(%d);",id));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;
+  }
+  
   bool ConfigWriter::InsertSubConfiguration(const SubConfig& cfg)
   {
     if(!(this->ExistSubConfig(cfg.ID().Name())))  {
@@ -146,13 +190,14 @@ namespace ubpsql {
     auto const& sub_config_v = cfg.ListSubConfigIDs();
     ctr = sub_config_v.size();
     for(auto const& sub_config : sub_config_v) {
-      if( ctr ) query += Form(" \"%s\"=>%d,", sub_config.first.c_str(),sub_config.second);
+      if( ctr ) query += Form("\"%s\"=>%d,", sub_config.first.c_str(),sub_config.second);
       else query += Form(" \"%s\"=>%d", sub_config.first.c_str(),sub_config.second);
       --ctr;
     }
+
     query += " '::HSTORE,'";
     query += cfg.Name() + "');";
-
+    std::cout<<query.c_str()<<std::endl;
     PGresult* res = _conn->Execute(query);
     if(!res) return -1;
     int id = std::atoi(PQgetvalue(res,0,0));

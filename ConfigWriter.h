@@ -66,6 +66,17 @@ namespace ubpsql {
     //
     // Config table related
     //
+    /// Method to activate a main configuration
+    bool ActivateMainConfiguration(const std::string name);
+
+    /// Method to activate a main configuration
+    bool ActivateMainConfiguration(const unsigned int id);
+
+    /// Method to arxiv a main configuration
+    bool ArxivMainConfiguration(const std::string name);
+
+    /// Method to arxiv a main configuration
+    bool ArxivMainConfiguration(const unsigned int id);
     
     /// Method to insert a new sub configuration
     bool InsertSubConfiguration(const SubConfig& cfg);

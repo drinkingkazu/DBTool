@@ -697,7 +697,7 @@ $$ LANGUAGE plpgsql VOLATILE STRICT;
 DROP FUNCTION IF EXISTS InsertMainConfiguration(HSTORE,TEXT);
 CREATE OR REPLACE FUNCTION InsertMainConfiguration( subconfigparameters HSTORE,
        	  	  	   			    confname text,
-						    confRunType SMALLINT)
+						    confRunType SMALLINT DEFAULT -1)
 		  RETURNS INT AS $$
 DECLARE
   myrec RECORD;

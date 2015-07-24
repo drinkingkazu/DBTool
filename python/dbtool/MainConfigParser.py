@@ -50,10 +50,17 @@ class MainConfigParser(UBPyBase):
     def parse_block(self,block):
         lines = block.split('\n')
         words = lines[0].split()
-        if not len(words) == 1:
-            self.error("%s needs name (found \"%s\")" % (self._start_key,lines[0]))
+        if not len(words) == 2:
+            self.error("%s needs name & run type (found \"%s\")" % (self._start_key,lines[0]))
             raise ParseIException
-
+        runtype = -1
+        try:
+            exec('runtype=int(ubpsql.k%s)' % words[1])
+        except Exception:
+            runtype = -1
+        if runtype < 0:
+            self.error("RunType string was invalid (\"%s\")" % words[1])
+            raise ParseIException
         mcfg = ubpsql.MainConfig(words[0])
 
         for x in xrange(len(lines)):
