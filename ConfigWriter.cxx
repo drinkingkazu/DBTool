@@ -91,7 +91,7 @@ namespace ubpsql {
   bool ConfigWriter::ActivateMainConfiguration(const std::string name)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ActivateMainConfig('%s');",name.c_str()));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ActivateMainConfig('%s');",name.c_str()));
     if(!res) return false;
     
     bool success = (atoi(PQgetvalue(res,0,0)) == 0);
@@ -102,7 +102,7 @@ namespace ubpsql {
   bool ConfigWriter::ActivateMainConfiguration(const unsigned int id)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ActivateMainConfig(%d);",id));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ActivateMainConfig(%d);",id));
     if(!res) return false;
     
     bool success = (atoi(PQgetvalue(res,0,0)) == 0);
@@ -113,7 +113,7 @@ namespace ubpsql {
   bool ConfigWriter::ArxivMainConfiguration(const std::string name)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ArxivMainConfig('%s');",name.c_str()));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ArxivMainConfig('%s');",name.c_str()));
     if(!res) return false;
     
     bool success = (atoi(PQgetvalue(res,0,0)) == 0);
@@ -124,7 +124,7 @@ namespace ubpsql {
   bool ConfigWriter::ArxivMainConfiguration(const unsigned int id)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT ArxivMainConfig(%d);",id));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ArxivMainConfig(%d);",id));
     if(!res) return false;
     
     bool success = (atoi(PQgetvalue(res,0,0)) == 0);

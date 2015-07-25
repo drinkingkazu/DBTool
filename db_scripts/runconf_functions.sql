@@ -328,7 +328,7 @@ BEGIN
     RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
   END IF;
 
-  UPDATE MainConfigTable SET Arxived = TRUE WHERE ConfigName = MCfg;
+  UPDATE MainConfigTable SET Arxived = FALSE WHERE ConfigName = MCfg;
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
@@ -342,7 +342,7 @@ BEGIN
     RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
   END IF;
 
-  UPDATE MainConfigTable SET Arxived = FALSE WHERE ConfigName = MCfg;
+  UPDATE MainConfigTable SET Arxived = TRUE WHERE ConfigName = MCfg;
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
@@ -350,20 +350,22 @@ $$ LANGUAGE PLPGSQL;
 CREATE OR REPLACE FUNCTION ArxiveMainConfig(MCfgID INT) RETURNS INT AS $$
 DECLARE
   MCfgName TEXT;
+  Success INT;
 BEGIN
   SELECT INTO MCfgName MainConfigName(MCfgID);
-  SELECT ArxiveMainConfig(MCfgName);
-  RETURN 0;
+  SELECT INTO Success ArxiveMainConfig(MCfgName);
+  RETURN Success;
 END;
 $$ LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION ActivateMainConfig(MCfgID INT) RETURNS INT AS $$
 DECLARE
   MCfgName TEXT;
+  Success INT;
 BEGIN
   SELECT INTO MCfgName MainConfigName(MCfgID);
-  SELECT ActivateMainConfig(MCfgName);
-  RETURN 0;
+  SELECT INTO Success ActivateMainConfig(MCfgName);
+  RETURN Success;
 END;
 $$ LANGUAGE PLPGSQL;
 
