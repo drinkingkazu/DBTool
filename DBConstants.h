@@ -23,6 +23,8 @@ namespace ubpsql {
 
   static const TTimeStamp   kINVALID_TIMESTAMP((time_t)0,(int)0);
 
+  static const unsigned int kAGEOFECHURCH = 50;
+
   /// Special key string to name a parameter set
   const std::string kPSET_NAME_KEY("pset_name");
 

@@ -244,11 +244,12 @@ BEGIN
       	     FROM MainConfigTable
 	     WHERE NOT Arxived
   LOOP
-    RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.RunType::SMALLINT, rec.Expert::BOOLEAN, rec.Arxived::BOOLEAN;	
+    RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.RunType::SMALLINT, rec.Expert::BOOLEAN, rec.Arxived::BOOLEAN;
   END LOOP;
 END;
 $$ LANGUAGE PLPGSQL;
 
+DROP FUNCTION IF EXISTS MainConfigMetaData(TEXT);
 CREATE OR REPLACE FUNCTION MainConfigMetaData(CfgName TEXT)
        	  	  RETURNS TABLE (ConfigName TEXT, ConfigID INT, RunType SMALLINT, Expert BOOLEAN, Arxived BOOLEAN) AS $$
 DECLARE
@@ -263,59 +264,11 @@ BEGIN
 			     MainConfigTable.Expert,
 			     MainConfigTable.Arxived
       	     FROM MainConfigTable
-	     WHERE ConfigName = CfgName
+	     WHERE MainConfigTable.ConfigName = CfgName
 	     LIMIT 1
   LOOP
     RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.RunType::SMALLINT, rec.Expert::BOOLEAN, rec.Arxived::BOOLEAN;
   END LOOP;
-END;
-$$ LANGUAGE PLPGSQL;
-
-CREATE OR REPLACE FUNCTION MakeExpertConfig(MCfg TEXT) RETURNS INT AS $$
-DECLARE
-  rec RECORD;
-BEGIN
-
-  IF NOT ExistMainConfig(MCfg) THEN
-    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
-  END IF;
-
-  UPDATE MainConfigTable SET Expert = TRUE WHERE ConfigName = MCfg;
-  RETURN 0;
-END;
-$$ LANGUAGE PLPGSQL;
-
-CREATE OR REPLACE FUNCTION MakeNonExpertConfig(MCfg TEXT) RETURNS INT AS $$
-DECLARE
-  rec RECORD;
-BEGIN
-
-  IF NOT ExistMainConfig(MCfg) THEN
-    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
-  END IF;
-
-  UPDATE MainConfigTable SET Expert = FALSE WHERE ConfigName = MCfg;
-  RETURN 0;
-END;
-$$ LANGUAGE PLPGSQL;
-
-CREATE OR REPLACE FUNCTION MainExpertConfig(MCfgID INT) RETURNS INT AS $$
-DECLARE
-  MCfgName TEXT;
-BEGIN
-  SELECT INTO MCfgName MainConfigName(MCfgID);
-  SELECT MakeExpertConfig(MCfgName);
-  RETURN 0;
-END;
-$$ LANGUAGE PLPGSQL;
-
-CREATE OR REPLACE FUNCTION MakeNonExpertConfig(MCfgID INT) RETURNS INT AS $$
-DECLARE
-  MCfgName TEXT;
-BEGIN
-  SELECT INTO MCfgName MainConfigName(MCfgID);
-  SELECT MakeNonExpertConfig(MCfgName);
-  RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
 
@@ -328,7 +281,7 @@ BEGIN
     RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
   END IF;
 
-  UPDATE MainConfigTable SET Arxived = FALSE WHERE ConfigName = MCfg;
+  UPDATE MainConfigTable SET Arxived = TRUE WHERE ConfigName = MCfg;
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
@@ -342,7 +295,7 @@ BEGIN
     RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
   END IF;
 
-  UPDATE MainConfigTable SET Arxived = TRUE WHERE ConfigName = MCfg;
+  UPDATE MainConfigTable SET Arxived = FALSE WHERE ConfigName = MCfg;
   RETURN 0;
 END;
 $$ LANGUAGE PLPGSQL;
@@ -365,6 +318,57 @@ DECLARE
 BEGIN
   SELECT INTO MCfgName MainConfigName(MCfgID);
   SELECT INTO Success ActivateMainConfig(MCfgName);
+  RETURN Success;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION MakeNonExpertConfig(MCfg TEXT) RETURNS INT AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  IF NOT ExistMainConfig(MCfg) THEN
+    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
+  END IF;
+
+  UPDATE MainConfigTable SET Expert = FALSE WHERE ConfigName = MCfg;
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION MakeExpertConfig(MCfg TEXT) RETURNS INT AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+
+  IF NOT ExistMainConfig(MCfg) THEN
+    RAISE EXCEPTION '+++++++++++ No MainConfig w/ name % +++++++++++', MCfg;
+  END IF;
+
+  UPDATE MainConfigTable SET Expert = TRUE WHERE ConfigName = MCfg;
+  RETURN 0;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION MakeNonExpertConfig(MCfgID INT) RETURNS INT AS $$
+DECLARE
+  MCfgName TEXT;
+  Success INT;
+BEGIN
+  SELECT INTO MCfgName MainConfigName(MCfgID);
+  SELECT INTO Success MakeNonExpertConfig(MCfgName);
+  RETURN Success;
+END;
+$$ LANGUAGE PLPGSQL;
+
+DROP FUNCTION IF EXISTS MainExpertConfig(MCfgID INT);
+CREATE OR REPLACE FUNCTION MakeExpertConfig(MCfgID INT) RETURNS INT AS $$
+DECLARE
+  MCfgName TEXT;
+  Success INT;
+BEGIN
+  SELECT INTO MCfgName MainConfigName(MCfgID);
+  SELECT INTO Success MakeExpertConfig(MCfgName);
   RETURN Success;
 END;
 $$ LANGUAGE PLPGSQL;

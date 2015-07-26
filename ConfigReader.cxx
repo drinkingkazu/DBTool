@@ -112,12 +112,15 @@ namespace ubpsql {
     data.fName    = PQgetvalue(res,0,0);
     data.fID      = atoi(PQgetvalue(res,0,1));
     data.fRunType = atoi(PQgetvalue(res,0,2));
-    std::string arxived(PQgetvalue(res,0,3));
-    std::string expert(PQgetvalue(res,0,4));
-    data.fArxived = (arxived == "t" || arxived == "true" || arxived == "1");
-    data.fExpert  = (expert  == "t" || expert  == "true" || expert  == "1");
+    data.fExpert  = (strncmp(PQgetvalue(res,0,3),"t",1) == 0);
+    data.fArxived = (strncmp(PQgetvalue(res,0,4),"t",1) == 0);
     PQclear(res);
     return data;
+  }
+
+  MainConfigMetaData ConfigReader::GetMainConfigMetaData(const unsigned int cfg_id)
+  {
+    return GetMainConfigMetaData(MainConfigName(cfg_id));
   }
   
   std::vector<ubpsql::MainConfigMetaData>
@@ -129,16 +132,13 @@ namespace ubpsql {
     if(!Connect()) throw ConnectionError();
     PGresult* res = _conn->Execute("SELECT * FROM ListAllMainConfigs();");
     if(!res)  return config_v;
-
     for(size_t i=0; i<PQntuples(res); ++i) {
       MainConfigMetaData data;
       data.fName    = PQgetvalue(res,i,0);
       data.fID      = atoi(PQgetvalue(res,i,1));
       data.fRunType = atoi(PQgetvalue(res,i,2));
-      std::string arxived(PQgetvalue(res,i,3));
-      std::string expert(PQgetvalue(res,i,4));
-      data.fArxived = (arxived == "t" || arxived == "true" || arxived == "1");
-      data.fExpert  = (expert  == "t" || expert  == "true" || expert  == "1");
+      data.fExpert  = (strncmp(PQgetvalue(res,i,3),"t",1) == 0);
+      data.fArxived = (strncmp(PQgetvalue(res,i,4),"t",1) == 0);
       if( run_type >= 0 && data.fRunType != run_type ) continue;
       if( data.fExpert  && !include_expert  ) continue;
       if( data.fArxived && !include_arxived ) continue;

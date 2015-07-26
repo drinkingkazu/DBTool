@@ -19,6 +19,34 @@ namespace ubpsql {
   }
 
   //-------------------------------------------------------------------------------------------
+  unsigned int ConfigWriter::DeathStarPlusPlus(const unsigned int config_id,
+					       const unsigned int new_run_number,
+					       const unsigned int age_of_eric)
+  {
+    if(!Connect()) throw ConnectionError();
+    if(age_of_eric != kAGEOFECHURCH) {
+      std::cerr << "\033[93mYou failed to contribute in DeathStar community.\033[00m" << std::endl;
+      return kINVALID_UINT;
+    }
+    PGresult* res = _conn->Execute(Form("SELECT DeathStarPlusPlus(%d,%d);",config_id,new_run_number));
+    if(!res) return false;
+
+    unsigned int run = atoi(PQgetvalue(res,0,0));
+    PQclear(res);
+    return run;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  unsigned int ConfigWriter::DeathStarPlusPlus(const std::string  config_name,
+					       const unsigned int new_run_number,
+					       const unsigned int age_of_eric)
+  {
+    return DeathStarPlusPlus( this->MainConfigID(config_name),
+			      new_run_number,
+			      age_of_eric );
+  }
+ 
+  //-------------------------------------------------------------------------------------------  
   unsigned int ConfigWriter::InsertNewRun(const std::string& cfg_name)
   { return InsertNewRun( this->MainConfigID(cfg_name) ); }
 
@@ -83,11 +111,9 @@ namespace ubpsql {
     return success;
   }
   
-
   //
   // Configuration related
   //
-
   bool ConfigWriter::ActivateMainConfiguration(const std::string name)
   {
     if(!Connect()) throw ConnectionError();
@@ -110,10 +136,10 @@ namespace ubpsql {
     return success;
   }
 
-  bool ConfigWriter::ArxivMainConfiguration(const std::string name)
+  bool ConfigWriter::ArxiveMainConfiguration(const std::string name)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT * FROM ArxivMainConfig('%s');",name.c_str()));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ArxiveMainConfig('%s');",name.c_str()));
     if(!res) return false;
     
     bool success = (atoi(PQgetvalue(res,0,0)) == 0);
@@ -121,15 +147,59 @@ namespace ubpsql {
     return success;
   }
 
-  bool ConfigWriter::ArxivMainConfiguration(const unsigned int id)
+  bool ConfigWriter::ArxiveMainConfiguration(const unsigned int id)
   {
     if(!Connect()) throw ConnectionError();
-    PGresult* res = _conn->Execute(Form("SELECT * FROM ArxivMainConfig(%d);",id));
+    PGresult* res = _conn->Execute(Form("SELECT * FROM ArxiveMainConfig(%d);",id));
     if(!res) return false;
     
     bool success = (atoi(PQgetvalue(res,0,0)) == 0);
     PQclear(res);
     return success;
+  }
+
+  bool ConfigWriter::MakeExpertConfiguration(const std::string name)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT * FROM MakeExpertConfig('%s');",name.c_str()));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;    
+  }
+
+  bool ConfigWriter::MakeExpertConfiguration(const unsigned int id)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT * FROM MakeExpertConfig(%d);",id));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;
+  }
+
+  bool ConfigWriter::MakeNonExpertConfiguration(const std::string name)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT * FROM MakeNonExpertConfig('%s');",name.c_str()));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;        
+  }
+
+  bool ConfigWriter::MakeNonExpertConfiguration(const unsigned int id)
+  {
+    if(!Connect()) throw ConnectionError();
+    PGresult* res = _conn->Execute(Form("SELECT * FROM MakeNonExpertConfig(%d);",id));
+    if(!res) return false;
+    
+    bool success = (atoi(PQgetvalue(res,0,0)) == 0);
+    PQclear(res);
+    return success;    
   }
   
   bool ConfigWriter::InsertSubConfiguration(const SubConfig& cfg)

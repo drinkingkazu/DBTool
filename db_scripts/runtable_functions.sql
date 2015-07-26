@@ -61,11 +61,42 @@ $$ LANGUAGE PLPGSQL;
 --          ....
 --$PROC$ LANGUAGE plpgsql;
 
+DROP FUNCTION IF EXISTS DeathStarPlusPlus(CfgID INT,Run INT);
+CREATE OR REPLACE FUNCTION DeathStarPlusPlus(CfgID INT,Run INT)  RETURNS integer AS $$
+DECLARE
+    disabled BOOLEAN;
+    confRunType SMALLINT;
+    alreadyexist BOOLEAN;
+BEGIN
+
+    IF NOT ExistMainConfig(CfgID) THEN
+      RAISE EXCEPTION '+++++++++++ MainConfig w/ ID % does not exist... ++++++++++', CfgID;
+    END IF;
+
+    SELECT INTO disabled Arxived::BOOLEAN FROM MainConfigTable WHERE ConfigID = CfgID;
+    IF disabled OR disabled IS NULL THEN
+      RAISE EXCEPTION '+++++++++++ MainCOnfig w/ ID % is arxived! (you cannot use it) +++++++++++++',CfgID;
+    END IF;
+
+    SELECT INTO alreadyexist TRUE FROM MainRun WHERE RunNumber = Run LIMIT 1;
+    IF alreadyexist THEN
+      RAISE EXCEPTION '+++++++++++ Run Number % already in DB! +++++++++++++',Run;
+    END IF;
+
+    SELECT INTO confRunType RunType FROM MainConfigTable WHERE ConfigID = CfgID;
+   
+    INSERT INTO MainRun(RunNumber,SubRunNumber,ConfigID,RunType) VALUES (Run,0,CfgID,confRunType);
+
+    RETURN Run;
+
+END;
+$$ LANGUAGE plpgsql;
+
 DROP FUNCTION IF EXISTS InsertNewRun(CfgID INT);
 CREATE OR REPLACE FUNCTION InsertNewRun(CfgID INT)  RETURNS integer AS $$
 DECLARE
     lastrun mainrun.RunNumber%TYPE;
-    enabled BOOLEAN;
+    disabled BOOLEAN;
     confRunType SMALLINT;
 BEGIN
     SELECT INTO lastrun GetLastRun();
@@ -74,8 +105,8 @@ BEGIN
       RAISE EXCEPTION '+++++++++++ MainConfig w/ ID % does not exist... ++++++++++', CfgID;
     END IF;
 
-    SELECT INTO enabled Arxived FROM MainConfigTable WHERE ConfigID = CfgID;
-    IF NOT enabled THEN
+    SELECT INTO disabled Arxived::BOOLEAN FROM MainConfigTable WHERE ConfigID = CfgID;
+    IF disabled OR disabled IS NULL THEN
       RAISE EXCEPTION '+++++++++++ MainCOnfig w/ ID % is arxived! (you cannot use it) +++++++++++++',CfgID;
     END IF;
 
@@ -97,7 +128,7 @@ DECLARE
     lastrun mainrun.RunNumber%TYPE;
     lastsubrun mainrun.SubRunNumber%TYPE;
     confRunType SMALLINT;
-    enabled BOOLEAN;
+    disabled BOOLEAN;
 BEGIN
 
     IF run <0 THEN
@@ -116,8 +147,8 @@ BEGIN
       RAISE EXCEPTION '+++++++++++ MainConfig w/ ID % does not exist... ++++++++++', CfgID;
     END IF;
 
-    SELECT INTO enabled Arxived FROM MainConfigTable WHERE ConfigID = CfgID;
-    IF NOT enabled THEN
+    SELECT INTO disabled Arxived FROM MainConfigTable WHERE ConfigID = CfgID;
+    IF disabled OR disabled IS NULL THEN
       RAISE EXCEPTION '+++++++++++ MainCOnfig w/ ID % is arxived! (you cannot use it) +++++++++++++',CfgID;
     END IF;
 

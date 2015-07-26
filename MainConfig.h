@@ -17,9 +17,11 @@
 #include "DBEnv.h"
 #include "SubConfig.h"
 #include <vector>
+#include <sstream>
 namespace ubpsql {
 
-  struct MainConfigMetaData {
+  class  MainConfigMetaData {
+  public:
     std::string  fName;
     unsigned int fID;
     bool         fArxived;
@@ -32,6 +34,17 @@ namespace ubpsql {
       , fExpert(true)
       , fRunType(-1)
     {}
+    ~MainConfigMetaData(){}
+    std::string Dump()
+    {
+      std::stringstream ss;
+      ss << "Config Name: " << fName.c_str() << std::endl
+	 << "Config ID  : " << fID << std::endl
+	 << "Run Type   : " << fRunType << std::endl
+	 << "Arxived?   : " << fArxived << std::endl
+	 << "Expert?    : " << fExpert << std::endl;
+      return ss.str();
+    }
   };
   
   /**

@@ -62,6 +62,8 @@ namespace ubpsql {
 							    bool  arxived = false);
     /// MainConfig meta data getter
     MainConfigMetaData GetMainConfigMetaData(const std::string cfg_name);
+    /// MainConfig meta data getter
+    MainConfigMetaData GetMainConfigMetaData(const unsigned int cfg_id);
     /// List All Sub-Config name/ID pair for a given MainConfig name
     //std::vector<std::pair<std::string,unsigned int> >  ListSubConfigs(const std::string& cfg_name);
     /// Existence checker.
