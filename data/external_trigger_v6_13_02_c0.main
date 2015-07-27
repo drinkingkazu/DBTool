@@ -1,4 +1,4 @@
-MAIN_CONFIG_START external_trigger_v6_13_02_noPMT PHYSICS
+MAIN_CONFIG_START external_trigger_v6_13_02_c0 PHYSICS
 
   sebAppseb01 => 1
   sebAppseb02 => 1
@@ -9,10 +9,10 @@ MAIN_CONFIG_START external_trigger_v6_13_02_noPMT PHYSICS
   sebAppseb07 => 1
   sebAppseb08 => 1
   sebAppseb09 => 1
-  sebAppseb10 => 2
+  sebAppseb10 => 1
   dispatcherevb => 1
   online_monitornear1 => 1
-  assemblerAppevb => 2
+  assemblerAppevb => 1
   ASIC => 1
   Pulser => 1
   ExtTrigger => 1
