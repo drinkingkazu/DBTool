@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from dbtool import ubpsql
 from dbtool.colored_msg import error
 import sys
