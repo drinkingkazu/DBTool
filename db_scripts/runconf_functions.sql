@@ -224,6 +224,7 @@ BEGIN
 			     MainConfigTable.Expert,
 		       	     MainConfigTable.Arxived
 	     FROM MainConfigTable
+	     ORDER BY MainConfigTable.ConfigID
   LOOP
       RETURN QUERY SELECT rec.ConfigName::TEXT, rec.ConfigID::INT, rec.RunType::SMALLINT, rec.Expert::BOOLEAN, rec.Arxived::BOOLEAN;
   END LOOP;

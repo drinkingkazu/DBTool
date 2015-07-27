@@ -3,6 +3,8 @@
 me="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export DBTOOL_DIR="$( cd "$( dirname "$me" )" && pwd )"
 
+
+
 dbtool_cmake_flag=""
 case `uname -n` in
     (*ubdaq-prod*)
@@ -16,7 +18,34 @@ case `uname -n` in
 
     case `whoami` in
 	(uboonedaq)
-        echo Setting up production config db...
+	if [[ $1 ]]; then
+            echo Setting up production config db...
+	else
+            echo Setting up test config db...
+	    export DBTOOL_READER_DB="testrunconfdb";
+	    export DBTOOL_WRITER_DB="testrunconfdb";
+	    export DBTOOL_ADMIN_DB="testrunconfdb";
+	fi
+	;;
+	(kterao)
+	if [[ $1 ]]; then
+            echo Setting up production config db...
+	else
+            echo Setting up test config db...
+	    export DBTOOL_READER_DB="testrunconfdb";
+	    export DBTOOL_WRITER_DB="testrunconfdb";
+	    export DBTOOL_ADMIN_DB="testrunconfdb";
+	fi
+	;;
+	(yuntse)
+	if [[ $1 ]]; then
+            echo Setting up production config db...
+	else
+            echo Setting up test config db...
+	    export DBTOOL_READER_DB="testrunconfdb";
+	    export DBTOOL_WRITER_DB="testrunconfdb";
+	    export DBTOOL_ADMIN_DB="testrunconfdb";
+	fi
 	;;
 	(*)
         echo Setting up test config db...
