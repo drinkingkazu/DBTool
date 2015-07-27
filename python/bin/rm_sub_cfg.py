@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from dbtool import ubpsql
 import sys
-writer = ubpsql.ConfigWriter()
+writer = ubpsql.DeathStar()
 
 if len(sys.argv)<2: 
     print 
