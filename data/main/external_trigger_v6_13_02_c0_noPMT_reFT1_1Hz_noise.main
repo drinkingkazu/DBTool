@@ -1,0 +1,21 @@
+MAIN_CONFIG_START external_trigger_v6_13_02_c0_noPMT_reFT1_1Hz_noise PHYSICS
+
+  sebAppseb01 => 1
+  sebAppseb02 => 1
+  sebAppseb03 => 1
+  sebAppseb04 => 1
+  sebAppseb05 => 1
+  sebAppseb06 => 1
+  sebAppseb07 => 1
+  sebAppseb08 => 1
+  sebAppseb09 => 1
+  sebAppseb10 => 2
+  dispatcherevb => 1
+  online_monitornear1 => 1
+  assemblerAppevb => 2
+  ASIC => 4
+  Pulser => 3
+  ExtTrigger => 2
+
+MAIN_CONFIG_END
+
