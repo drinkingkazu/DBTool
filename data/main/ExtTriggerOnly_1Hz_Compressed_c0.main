@@ -1,0 +1,21 @@
+MAIN_CONFIG_START ExtTriggerOnly_1Hz_Compressed_c0 PHYSICS
+
+  sebAppseb01 => 2
+  sebAppseb02 => 2
+  sebAppseb03 => 2
+  sebAppseb04 => 2
+  sebAppseb05 => 2
+  sebAppseb06 => 2
+  sebAppseb07 => 2
+  sebAppseb08 => 2
+  sebAppseb09 => 2
+  sebAppseb10 => 13
+  dispatcherevb => 1
+  online_monitornear1 => 1
+  assemblerAppevb => 1
+  ASIC => 3
+  Pulser => 3
+  ExtTrigger => 2
+
+MAIN_CONFIG_END
+
