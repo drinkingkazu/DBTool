@@ -93,9 +93,9 @@ class MainConfigUploader(UBPyBase):
     def LoadParams( self, cfg ):
         params = {}
         subconfigs = cfg.ListSubConfigIDs()
+        Reader = ubpsql.ConfigReader()
         for subconfig in subconfigs:
-            iReader = ubpsql.ConfigReader()
-            isubcfg = iReader.GetSubConfig( subconfig.Name(), subconfig.ID() )
+            isubcfg = Reader.GetSubConfig( subconfig.Name(), subconfig.ID() )
             d = fcl2py.Parse( isubcfg.Dump() )
             params[subconfig.Name()] = d[subconfig.Name()]
             
