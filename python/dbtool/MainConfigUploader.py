@@ -2,8 +2,8 @@ from UBPyCPP import ubpsql
 from UBPyBase import UBPyBase
 from UBPySQLException import ParseIException
 from ask_binary import ask_binary
+import fcl2py
 import sys
-import json
 
 class MainConfigUploader(UBPyBase):
 
@@ -96,38 +96,9 @@ class MainConfigUploader(UBPyBase):
         for subconfig in subconfigs:
             iReader = ubpsql.ConfigReader()
             isubcfg = iReader.GetSubConfig( subconfig.Name(), subconfig.ID() )
-            d = self.Parse( isubcfg.Dump() )
+            d = fcl2py.Parse( isubcfg.Dump() )
             params[subconfig.Name()] = d[subconfig.Name()]
             
         return params
     # LoadParams( self, cfg )
-
-    def Parse( self, s ):
-        """Interprets  as a dictionary"""
-
-        Tokens = [ ':', '{', '}', ',', '[', ']', ]
-
-        # add spaces around the tokens
-        t = s
-        for token in Tokens:
-            t = t.replace(token, " " + token + " ")
-
-        # split into words
-        w = t.split()
-        # add commas
-        tw = []
-        for iWord, word in enumerate(w):
-            if word not in Tokens and word[0] != '"':
-                tw.append('"'+word+'"')
-            else:
-                tw.append(word)
-            if word not in [ ':', '{', '[', ',' ]:
-                if iWord+1 < len(w) and not w[iWord+1] in [ ':', '}', ']', ',' ]:
-                    tw.append(",")
-
-        js = " ".join(tw)
-        js = "{ " + js + " }"
-        d = json.loads(js)
-        return d
-    # Parse()
 

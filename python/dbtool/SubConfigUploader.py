@@ -58,10 +58,10 @@ class SubConfigUploader(UBPyBase):
                         for missing_id in missing_list:
                             self.error('    MISSING: %s w/ ID = %d' % missing_id)
                     else:
-                        # validated = self.Check( cfg )
-                        # if validated is False:
-                        #     self.error('  Config %s %d fails the validation!' % ( cfg.ID().Name(), cfg.ID().ID() ) )
-                        #     continue
+                        validated = self.Check( cfg )
+                        if validated is False:
+                            self.error('  Config %s %d fails the validation!' % ( cfg.ID().Name(), cfg.ID().ID() ) )
+                            continue
                         local_conf_list.append(name_id)
                         upload_list.append(cfg)
                         if not self._api.ExistSubConfig(name_id[0]):
