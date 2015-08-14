@@ -1,0 +1,21 @@
+MAIN_CONFIG_START laser_trigger_v6_13_03_c4 PHYSICS
+
+  sebAppseb01 => 4
+  sebAppseb02 => 4
+  sebAppseb03 => 4
+  sebAppseb04 => 4
+  sebAppseb05 => 4
+  sebAppseb06 => 4
+  sebAppseb07 => 4
+  sebAppseb08 => 4
+  sebAppseb09 => 4
+  sebAppseb10 => 27
+  dispatcherevb => 1
+  online_monitornear1 => 1
+  assemblerAppevb => 1
+  ASIC => 1
+  Pulser => 3
+  ExtTrigger => 7
+
+MAIN_CONFIG_END
+

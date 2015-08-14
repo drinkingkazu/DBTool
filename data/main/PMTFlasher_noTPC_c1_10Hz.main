@@ -1,0 +1,21 @@
+MAIN_CONFIG_START PMTFlasher_noTPC_c1_10Hz PHYSICS
+
+  sebAppseb01 => 3
+  sebAppseb02 => 3
+  sebAppseb03 => 3
+  sebAppseb04 => 3
+  sebAppseb05 => 3
+  sebAppseb06 => 3
+  sebAppseb07 => 3
+  sebAppseb08 => 3
+  sebAppseb09 => 3
+  sebAppseb10 => 14
+  dispatcherevb => 1
+  online_monitornear1 => 1
+  assemblerAppevb => 3
+  ASIC => 1
+  Pulser => 1
+  ExtTrigger => 6
+
+MAIN_CONFIG_END
+
