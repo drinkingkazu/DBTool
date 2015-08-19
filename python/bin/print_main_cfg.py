@@ -4,7 +4,7 @@ from dbtool.colored_msg import error,warning,info
 import sys
 reader = ubpsql.ConfigReader()
 
-if not len(sys.argv) == 2:
+if not len(sys.argv) in [2,3]:
     error('Usage: %s MAIN_CONFIG_KEY' % sys.argv[0])
     sys.exit(1)
 
@@ -24,7 +24,7 @@ else:
     cfg_id   = reader.MainConfigID(cfg_name)
 
 sub_cfgs = reader.ListSubConfigs(cfg_name)
-if 'format' in sys.argv:
+if not 'format' in sys.argv:
     print
     print '    \033[95mConfig ID %d\033[00m => \033[93m%s\033[00m ' % (cfg_id,cfg_name)
     for y in xrange(sub_cfgs.size()):
