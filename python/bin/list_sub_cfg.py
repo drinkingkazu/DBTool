@@ -12,13 +12,14 @@ if names.size() < 1:
     sys.exit(1)
     
 print
+msg = 'List of SubConfigs...\n'
 for x in xrange(names.size()):
     name = names[x]
     ids  = reader.SubConfigIDs(name)
-    msg  = '%s ... ' % name
+    msg  += '    \033[93m%-20s\033[00m ... ' % name
     for y in xrange(ids.size()):
-        msg += '%d,' % ids[y]
+        msg += '\033[95m%d\033[00m,' % ids[y]
     msg = msg[0:len(msg)-1]
-    info(msg)
-print
+    msg += '\n'
+info(msg)
 
