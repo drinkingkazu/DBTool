@@ -21,6 +21,9 @@
 #pragma link C++ class ubpsql::ConnectionError+;
 #pragma link C++ class ubpsql::ConfigError+;
 
+#pragma link C++ function ubpsql::RunTypeFromName(const string)+;
+#pragma link C++ function ubpsql::RunTypeName(const int)+;
+
 #pragma link C++ class ubpsql::DBBase+;
 #pragma link C++ class ubpsql::DBAppBase+;
 #pragma link C++ class ubpsql::PQMessenger+;
