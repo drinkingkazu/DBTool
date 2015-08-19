@@ -32,7 +32,12 @@ if not 'format' in sys.argv:
     print
 else:
     mcfg_data = reader.GetMainConfigMetaData(cfg_name)
-    msg = 'MAIN_CONFIG_START %s %s\n' % (mcfg_data.fName,ubpsql.RunTypeName(mcfg_data.fRunType))
+    run_type = mcfg_data.fRunType
+    run_type_name='UNKNOWN'
+    if run_type >= 0:
+        run_type_name = ubpsql.RunTypeName(run_type)
+
+    msg = 'MAIN_CONFIG_START %s %s\n' % (mcfg_data.fName,run_type_name)
     for y in xrange(sub_cfgs.size()):
         msg += '%s => %d\n' % (sub_cfgs[y].first,sub_cfgs[y].second)
     msg += 'MAIN_CONFIG_END\n'
