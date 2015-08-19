@@ -39,8 +39,14 @@ class SubConfigUploader(UBPyBase):
                 name_id = (cfg.ID().Name(),cfg.ID().ID())
                 print "cfg %s ... %d" % (cfg.ID().Name(),cfg.ID().ID())
                 # Check this is already-existing cfg or not
+                duplicate_scfg_id = self._api.FindSubConfig(cfg)
                 if self._api.ExistSubConfig(name_id[0],name_id[1]):
                     self.info('  Already existing configuration \"%s\" w/ ID = %d' % name_id)
+                elif duplicate_scfg_id >= 0:
+                    msg = '  SubConfig \"%s\" w/ ID = %d contents identical to already-existing ID = %d'
+                    msg = msg % (name_id[0],name_id[1],duplicate_scfg_id)
+                    self.error(msg)
+                    raise ParseIException()
                 else:
                     # Check if this config can be registered or not
                     self.warning('  New Configuration \"%s\" w/ ID = %d' % name_id)

@@ -286,7 +286,7 @@ namespace ubpsql {
     PGresult* res = _conn->Execute(cmd);
     if(!res) return false;
     
-    bool status = std::atoi(PQgetvalue(res,0,0));
+    bool status = (std::atoi(PQgetvalue(res,0,0)) == 0);
     PQclear(res);
     return status;
   }
@@ -300,7 +300,7 @@ namespace ubpsql {
     PGresult* res = _conn->Execute(cmd);
     if(!res) return false;
     
-    bool status = std::atoi(PQgetvalue(res,0,0));
+    bool status = (std::atoi(PQgetvalue(res,0,0))==0);
     PQclear(res);
     return status;
   }

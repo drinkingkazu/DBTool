@@ -968,6 +968,9 @@ query TEXT;
 sub_conf_type INT;
 sub_conf_id INT;
 sub_conf_ctr INT;
+rec1 RECORD;
+rec2 RECORD;
+res INT;
 BEGIN
 
   sub_conf_type := -1;  
@@ -977,18 +980,30 @@ BEGIN
   END IF;
 
   sub_conf_id :=-1;
-
+  res := 1;
+  -- Check if this is used in MainConfig
   SELECT SubConfigID FROM MainConfigTable WHERE SubConfigType = sub_conf_type AND SubConfigID = cfg_id INTO sub_conf_id;
-
   IF sub_conf_id IS NOT NULL AND sub_conf_id >= 0 THEN
     RAISE WARNING '++++++++++++ Sub-Config %s w/ ID % currently in use within MainConfigTable! ++++++++++++',cfg_name,cfg_id;
-    RETURN 0;
+    RETURN res;
   ELSE
-    query := 'DELETE FROM ' || cfg_name || ' WHERE ConfigID = ' || cfg_id || ';';
-    EXECUTE query;
-    RETURN 1;    
-  END IF;    
-  RETURN 0;
+    res := 0;
+    -- Check if this is used by other SubConfig
+    FOR rec1 IN SELECT DISTINCT SubConfigName FROM ConfigLookUp
+    LOOP
+        query := 'SELECT ConfigID, ParameterSets->''' || cfg_name || ''' FROM ' || rec1.SubConfigName || ' WHERE ParameterSets ? ''' || cfg_name || ''';'; 
+	EXECUTE query INTO rec2;
+	IF rec2 IS NOT NULL THEN
+	  RAISE WARNING 'SubConfig % is used by another SubConfig % (ID=%) and possibly others...', cfg_name,rec1.SubConfigName,rec2.ConfigID;
+	  res := 1;
+	END IF;
+    END LOOP;
+    IF res = 0 THEN
+      query := 'DELETE FROM ' || cfg_name || ' WHERE ConfigID = ' || cfg_id || ';';
+      EXECUTE query;
+    END IF;
+  END IF;
+  RETURN res;
 END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
@@ -999,29 +1014,34 @@ DROP FUNCTION IF EXISTS CleanSubConfig( cfg_name TEXT);
 CREATE OR REPLACE FUNCTION CleanSubConfig( cfg_name TEXT ) RETURNS INT AS $$
 DECLARE
 query TEXT;
+rec RECORD;
+status INT;
+res    INT;
 sub_conf_type INT;
 sub_conf_id INT;
 sub_conf_ctr INT;
 BEGIN
 
-  sub_conf_type := -1;  
-  SELECT INTO sub_conf_type SubConfigType(cfg_name);
-  IF sub_conf_type IS NULL THEN 
-  RETURN 0;
+  IF NOT ExistSubConfig(cfg_name) THEN
+    RAISE WARNING '+++++++++++++ No such SubConfig % +++++++++++++',cfg_name;
+    RETURN 1;
   END IF;
 
-  sub_conf_id :=-1;
-  SELECT SubConfigID FROM MainConfigTable WHERE SubConfigType = sub_conf_type INTO sub_conf_id;
+  res := 0;
+  query := 'SELECT DISTINCT SubConfigID FROM ' || cfg_name || ';';
+  FOR rec IN EXECUTE query
+  LOOP
+    SELECT CleanSubConfig(cfg_name,rec.SubConfigID::INT) INTO status;
+    IF status > 0 THEN
+      res = res + 1;
+    END IF;
+  END LOOP;
 
-  IF sub_conf_id IS NOT NULL AND sub_conf_id >= 0 THEN
-    RAISE WARNING '++++++++++++ Sub-Config % currently in use within MainConfigTable! ++++++++++++',cfg_name;
-    RETURN 0;
-  ELSE
+  IF res = 0 THEN  
     query := 'DROP TABLE ' || cfg_name || ';';
     EXECUTE query;
     DELETE FROM ConfigLookUp WHERE SubConfigName = cfg_name;
-    RETURN 1;    
-  END IF;    
+  END IF;
   RETURN 0;
 END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;

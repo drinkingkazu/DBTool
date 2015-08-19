@@ -1,34 +1,29 @@
 #!/usr/bin/env python
 from dbtool import ubpsql
+from dbtool.colored_msg import error,warning
 import sys
 writer = ubpsql.DeathStar()
 
-if len(sys.argv)<2: 
-    print 
-    print '    Must give Sub-Config name as an argument.'
-    print
+#if len(sys.argv)<2:
+if not len(sys.argv) == 3:
+    error('    Must give Sub-Config name & id as an argument.')
     sys.exit(1)
 
 cfg_name = sys.argv[1]
 cfg_id = -1
 
-if len(sys.argv)>2:
-    if not sys.argv[2].isdigit():
-        print 
-        print '    2nd argument must be integer Sub-Config id!'
-        print
-        sys.exit(1)
-    cfg_id = int(sys.argv[2])
-
+if not sys.argv[2].isdigit():
+    error('    2nd argument must be integer Sub-Config id!')
+    sys.exit(1)
+cfg_id = int(sys.argv[2])
+if cfg_id < 0:
+    error('    Invalid Sub-Config ID: %d' % cfg_id)
+    sys.exit(1)
 if not writer.ExistSubConfig(cfg_name):
-    print
-    print '    Sub-Config %s does not exist...' % cfg_name
-    print
+    error('    Sub-Config %s does not exist...' % cfg_name)
     sys.exit(1)
 
-print
-print '    Attempting to remove Sub-Config: %s' % cfg_name
-print
+warning('    Attempting to remove Sub-Config: %s' % cfg_name)
 user_input=''
 while 1:
     sys.stdout.write('    [y/n]: ')
