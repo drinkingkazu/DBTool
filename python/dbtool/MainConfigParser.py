@@ -61,8 +61,13 @@ class MainConfigParser(UBPyBase):
         if runtype < 0:
             self.error("RunType string was invalid (\"%s\")" % words[1])
             raise ParseIException
-        mcfg = ubpsql.MainConfig(words[0])
 
+        # MainConfigMetaData
+        meta_mcfg=ubpsql.MainConfigMetaData()
+        meta_mcfg.fName = words[0]
+        meta_mcfg.fRunType = runtype
+        mcfg = ubpsql.MainConfig(meta_mcfg)
+        
         for x in xrange(len(lines)):
             if x == 0: continue
             line = lines[x]

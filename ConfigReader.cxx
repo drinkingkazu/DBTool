@@ -430,6 +430,52 @@ namespace ubpsql {
     return exist;
   }
 
+  int  ConfigReader::FindSubConfig(const SubConfig& scfg)
+  {
+    if(!Connect()) throw ConnectionError();
+
+    std::string params_hstore,psets_hstore;
+    TString value="";
+    size_t ctr = 0;
+
+    params_hstore = "'";
+    auto const& params = scfg.Parameters();
+    ctr = params.size();
+    value = "";
+    for(auto const& param : params) {
+      value = param.second;
+      value = value.ReplaceAll("\"","\\\"");
+      if( ctr ) params_hstore += Form(" \"%s\"=>\"%s\",", param.first.c_str(), value.Data());
+      else params_hstore += Form(" \"%s\"=>\"%s\"", param.first.c_str(), value.Data());
+      --ctr;
+    }
+    params_hstore += " '::HSTORE";
+
+    psets_hstore = "'";
+    auto const& psets = scfg.ListSubConfigIDs();
+    ctr = psets.size();
+    value = "";
+    for(auto const& pset : psets) {
+      if( ctr ) psets_hstore += Form(" \"%s\"=>%d,", pset.first.c_str(), pset.second);
+      else psets_hstore += Form(" \"%s\"=>%d", pset.first.c_str(), pset.second);
+      --ctr;
+    }
+    psets_hstore += " '::HSTORE";
+
+    std::string query;
+
+    query = Form("SELECT FindSubConfig('%s',%s,%s);",scfg.ID().Name().c_str(),params_hstore.c_str(),psets_hstore.c_str());
+    PGresult* res = _conn->Execute(query);
+    if(!res) return false;
+
+    int result = -1;
+    if(PQntuples(res)){
+      result = std::atoi(PQgetvalue(res,0,0));
+    }
+    PQclear(res);
+    return result;
+  }
+
   /*
   std::vector<std::string> ConfigReader::GetSubConfigParameterNames(std::string const& sub_config_name)
   {

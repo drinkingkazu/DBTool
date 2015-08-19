@@ -58,6 +58,11 @@ namespace ubpsql {
     
     /// Default constructor
     MainConfig(std::string name){ fMetaData.fName=name; }
+
+    /// Alternative ctor
+    MainConfig(const MainConfigMetaData& data)
+      : fMetaData(data)
+    {}
     
     /// Default destructor
     virtual ~MainConfig(){}

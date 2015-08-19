@@ -266,8 +266,10 @@ namespace ubpsql {
     }
 
     query += " '::HSTORE,'";
-    query += cfg.Name() + "');";
-    std::cout<<query.c_str()<<std::endl;
+    query += cfg.Name() + "'::TEXT,";
+    query += std::to_string(cfg.RunType());
+    query += "::SMALLINT);";
+    //std::cout<<query.c_str()<<std::endl;
     PGresult* res = _conn->Execute(query);
     if(!res) return -1;
     int id = std::atoi(PQgetvalue(res,0,0));
