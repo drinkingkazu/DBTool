@@ -321,6 +321,32 @@ namespace ubpsql {
     return result;
   }
 
+  void ConfigWriter::RenameMainConfig(const std::string& before,
+				      const std::string& after)
+  {
+    if(!Connect()) throw ConnectionError();
+    if(!(this->ExistMainConfig(before))) {
+      Print(msg::kERROR,__FUNCTION__,Form("MainConfig \"%s\" does not exist!",before.c_str()));
+      return;
+    }
+    std::string cmd = Form("SELECT ResetMainConfigName('%s','%s');",before.c_str(),after.c_str());
+    PGresult* res = _conn->Execute(cmd);
+    PQclear(res);
+  }
+
+  void ConfigWriter::RenameMainConfig(const unsigned int before,
+				      const std::string& after)
+  {
+    if(!Connect()) throw ConnectionError();
+    if(!(this->ExistMainConfig(before))) {
+      Print(msg::kERROR,__FUNCTION__,Form("MainConfig %d does not exist!",before));
+      return;
+    }
+    std::string cmd = Form("SELECT ResetMainConfigName(%d,'%s');",before,after.c_str());
+    PGresult* res = _conn->Execute(cmd);
+    PQclear(res);
+  }
+
 }
 
 #endif
