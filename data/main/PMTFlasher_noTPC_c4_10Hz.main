@@ -11,3 +11,15 @@ MAIN_CONFIG_START PMTFlasher_noTPC_c4_10Hz_TEST CALIBRATION
 
 MAIN_CONFIG_END
 
+MAIN_CONFIG_START PMTFlasher_noTPC_c4_10Hz CALIBRATION
+
+  sebAppseb10 => 29
+  dispatcherevb => 1
+  online_monitornear1 => 1
+  assemblerAppevb => 3
+  ASIC => 1
+  Flasher => 3
+  Strobe1 => 4
+  Strobe2 => 3
+
+MAIN_CONFIG_END
