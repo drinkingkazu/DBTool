@@ -17,6 +17,9 @@ def Parse( s ):
     for iWord, word in enumerate(w):
         if word not in Tokens and word[0] != '"':
             tw.append('"'+word+'"')
+        elif word[0] == '"':
+            #print '"\"%s\""' % word.replace('"','')
+            tw.append('"\\\"%s\\\""' % word.replace('"',''))
         else:
             tw.append(word)
         if word not in [ ':', '{', '[', ',' ]:
