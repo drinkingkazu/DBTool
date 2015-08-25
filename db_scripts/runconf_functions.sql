@@ -991,10 +991,10 @@ BEGIN
     -- Check if this is used by other SubConfig
     FOR rec1 IN SELECT DISTINCT SubConfigName FROM ConfigLookUp
     LOOP
-        query := 'SELECT ConfigID, ParameterSets->''' || cfg_name || ''' FROM ' || rec1.SubConfigName || ' WHERE ParameterSets ? ''' || cfg_name || ''';'; 
+        query := 'SELECT ConfigID AS ParentID, ParameterSets->''' || cfg_name || ''' AS ChildID FROM ' || rec1.SubConfigName || ' WHERE ParameterSets ? ''' || cfg_name || ''';'; 
 	EXECUTE query INTO rec2;
-	IF rec2 IS NOT NULL THEN
-	  RAISE WARNING 'SubConfig % is used by another SubConfig % (ID=%) and possibly others...', cfg_name,rec1.SubConfigName,rec2.ConfigID;
+	IF rec2 IS NOT NULL AND rec2.ChildID::INT = cfg_id THEN
+	  RAISE WARNING 'SubConfig % is used by another SubConfig % (ID=%) and possibly others...', cfg_name,rec1.SubConfigName,rec2.ParentID;
 	  res := 1;
 	END IF;
     END LOOP;
