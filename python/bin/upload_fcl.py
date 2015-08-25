@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from dbtool import fcl2py,ubpsql,ask_binary
 from dbtool.colored_msg import info,warning,error
 import sys
@@ -124,7 +125,7 @@ if __name__ == '__main__':
         sys.exit(0)
     cfg_name=''
     while not cfg_name:
-        print '\033[95mType MainConfig name:\033[00m ',
+        print '\033[95mEnter MainConfig name:\033[00m ',
         sys.stdout.flush()
         cfg_name=sys.stdin.readline().rstrip('\n')
         if cfg_name.find(' ')>=0:
@@ -135,7 +136,27 @@ if __name__ == '__main__':
             error('MainConfig \"%s\" already exists!' % cfg_name)
             cfg_name = ''
             continue
-    main_cfg = ubpsql.MainConfig(str(cfg_name))
+
+    print '\033[95mChoose RunType for this config:\033[00m '
+    options=[]
+    for x in xrange(ubpsql.kRunTypeMax):
+        print '  %d => %s' % (x,ubpsql.RunTypeName(x))
+        options.append(x)
+    run_type=ubpsql.kRunTypeMax
+    while run_type == ubpsql.kRunTypeMax:
+        print '\033[95mEnter %s: ' % str(options),
+        sys.stdout.flush()
+        user_input = sys.stdin.readline().rstrip('\n')
+        if not user_input.isdigit() or not int(user_input) in options:
+            print '\033[91mInvalid input:\033[00m',user_input
+            continue
+        run_type = int(user_input)
+    
+    main_cfg_metadata = ubpsql.MainConfigMetaData()
+    main_cfg_metadata.fName = cfg_name
+    main_cfg_metadata.fRunType = run_type
+
+    main_cfg = ubpsql.MainConfig(main_cfg_metadata)
     for top_sub_cfg_id in top_sub_cfg_v:
         main_cfg.AddSubConfig(ubpsql.SubConfig(str(top_sub_cfg_id[0]),int(top_sub_cfg_id[1])))
     

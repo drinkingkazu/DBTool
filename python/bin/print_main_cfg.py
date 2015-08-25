@@ -24,19 +24,21 @@ else:
     cfg_id   = reader.MainConfigID(cfg_name)
 
 sub_cfgs = reader.ListSubConfigs(cfg_name)
+mcfg_data = reader.GetMainConfigMetaData(cfg_name)
+run_type = mcfg_data.fRunType
+run_type_name='UNKNOWN'
+if run_type >= 0:
+    run_type_name = ubpsql.RunTypeName(run_type)
+    
 if not 'format' in sys.argv:
     print
-    print '    \033[95mConfig ID %d\033[00m => \033[93m%s\033[00m ' % (cfg_id,cfg_name)
+    print '    \033[95mConfig ID %d\033[00m => \033[93m%s\033[00m' % (cfg_id,cfg_name),
+    print '...',
+    print '\033[95mRunType:\033[00m \033[93m%s\033[00m' % run_type_name
     for y in xrange(sub_cfgs.size()):
         print '        |- \"%s\" (ID=%d)' % (sub_cfgs[y].first,sub_cfgs[y].second)
     print
 else:
-    mcfg_data = reader.GetMainConfigMetaData(cfg_name)
-    run_type = mcfg_data.fRunType
-    run_type_name='UNKNOWN'
-    if run_type >= 0:
-        run_type_name = ubpsql.RunTypeName(run_type)
-
     msg = 'MAIN_CONFIG_START %s %s\n' % (mcfg_data.fName,run_type_name)
     for y in xrange(sub_cfgs.size()):
         msg += '%s => %d\n' % (sub_cfgs[y].first,sub_cfgs[y].second)
