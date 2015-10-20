@@ -23,7 +23,7 @@
 #pragma link C++ class ubpsql::DBAppBase+;
 #pragma link C++ class ubpsql::PQMessenger+;
 #pragma link C++ class ubpsql::DBConn+;
-
+#pragma link C++ class ubpsql::DBConnInfo+;
 #pragma link C++ class ubpsql::RunInfo+;
 
 #pragma link C++ class ubpsql::ConfigReader+;
