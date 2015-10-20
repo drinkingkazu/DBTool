@@ -101,6 +101,9 @@ namespace ubpsql {
     bool ExistSubConfig(std::string sub_config_name);
     /// Existence checker for a specific sub-config id
     bool ExistSubConfig(std::string sub_config_name, unsigned int id);
+    /// SubConfig finder based on name, parameters, and children sub-configs
+    int  FindSubConfig(const SubConfig& scfg);
+
     /// Getter for the maximum sub-config ID number used 
     int MaxSubConfigID(std::string sub_config_name);
 

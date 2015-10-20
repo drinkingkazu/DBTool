@@ -3,13 +3,12 @@ from dbtool import ubpsql
 import sys
 reader = ubpsql.ConfigReader()
 
-detail = ('detail' in sys.argv)
 arxive = ('arxive' in sys.argv)
 expert = ('expert' in sys.argv)
 
 if '-h' in sys.argv or '--help' in sys.argv:
 
-    print 'Usage: %s [detail|arxive|expert]' % sys.argv[0]
+    print 'Usage: %s [arxive|expert]' % sys.argv[0]
     sys.exit(1)
 
 cfgs = reader.ListMainConfigs(-1,expert,arxive)
@@ -29,9 +28,4 @@ for x in xrange(cfgs.size()):
         if cfgs[x].fExpert:  msg +=' Expert'
         msg += ' )'
     print msg
-    if not detail: continue
-    sub_cfgs = reader.ListSubConfigs(cfgs[x].fName)
-    for y in xrange(sub_cfgs.size()):
-        print '        |- \"%s\" (ID=%d)' % (sub_cfgs[y].first,sub_cfgs[y].second)
-    print
 print

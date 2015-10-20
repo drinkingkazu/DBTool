@@ -122,6 +122,13 @@ namespace ubpsql {
     /// Drop MainConfig
     bool CleanMainConfig(const std::string& name);
 
+    /// Rename MainConfig (Name)
+    void RenameMainConfig(const std::string& before,
+			  const std::string& after);
+
+    /// Rename MainConfig (ID)
+    void RenameMainConfig(const unsigned int,
+			  const std::string& after);
   };
 }
 

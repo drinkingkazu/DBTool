@@ -13,11 +13,16 @@
 #pragma link C++ namespace ubpsql::msg;
 #pragma link C++ enum   ubpsql::RunType_t+;
 #pragma link C++ class std::pair<string,unsigned int>+;
+#pragma link C++ class std::pair<string,string>+;
+#pragma link C++ class std::map<string,string>+;
 #pragma link C++ class std::vector<std::pair<string,unsigned int> >+;
 #pragma link C++ class ubpsql::DBException+;
 #pragma link C++ class ubpsql::InvalidUser+;
 #pragma link C++ class ubpsql::ConnectionError+;
 #pragma link C++ class ubpsql::ConfigError+;
+
+#pragma link C++ function ubpsql::RunTypeFromName(const string)+;
+#pragma link C++ function ubpsql::RunTypeName(const int)+;
 
 #pragma link C++ class ubpsql::DBBase+;
 #pragma link C++ class ubpsql::DBAppBase+;

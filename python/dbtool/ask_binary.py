@@ -1,6 +1,8 @@
 import sys
 
-def ask_binary(self):
+def ask_binary(msg):
+    if msg:
+        print msg
     user_input=''
     while not user_input:
         print 'Enter [y/n]: ',

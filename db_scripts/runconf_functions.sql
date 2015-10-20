@@ -2,6 +2,9 @@ SET ROLE uboonedaq_admin;
 
 ------------------------------------------------------------------------------
 
+--------------------------------------------------------------------
+-- ExistMainConfig from Name
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS ExistMainConfig(MCfgName TEXT);
 CREATE OR REPLACE FUNCTION ExistMainConfig(MCfgName TEXT) RETURNS BOOLEAN AS $$
 DECLARE
@@ -13,6 +16,9 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+--------------------------------------------------------------------
+-- ExistMainConfig from ID
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS ExistMainConfig(MCfgID INT);
 CREATE OR REPLACE FUNCTION ExistMainConfig(MCfgID INT) RETURNS BOOLEAN AS $$
 DECLARE
@@ -24,6 +30,10 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+--------------------------------------------------------------------
+-- MainConfig Name from ID
+--------------------------------------------------------------------
+DROP FUNCTION IF EXISTS MainConfigName(MCfgName TEXT);
 DROP FUNCTION IF EXISTS MainConfigName(MCfgID INT);
 CREATE OR REPLACE FUNCTION MainConfigName(MCfgID INT) RETURNS TEXT AS $$
 DECLARE
@@ -37,6 +47,9 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+--------------------------------------------------------------------
+-- MainConfig ID from Name
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS MainConfigID(MCfgName TEXT);
 CREATE OR REPLACE FUNCTION MainConfigID(MCfgName TEXT) RETURNS TEXT AS $$
 DECLARE
@@ -50,6 +63,90 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+--------------------------------------------------------------------
+-- ReSetRunType for MainConfig (Name)
+--------------------------------------------------------------------
+DROP FUNCTION IF EXISTS SetRunType(TEXT,SMALLINT);
+CREATE OR REPLACE FUNCTION SetRunType(MCfgName TEXT, RType SMALLINT)
+       	  	  RETURNS VOID AS $$
+DECLARE
+  mcfg_id INT;
+  myrec RECORD;
+BEGIN
+  IF NOT ExistMainConfig(MCfgName) THEN
+    RAISE EXCEPTION '++++++++++++ No MainConfig w/ Name % ++++++++++++',MCfgName;
+  END IF;
+
+  SELECT MainConfigID(MCfgName) INTO mcfg_id;
+
+  SELECT INTO myrec MainConfigTable.RunType FROM MainConfigTable WHERE MainConfigTable.ConfigID = mcfg_id LIMIT 1;
+
+  IF myrec.RunType >= 0 THEN
+    RAISE EXCEPTION '++++++++++++ Cannot re-set RunType! (already a valid ID %d) +++++++++++++',myrec.RunType;
+  END IF;
+
+  UPDATE MainConfigTable SET RunType = RType WHERE ConfigID = mcfg_id;
+  UPDATE MainRun SET RunType = RType WHERE ConfigID = mcfg_id;
+
+END;
+$$ LANGUAGE PLPGSQL;
+
+--------------------------------------------------------------------
+-- ReSetRunType for MainConfig (ID)
+--------------------------------------------------------------------
+DROP FUNCTION IF EXISTS SetRunType(INT,SMALLINT);
+CREATE OR REPLACE FUNCTION SetRunType(MCfgID INT, RType SMALLINT)
+       	  	  RETURNS VOID AS $$
+DECLARE
+  mcfg_name TEXT;
+  res RECORD;
+BEGIN
+  IF NOT ExistMainConfig(MCfgID) THEN
+      RAISE EXCEPTION '++++++++++++ No MainConfig w/ ID % ++++++++++++',MCfgID;
+  END IF;
+
+  SELECT MainConfigName(MCfgID) INTO mcfg_name;
+  SELECT SetRunType(mcfg_name,RType) INTO res;
+
+END;
+$$ LANGUAGE PLPGSQL;
+
+--------------------------------------------------------------------
+-- ReSetName for MainConfig (Name)
+--------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION ResetMainConfigName(MCfgName TEXT, NewName TEXT)
+       	  	  RETURNS VOID AS $$
+DECLARE
+BEGIN
+  IF NOT ExistMainConfig(MCfgName) THEN
+      RAISE EXCEPTION '++++++++++++ No MainConfig w/ Name % ++++++++++++',MCfgName;
+  END IF;
+
+  UPDATE MainConfigTable SET ConfigName = NewName WHERE ConfigName = MCfgName;
+
+END;
+$$ LANGUAGE PLPGSQL;
+
+--------------------------------------------------------------------
+-- ReSetName for MainConfig (ID)
+--------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION ResetMainConfigName(MCfgID INT, NewName TEXT)
+       	  	  RETURNS VOID AS $$
+DECLARE
+BEGIN
+  IF NOT ExistMainConfig(MCfgID) THEN
+      RAISE EXCEPTION '++++++++++++ No MainConfig w/ ID % ++++++++++++',MCfgID;
+  END IF;
+
+  UPDATE MainConfigTable SET ConfigName = NewName WHERE ConfigID = MCfgID;
+
+END;
+$$ LANGUAGE PLPGSQL;
+
+
+--------------------------------------------------------------------
+-- ExistSubConfig w/ Name
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS ExistSubConfig(SCfgName TEXT);
 CREATE OR REPLACE FUNCTION ExistSubConfig(SCfgName TEXT) RETURNS BOOLEAN AS $$
 DECLARE
@@ -62,6 +159,9 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+--------------------------------------------------------------------
+-- ExistSubConfig w/ ID
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS ExistSubConfig(SCfgType INT);
 CREATE OR REPLACE FUNCTION ExistSubConfig(SCfgType INT) RETURNS BOOLEAN AS $$
 DECLARE
@@ -74,6 +174,9 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+--------------------------------------------------------------------
+-- ExistSubConfig w/ Name & ID
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS ExistSubConfig(SCfgName TEXT, SCfgID INT);
 CREATE OR REPLACE FUNCTION ExistSubConfig(SCfgName TEXT, SCfgID INT) RETURNS BOOLEAN AS $$
 DECLARE
@@ -92,6 +195,58 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--------------------------------------------------------------------
+-- FindSubConfig w/ Contents
+--------------------------------------------------------------------
+DROP FUNCTION IF EXISTS FindSubConfig(TEXT,HSTORE,HSTORE);
+
+CREATE OR REPLACE FUNCTION FindSubConfig( SCfgName  TEXT,
+       	  	  	   		  params    HSTORE,
+					  paramsets HSTORE )
+		  RETURNS INT AS $$
+DECLARE
+  query TEXT;
+  myrec RECORD;
+BEGIN
+
+  IF ExistSubConfig(SCfgName) THEN
+    query := format('SELECT ConfigID, Parameters AS ps, ParameterSets AS psets FROM %s;',SCfgName);
+    EXECUTE query INTO myrec;
+    FOR myrec IN EXECUTE query LOOP
+      IF params <@ myrec.ps AND params @> myrec.ps AND paramsets <@ myrec.psets AND paramsets @> myrec.psets THEN
+        RETURN myrec.ConfigID;
+      END IF;
+    END LOOP;
+  END IF;
+  RETURN -1;
+END;
+$$ LANGUAGE PLPGSQL;
+
+--------------------------------------------------------------------
+-- ExistSubConfig w/ Contents
+--------------------------------------------------------------------
+DROP FUNCTION IF EXISTS ExistSubConfig( TEXT, HSTORE, HSTORE );
+
+CREATE OR REPLACE FUNCTION ExistSubConfig( SCfgName  TEXT,
+       	  	  	   		   params    HSTORE,
+					   paramsets HSTORE )
+		  RETURNS BOOLEAN AS $$
+DECLARE
+  scfg_id INT;
+BEGIN
+
+  SELECT INTO scfg_id FindSubConfig(SCfgName,params,paramsets);
+  IF scfg_id >= 0 THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN FALSE;
+END;
+$$ LANGUAGE PLPGSQL;
+
+--------------------------------------------------------------------
+-- SubConfig Name from Type
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS SubConfigName(SCfgType INT);
 CREATE OR REPLACE FUNCTION SubConfigName(SCfgType INT) RETURNS TEXT AS $$
 DECLARE
@@ -106,6 +261,9 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+--------------------------------------------------------------------
+-- SubConfig Type from Name
+--------------------------------------------------------------------
 DROP FUNCTION IF EXISTS SubConfigType(SCfgName TEXT);
 CREATE OR REPLACE FUNCTION SubConfigType(SCfgName TEXT) RETURNS INT AS $$
 DECLARE
@@ -116,19 +274,6 @@ BEGIN
   END IF;
 
   SELECT SubConfigType FROM ConfigLookUp WHERE SubConfigName = SCfgName LIMIT 1 INTO res;
-  RETURN res;
-END;
-$$ LANGUAGE PLPGSQL;
-
-DROP FUNCTION IF EXISTS MainConfigName(MCfgName TEXT);
-CREATE OR REPLACE FUNCTION MainConfigName(MCfgName TEXT) RETURNS TEXT AS $$
-DECLARE
-  res INT;
-BEGIN
-  IF NOT ExistMainConfig(MCfgName) THEN
-    RAISE EXCEPTION '++++++++++++ No MainConfig w/ Name % ++++++++++++',MCfgName;
-  END IF;
-  SELECT INTO res ConfigID FROM MainConfigTable WHERE ConfigName = MCfgName LIMIT 1;
   RETURN res;
 END;
 $$ LANGUAGE PLPGSQL;
@@ -590,6 +735,7 @@ CREATE OR REPLACE FUNCTION InsertSubConfiguration( config_name TEXT,
   prohibit BOOLEAN;
   num_cfg_all INT;
   num_cfg_unique INT;
+  duplicate_cfg_id INT;
   BEGIN
 
   IF NOT ExistSubConfig(config_name) THEN
@@ -627,6 +773,12 @@ CREATE OR REPLACE FUNCTION InsertSubConfiguration( config_name TEXT,
   SELECT INTO num_cfg_unique COUNT(DISTINCT (SubConfigName,SubConfigID)) FROM ListDependencies(paramsets);
   IF not num_cfg_unique = num_cfg_all THEN
     RAISE EXCEPTION '++++++++++++ Duplicate Configuration Dependency! +++++++++++++';
+  END IF;
+
+  -- Make sure there is no duplication --
+  SELECT INTO duplicate_cfg_id FindSubConfig(config_name,params,paramsets);
+  IF duplicate_cfg_id >= 0 THEN
+    RAISE EXCEPTION '++++++++++++ Duplicate Configuration Contents (already exist as ID=%) +++++++++++++',duplicate_cfg_id;
   END IF;
 
   query := 'INSERT INTO '||config_name||'(ConfigID,Parameters,ParameterSets) VALUES('||config_id||','''||params||''','''||paramsets||''')';
@@ -702,6 +854,7 @@ $$ LANGUAGE plpgsql VOLATILE STRICT;
 
 ------------------------------------------------------------------------
 DROP FUNCTION IF EXISTS InsertMainConfiguration(HSTORE,TEXT);
+DROP FUNCTION IF EXISTS InsertMainConfiguration(HSTORE,TEXT,SMALLINT);
 CREATE OR REPLACE FUNCTION InsertMainConfiguration( subconfigparameters HSTORE,
        	  	  	   			    confname text,
 						    confRunType SMALLINT DEFAULT -1)
@@ -747,7 +900,7 @@ BEGIN
 
     -- 3rd CHECK:
     ---- Avoid making another main config entry with identical contents
-      FOR myrec IN SELECT * FROM ListAllMainConfigs()
+    FOR myrec IN SELECT * FROM ListAllMainConfigs()
     LOOP
       SELECT COUNT(TRUE) FROM MainConfigTable WHERE ConfigID = myrec.ConfigID INTO SubConfigCount;
       IF NOT SubConfigCount = ARRAY_LENGTH(AKEYS(subconfigparameters),1)
@@ -815,6 +968,9 @@ query TEXT;
 sub_conf_type INT;
 sub_conf_id INT;
 sub_conf_ctr INT;
+rec1 RECORD;
+rec2 RECORD;
+res INT;
 BEGIN
 
   sub_conf_type := -1;  
@@ -824,18 +980,30 @@ BEGIN
   END IF;
 
   sub_conf_id :=-1;
-
+  res := 1;
+  -- Check if this is used in MainConfig
   SELECT SubConfigID FROM MainConfigTable WHERE SubConfigType = sub_conf_type AND SubConfigID = cfg_id INTO sub_conf_id;
-
   IF sub_conf_id IS NOT NULL AND sub_conf_id >= 0 THEN
     RAISE WARNING '++++++++++++ Sub-Config %s w/ ID % currently in use within MainConfigTable! ++++++++++++',cfg_name,cfg_id;
-    RETURN 0;
+    RETURN res;
   ELSE
-    query := 'DELETE FROM ' || cfg_name || ' WHERE ConfigID = ' || cfg_id || ';';
-    EXECUTE query;
-    RETURN 1;    
-  END IF;    
-  RETURN 0;
+    res := 0;
+    -- Check if this is used by other SubConfig
+    FOR rec1 IN SELECT DISTINCT SubConfigName FROM ConfigLookUp
+    LOOP
+        query := 'SELECT ConfigID AS ParentID, ParameterSets->''' || cfg_name || ''' AS ChildID FROM ' || rec1.SubConfigName || ' WHERE ParameterSets ? ''' || cfg_name || ''';'; 
+	EXECUTE query INTO rec2;
+	IF rec2 IS NOT NULL AND rec2.ChildID::INT = cfg_id THEN
+	  RAISE WARNING 'SubConfig % is used by another SubConfig % (ID=%) and possibly others...', cfg_name,rec1.SubConfigName,rec2.ParentID;
+	  res := 1;
+	END IF;
+    END LOOP;
+    IF res = 0 THEN
+      query := 'DELETE FROM ' || cfg_name || ' WHERE ConfigID = ' || cfg_id || ';';
+      EXECUTE query;
+    END IF;
+  END IF;
+  RETURN res;
 END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
 
@@ -846,29 +1014,34 @@ DROP FUNCTION IF EXISTS CleanSubConfig( cfg_name TEXT);
 CREATE OR REPLACE FUNCTION CleanSubConfig( cfg_name TEXT ) RETURNS INT AS $$
 DECLARE
 query TEXT;
+rec RECORD;
+status INT;
+res    INT;
 sub_conf_type INT;
 sub_conf_id INT;
 sub_conf_ctr INT;
 BEGIN
 
-  sub_conf_type := -1;  
-  SELECT INTO sub_conf_type SubConfigType(cfg_name);
-  IF sub_conf_type IS NULL THEN 
-  RETURN 0;
+  IF NOT ExistSubConfig(cfg_name) THEN
+    RAISE WARNING '+++++++++++++ No such SubConfig % +++++++++++++',cfg_name;
+    RETURN 1;
   END IF;
 
-  sub_conf_id :=-1;
-  SELECT SubConfigID FROM MainConfigTable WHERE SubConfigType = sub_conf_type INTO sub_conf_id;
+  res := 0;
+  query := 'SELECT DISTINCT SubConfigID FROM ' || cfg_name || ';';
+  FOR rec IN EXECUTE query
+  LOOP
+    SELECT CleanSubConfig(cfg_name,rec.SubConfigID::INT) INTO status;
+    IF status > 0 THEN
+      res = res + 1;
+    END IF;
+  END LOOP;
 
-  IF sub_conf_id IS NOT NULL AND sub_conf_id >= 0 THEN
-    RAISE WARNING '++++++++++++ Sub-Config % currently in use within MainConfigTable! ++++++++++++',cfg_name;
-    RETURN 0;
-  ELSE
+  IF res = 0 THEN  
     query := 'DROP TABLE ' || cfg_name || ';';
     EXECUTE query;
     DELETE FROM ConfigLookUp WHERE SubConfigName = cfg_name;
-    RETURN 1;    
-  END IF;    
+  END IF;
   RETURN 0;
 END;
 $$ LANGUAGE plpgsql VOLATILE STRICT;
