@@ -27,7 +27,7 @@ namespace ubpsql{
   };
 
   /// RunType names
-  const std::string kRunTypeName[kRunTypeMax] = {"PHYSICS","CALIBRATION","TEST"};
+  const std::string kRunTypeName[kRunTypeMax] = { "Physics", "BeamOff", "TPCCalibration", "PMTCalibration", "LaserCalibration", "Noise", "Test", "Unknown" };
 }
 
 #endif
