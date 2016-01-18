@@ -2,9 +2,9 @@
 from dbtool import fcl2py,ubpsql,ask_binary
 from dbtool.colored_msg import info,warning,error
 import sys
-
+import unicodedata,copy
 db_writer = ubpsql.ConfigWriter()
-
+#db_writer.SetVerbosity(0)
 class lite_cfg(dict):
 
     def __init__(self,name='',d=dict(),level=-1):
@@ -44,17 +44,42 @@ def register_lite_cfg(cfg):
          if child_id < 0:
             return child_id
          child_cfg.append(ubpsql.SubConfig(str(key),child_id))
+      elif not type(value) == type(list()):
+
+          child_param.append((key,value))
+
       else:
-         child_param.append((key,value))
+           str_param = '['
+           for v in value: 
+               str_value = unicodedata.normalize('NFKD',v).encode('ascii','ignore')
+               str_param += str_value + ','
+           str_param=str_param[0:len(str_param)-1]
+           str_param = str_param.replace("',",',')
+           #str_param = str_param.replace("u'","")
+           str_param=str_param[0:len(str_param)]+']'
+           child_param.append((key,str_param))
 
    # See if this sub-config already exist
    #cmd='tmp_db_cfg=ubpsql.SubConfig(\'%s\',0)' % db_cfg_name
    #exec(cmd)
    tmp_db_cfg = ubpsql.SubConfig(str(db_cfg_name))
    for cfg in child_cfg:
-      tmp_db_cfg.Append(cfg)
+       #print 'cfg',cfg,type(cfg)
+       tmp_db_cfg.Append(cfg)
    for param in child_param:
-      tmp_db_cfg.Append(str(param[0]),str(param[1]))
+       key,value = (copy.copy(param[0]),copy.copy(param[1]))
+       #print 'param',param[0],'...',param[1],type(param[1])
+       if type(value) == type(list()):
+           str_param = '['
+           for v in value: 
+               str_value = unicodedata.normalize('NFKD',v).encode('ascii','ignore')
+               str_param += str_value + ','
+           str_param=str_param[0:len(str_param)-1]
+           str_param = str_param.replace("',",',')
+           #str_param = str_param.replace("u'","")
+           str_param=str_param[0:len(str_param)]+']'
+           value = str_param
+       tmp_db_cfg.Append(str(key), str(value))
    db_cfg_id = db_writer.FindSubConfig(tmp_db_cfg)
 
    if db_cfg_id >= 0: return db_cfg_id
