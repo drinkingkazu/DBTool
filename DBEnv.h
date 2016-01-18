@@ -15,14 +15,19 @@ namespace ubpsql{
 
   /// ENUM to define a run type
   enum RunType_t {
-    kPHYSICS=0,   ///< PHYSICS dude
-    kCALIBRATION, ///< CALIBRATION ma'am
-    kTEST,        ///< TEST sucker
-    kRunTypeMax   ///< max
+    kPhysics=0,        ///< PHYSICS dude
+    kBeamOff,          ///< When the beam is off
+    kTPCCalibration,   ///< TPC CALIBRATION ma'am
+    kPMTCalibration,   ///< PMT CALIBRATION ma'am
+    kLaserCalibration, ///< Laser CALIBRATION ma'am
+    kNoise,            ///< Noise sir
+    kTest,             ///< TEST sucker
+    kUnknown,          ///< who cares?
+    kRunTypeMax        ///< max
   };
 
   /// RunType names
-  const std::string kRunTypeName[kRunTypeMax] = {"PHYSICS","CALIBRATION","TEST"};
+  const std::string kRunTypeName[kRunTypeMax] = { "Physics", "BeamOff", "TPCCalibration", "PMTCalibration", "LaserCalibration", "Noise", "Test", "Unknown" };
 }
 
 #endif

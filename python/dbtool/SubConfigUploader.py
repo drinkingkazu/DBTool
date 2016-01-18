@@ -235,6 +235,10 @@ class SubConfigUploader(UBPyBase):
             if not ipcie in EnabledPCIes:
                 self.error('  Need %s PCIe for %s' % ( ipcie, istream ) )
                 return False
+            if Params[istream]['compress'] == 'true' or Params[istream]['compress'] == 'True':
+                if not Params[istream]['dmastrategy'] == 'disrespect':
+                   self.error('  dmastrategy should be disrespect when data is compressed!')
+                   return False
 
         return True
     # CheckSebAppConfig( self, cfg )
