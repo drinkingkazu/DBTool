@@ -156,26 +156,26 @@ class SubConfigUploader(UBPyBase):
 
         # Check if any slot is colliding
         slot = [ 'none' ] * 21
-        for islot in xrange( 21 ):
-            for imodule in EnabledModules:
-                if imodule in [ 'tpc', 'pmt', 'shaper' ]:
-                    loc = int(Params[imodule]['slots'], 0)
-                else:
-                    loc = int(Params[imodule]['slot'], 0)
-                if imodule in [ 'tpc', 'pmt', 'shaper' ]:
-                    if ( loc & ( 1 << islot ) ):
-                        if slot[islot] == 'none':
-                            slot[islot] = imodule
-                        else:
-                            self.error('  Slot %d have %s and %s!' %( slot[islot], imodule ) )
-                            return False
-                else:
-                    if ( loc == islot ):
-                        if slot[islot] == 'none':
-                            slot[islot] = imodule
-                        else:
-                            self.error('  Slot %d have %s and %s!' %( slot[islot], imodule ) )
-                            return False
+        # for islot in xrange( 21 ):
+        #     for imodule in EnabledModules:
+        #         if imodule in [ 'tpc', 'pmt', 'shaper' ]:
+        #             loc = int(Params[imodule]['slots'], 0)
+        #         else:
+        #             loc = int(Params[imodule]['slot'], 0)
+        #         if imodule in [ 'tpc', 'pmt', 'shaper' ]:
+        #             if ( loc & ( 1 << islot ) ):
+        #                 if slot[islot] == 'none':
+        #                     slot[islot] = imodule
+        #                 else:
+        #                     self.error('  Slot %d have %s and %s!' %( slot[islot], imodule ) )
+        #                     return False
+        #         else:
+        #             if ( loc == islot ):
+        #                 if slot[islot] == 'none':
+        #                     slot[islot] = imodule
+        #                 else:
+        #                     self.error('  Slot %d have %s and %s!' %( slot[islot], imodule ) )
+        #                     return False
 
         # Now check if the xmit is on the right of TPC/PMT FEMs, and if TPC/PMT FEMs are consecutive
         stage = 'beforeFEMs'

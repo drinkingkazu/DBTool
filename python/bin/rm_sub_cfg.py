@@ -16,7 +16,7 @@ if not sys.argv[2].isdigit():
     error('    2nd argument must be integer Sub-Config id!')
     sys.exit(1)
 cfg_id = int(sys.argv[2])
-if cfg_id < 0:
+if cfg_id < -1:
     error('    Invalid Sub-Config ID: %d' % cfg_id)
     sys.exit(1)
 if not writer.ExistSubConfig(cfg_name):
