@@ -16,6 +16,9 @@
 *~
 *.pcm
 *.swp
+*.cfg
+*.fcl
+*.main
 /doc/dOxy*
 /bin/larlite
 /build
